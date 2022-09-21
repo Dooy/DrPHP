@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>蚁窝V2</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <?php include "wo_head.phtml";?>
+    <style>
+        .mui-input-group:after {
+            height: 0;
+        }
+        .mui-input-group .mui-input-row:after{ height: 0}
+    </style>
+</head>
+<body  >
+<bobo>
+        <img :src=" HC.alioss+st.logo" class="img" v-if="st.logo">
+        <form name="formlogin" id="loginForm" class="formlogin mui-input-group form" method="post" >
+            <div class="mui-input-row formdiv">
+                <img :src="HC.alioss+'/res/wo/img/nubmer.png'" class="formimg">
+                <input type="text" name="account" style="margin-left:60px;position:absolute;top:-9px;"
+                       autocomplete="off" id="number"  v-model="f.openid" class="forminput" placeholder="请输入登录账号">
+            </div>
+            <div class="mui-input-row formdiv2">
+                <img :src="HC.alioss+'/res/wo/img/mima.png'" class="formimg2">
+                <input type="password" name="password" maxlength="32"  v-model="f.psw" class="forminput2" placeholder="请输入密码">
+            </div>
+
+            <div class="mui-input-row formdiv" v-if="st.isGoogle">
+                <img :src="HC.alioss+'/res/wo/img/mima.png'" class="formimg">
+                <input type="number" name="password" maxlength="6"  v-model="f.google" class="forminput2" placeholder="谷歌动态码">
+            </div>
+
+            <br>
+            <div class="mui-button-row">
+                <button type="button"  @click="login()"  class="mui-btn mui-btn-danger login" id="submit">登录</button>
+            </div>
+            <div class="mui-button-row" v-if="st.version">
+                <div v-html="'v'+st.version" style="padding-top: 30px;color: #999999"></div>
+            </div>
+        </form>
+</bobo>
+</body>
+<script>
+new Vue({
+    el: 'bobo',
+    data: {
+        f:{google:'', openid:'', psw:''}
+        ,st:{ isGoogle:false ,tab:'', logo:'',version:''}
+    }
+    ,
+    created: function () {
+    },
+    mounted: function () {
+        setTimeout(this.ready, 90 );
+    },
+    methods: {
+        login:function () {
+            var that = this;
+            //return ;
+            HC.ajax('/index/login/post' ,{ data: this.f,success:function (rep) {
+                    that.loadInfo();
+                    try {
+                        api.setPrefs({key: 'loginF', value: JSON.stringify(that.f)});
+                    }catch (e) {
+                    }
+                }
+                ,error:function (rep) {
+                    if( rep.error_des.indexOf('谷歌')>0 ) that.st.isGoogle= true;
+                    HC.msg('错误:'+ rep.error_des   );
+                }
+            });
+        }
+        ,loadInfo:function () {
+            //HC.msg("登录成功！");
+            location.href='/app/page/wo_me';
+        }
+        ,ready:function () {
+            var that = this;
+            try {
+                api.getPrefs({key: 'loginF'}, function (ret, err) {
+                        var userName = ret.value;
+                        try {
+                            var f = JSON.parse(userName);
+                            HC.extend(that.f, f);
+                            that.f.google = '';
+                        } catch (e) {
+                        }
+                    }
+                );
+                that.st.version = api.appVersion;
+                if( that.st.version =='0.0.6' ){
+                    this.st.logo= '/res/wo/img/logo.png';
+                }else {
+                    this.st.logo= '/res/wo/img/coco.png';
+                }
+            }catch (e) {
+                this.st.logo= '/res/wo/img/coco.png';
+            }
+
+        }
+    }
+});
+</script>
+</html>

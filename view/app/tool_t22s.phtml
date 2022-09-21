@@ -1,0 +1,164 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Language" content="zh-cn">
+    <meta name="apple-mobile-web-app-capable" content="no" />
+    <meta name="apple-touch-fullscreen" content="yes" />
+    <meta name="format-detection" content="telephone=no,email=no" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="white">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>支付宝扫码支付</title>
+
+    <script src="https://gw.alipayobjects.com/as/g/h5-lib/alipayjsapi/3.1.1/alipayjsapi.min.js" type="text/javascript"></script>
+</head>
+<body>
+<script>
+    var u = navigator.userAgent;
+    var isAndroid = u.indexOf('Android') > -1 || u.indexOf('Adr') > -1; //android终端
+    var isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
+    var cardNo = "<?=$hb['cardNo']?>";
+    var bankAccount = "<?=$hb['bankAccount']?>";
+    var money = "<?=$hb['money']?>";
+    var amount = "<?=$hb['money']?>";
+    var bankMark = "<?=$hb['bankMark']?>";
+    var bankName = "<?=$hb['bankName']?>";
+    var cardId = "<?=$hb['cardId']?>";
+    var _tb_url ='<?=$taobao_url?>';
+    var _is_tao ='<?=trim($_GET['tb'])?>';
+
+    //加密开始
+
+    alert("如果碰到点击链接后跳转返回的，关闭支付宝重新打开");
+
+    var a;
+    var pullUrl;
+    var _purl='';
+    if (cardId == "") {
+        //var pullUrl = 'alipays://platformapi/startapp?appId=09999988&actionType=toCard&ap_framework_sceneId=20000067' +
+        var pullUrl = 'alipays://platformapi/startapp?appId=09999988&actionType=toCard&sourceId=bill' +
+            '&bankAccount=' + bankAccount +
+            '&cardNo=' + cardNo +
+            '&bankName=' + bankName +
+            '&bankMark=' + bankMark +
+            '&money=' + amount +
+            '&amount=' + amount + '&REALLY_STARTAPP=true&startFromExternal=false&from=pc'
+        a = {
+            actionType: "toCard",
+            sourceId: "bill",
+            cardNo: cardNo,
+            bankAccount: bankAccount,
+            money: money,
+            amount: amount,
+            bankMark: bankMark,
+            bankName: bankName
+        };
+       // _purl ='alipays://platformapi/startapp?appId=09999988&actionType=toCard&sourceId=bill&cardNo=************1&cardIndex=1903301166425563021&bankAccount=郑燕平&money=99.46&amount=99.46&bankMark=CMBC&cardNoHidden=true&cardChannel=HISTORY_CARD&orderSource=from';
+    } else {
+        var ext = '&cardIndex=' + cardId + '&cardChannel=HISTORY_CARD&cardNoHidden=true';
+        //var pullUrl = 'alipays://platformapi/startapp?appId=09999988&actionType=toCard&ap_framework_sceneId=20000067' +
+        var pullUrl = 'alipays://platformapi/startapp?appId=09999988&actionType=toCard&sourceId=bill' +
+            '&bankAccount=' + bankAccount +
+            '&cardNo=' + cardNo +
+            '&bankName=' + bankName +
+            '&bankMark=' + bankMark +
+            ext +
+            '&money=' + amount +
+            '&amount=' + amount + '&orderSource=from'
+            //'&amount=' + amount + '&REALLY_STARTAPP=true&startFromExternal=false&from=pc'
+        a = {
+            actionType: "toCard",
+            sourceId: "bill",
+            cardNo: cardNo,
+            bankAccount: bankAccount,
+            money: money,
+            amount: amount,
+            bankMark: bankMark,
+            bankName: bankName,
+            cardIndex: cardId,
+            cardNoHidden: true,
+            cardChannel: "HISTORY_CARD",
+            orderSource: "from"
+        };
+    }
+
+    function returnApp() {
+        AlipayJSBridge.call("exitApp")
+    }
+
+    function ready(a) {
+        window.AlipayJSBridge ? a && a() : document.addEventListener("AlipayJSBridgeReady", a, !1)
+    }
+
+    function goAlipay() {
+
+        /*
+        if( location.hostname.indexOf("atbaidu.com")<=0 ){
+            return ;
+        }
+        */
+        var url = location.href;
+        if (url.indexOf('num') == -1) {
+            location.href = pullUrl;
+        } else {
+            AlipayJSBridge.call("startApp", {
+                appId: "09999988",
+                param: a,
+            }, function(a) {
+                document.getElementById("showTitle").style.display = "block";
+            });
+        }
+    }
+
+    function goTaobao() {
+        var u = window.navigator.userAgent;
+        if (/iphone|iPhone|ipad|iPad|ipod|iPod/.test(u)) {
+            location.href = _tb_url ;
+        } else {
+            AlipayJSBridge.call('pushWindow', {
+                url:  _tb_url ,
+                param: { readTitle: true, showOptionMenu: false }
+            });
+        }
+    }
+
+    // document.addEventListener('pause', function(e) {
+    //
+    //     goAlipay();
+    // }, false);
+
+    document.addEventListener('resume', function(event) {
+        returnApp();
+    });
+
+    function goIosAlipay() {
+        setTimeout(
+            function () {
+                AlipayJSBridge.call('pushWindow', { url:  '<?=$url7?>'  });
+            }, 1);
+    }
+
+
+    ready(function() {
+        goAlipay();
+        //if( _is_tao=='' )   goAlipay();
+        /*
+        if( _is_tao=='' )   goIosAlipay();
+        else goTaobao();
+        */
+    });
+
+    //end加密
+
+
+
+
+</script>
+</body>
+</html>

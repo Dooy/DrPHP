@@ -1,0 +1,271 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>上分</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <?php include "bk_head.phtml";?>
+    <style>
+        .title{
+            margin: 20px 15px 7px;
+            color: #6d6d72;
+            font-size: 15px;
+        }
+        .fade-enter-active, .fade-leave-active {
+            transition: opacity .5s;
+        }
+        .fade-enter, .fade-leave-to  {
+            opacity: 0;
+        }
+        #tabs, #tabs *{ touch-action: none; }
+        html{  touch-action: none;}
+
+        .mui-bar-tab .mui-tab-item2 .mui-icon~.mui-tab-label {
+            font-size: 11px;
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .mui-bar-tab .mui-tab-item2 .mui-icon {
+            top: 3px;
+            width: 24px;
+            height: 24px;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+        .mui-bar-tab .mui-tab-item2 {
+            display: table-cell;
+            overflow: hidden;
+            width: 1%;
+            height: 50px;
+            text-align: center;
+            vertical-align: middle;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            color: #929292;
+        }
+        .mui-bar-tab .mui-tab-item2.mui-active {
+            color: #007aff;
+        }
+        .buttons{
+            color:aquamarine;
+            font-family:'微软雅黑';
+            width:80%;
+            line-height:2em;
+            border-radius:20px;
+            background:linear-gradient(45deg,BLUE,purple);
+            border:0px solid;
+            top:25%;
+            left: 10%;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+<bobo>
+    <header class="mui-bar mui-bar-nav">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"  ></a>
+        <h1 class="mui-title">上分服务</h1>
+    </header>
+    <div v-if="st.tab=='one'" class="mui-content">
+
+        <div class="title"  >ID:{{oitem.fw_id}}</div>
+        <ul class="mui-table-view">
+            <li class="mui-table-view-cell">
+                金额：<span  v-html="oitem.realprice/100" style="color: green"></span>
+
+            </li>
+            <li class="mui-table-view-cell" >
+                付款人：<span  v-html="oitem.opt_value.beizhu" style="color: red" v-if="oitem.opt_value && oitem.opt_value.beizhu"></span>
+            </li>
+            <li class="mui-table-view-cell">
+                卡号：<span  v-html="oitem.c_id"></span>
+
+            </li>
+            <li class="mui-table-view-cell">
+                银行：<span  v-html="oitem.c_bank"></span>
+
+            </li>
+            <li class="mui-table-view-cell">
+                收款人：<span  v-html="oitem.c_name"></span>
+
+            </li>
+            <li class="mui-table-view-cell">
+                开户行：<span  v-html="oitem.c_add"></span>
+
+            </li>
+
+            <li class="mui-table-view-cell">
+                 客户：<span  v-html="oitem.user_id_merge.name"></span>(<b v-html="oitem.user_id"></b>)
+            </li>
+
+            <li class="mui-table-view-cell">
+                时间：<span  v-html="HC.dateUtils.date_format(oitem.ctime,'yyyy-MM-dd HH:mm:ss')"></span>
+            </li>
+            <li class="mui-table-view-cell">
+                状态：<span  v-html="sv.opt_type[oitem.opt_type]"></span>
+            </li>
+
+        </ul>
+        <div class="mui-content-padded" v-if="oitem.opt_type==3">
+            <button    type="button"  class="mui-btn mui-btn-block mui-btn-primary" @click="czB2(oitem,'dao')" style="padding: 10px 0"  >确认到账</button>
+            <button   type="button"  class="mui-btn mui-btn-block " @click="czB2(oitem,'bo')" style="padding: 10px 0"  >驳回</button>
+
+        </div>
+        <div class="mui-content-padded" v-else-if="oitem.opt_type==0">
+            <div style="text-align: center;padding: 20px;">正在等待客户付款</div>
+        </div>
+
+        <div  v-if="oitem.opt_value.img" style="text-align: center; padding-top: 40px;" >
+            汇款凭证： <br>
+            <a :href="HC.alioss+oitem.opt_value.img" target="_blank"> <img :src="HC.alioss+oitem.opt_value.img" style="max-width: 90%;"></a>
+        </div>
+
+    </div>
+    <div class="mui-content" v-else-if="sv.bank && sv.bank.c_id">
+        <div class="mui-content-padded">
+            当前余额：<span v-html="sv.ma.amount/100"></span>
+        </div>
+
+        <ul v-if="yesList.length" class="mui-table-view">
+            <template v-for="(v,k) in yesList" >
+
+                    <li class="mui-table-view-cell" style="height: 70px;"@click="open2dao(v)">
+                        <b style="color:#f0ad4e" v-html="v.realprice/100"></b>元
+                        <span v-if="v.opt_value && v.opt_value.beizhu" v-html="'付款人:'+ v.opt_value.beizhu "></span>
+                        <br>
+                        <span style="color: #999;font-size: 13px;"  v-html="v.c_name"></span>
+                        <span style="color: #999;font-size: 13px;"  v-html="v.c_bank"></span>
+                        <span style="color: #999;font-size: 13px;"  v-html="v.c_id"></span>
+                        <button type="button" class="mui-btn mui-btn-danger" @click="open2dao(v)">确认收款 </button>
+                    </li>
+            </template>
+        </ul>
+        <div v-else-if="sv.rank>0 && sv.rank<1000" style="padding: 20px;text-align: center">
+            正在等待会员充值，稍后会出现订单！ <br>收款请确认
+            <br><br>
+            你前面还有<b v-html="sv.rank" style="color: red"></b>人排队 <a @click="paiduiOff()">取消</a>
+        </div>
+        <div style="padding: 20px; text-align: center; " v-else>
+            <a  href="javascript:;" class=" buttons" @click="paidui()">去排队</a>
+            <br>
+            <br>点击去排队 参与派单
+            <!--
+            <div v-if="sv.px>=0" style="padding-top: 20px;">
+                当前共有<b v-html="sv.px+1" style="color:#c89e02"></b>人排队,注意时间间隔
+            </div>
+            -->
+        </div>
+
+
+        <div class="title"  @tap="location.href='/app/page/q_card'">当前收款信息，点我进行切换</div>
+        <ul class="mui-table-view mui-table-view-striped mui-table-view-condensed"  >
+            <li class="mui-table-view-cell" @tap="location.href='/app/page/q_card'">
+                <div class="mui-table"   >
+                    <div class="mui-table-cell mui-col-xs-10">
+                        <h4 class="mui-ellipsis" v-html="'卡号 '+sv.bank.c_id"></h4>
+                        <h5>收款人:<span v-html="sv.bank.c_name"></span>，银行:<span v-html="sv.bank.c_bank"></span></h5>
+                        <p class="mui-h6 mui-ellipsis" v-html="'开户行:'+sv.bank.c_add"></p>
+                    </div>
+
+                </div>
+            </li>
+        </ul>
+
+        <template v-if="sv.czList.length>0">
+            <div class="title">上分记录</div>
+            <ul   class="mui-table-view">
+                <template v-for="(v,k) in sv.czList" >
+
+                    <li class="mui-table-view-cell" style="height: 70px;"@click="open2dao(v)">
+                        <b style="color:#f0ad4e" v-html="v.realprice/100"></b>元
+                        <span v-if="v.opt_value && v.opt_value.beizhu" v-html="'付款人:'+ v.opt_value.beizhu "></span>
+                        <br>
+                        <span style="color: #999;font-size: 13px;"  v-html="v.c_name"></span>
+                        <span style="color: #999;font-size: 13px;"  v-html="v.c_bank"></span>
+                        <span style="color: #999;font-size: 13px;"  v-html="v.c_id"></span>
+                        <span class="mui-badge mui-badge-primary" style="top: 10px;" v-if="sv.opt_type[v.opt_type] && v.opt_type==1" v-html="sv.opt_type[v.opt_type] ">状态</span>
+                        <span class="mui-badge mui-badge-purple" style="top: 10px;" v-else-if="sv.opt_type[v.opt_type]" v-html="sv.opt_type[v.opt_type]">状态</span>
+                    </li>
+                </template>
+            </ul>
+        </template>
+
+    </div>
+    <div class="mui-content"   v-else>
+        <div style="padding: 20px;padding-top: 100px; text-align: center">
+            <a href="javascript:;"  @tap="location.href='/app/page/q_card'">请先设置收款信息</a>
+        </div>
+    </div>
+</bobo>
+</body>
+<script>
+new Vue({
+    el: 'bobo',
+    data: {
+        sv:{ma:{amount:0},czList:[],opt_type:{}}
+        ,yesList:[]
+        ,st:{tab:''}
+        ,oitem:{"fw_id":"1","ctime":"8","user_id":"12","c_user_id":"4","ma_user_id":"21","ma_bill_id":"54","opt_id":"55","type":"1","opt_type":"3","utime":"","realprice":"100000","c_id":"","c_name":"","c_bank":"","c_add":"","opt_value":{"beizhu":""}}
+    }
+    ,
+    created: function () {
+        this.load();
+    },
+    mounted: function () {
+        setInterval( this.load, 10*1000)
+    },
+    methods: {
+        load:function () {
+            var that = this;
+
+            HC.ajax('/fw/live' ,{ success:function (res) {
+                    console.log('live',res );
+                    that.sv= res.sv;
+                    that.yesListCheck();
+                }});
+        }
+        ,yesListCheck:function () {
+            var that = this;
+            that.yesList=[];
+            for(var p in that.sv.czList){
+                var v= that.sv.czList[p];
+                if(v.opt_type==3 || v.opt_type==0){
+                    that.yesList.push( v);
+                }
+            }
+            if( that.yesList.length==1){
+                that.open2dao( that.yesList[0]);
+            }else if(that.yesList.length==0 && this.st.tab=='one'){
+                this.st.tab='';
+            }
+            console.log('yesList' ,that.yesList );
+        }
+        ,paidui:function () {
+            var that = this;
+            HC.ajax('/fw/live/paidui' , { success:function (rep) {
+                    that.load();
+            }});
+        }
+        ,paiduiOff:function () {
+            var that = this;
+            HC.ajax( '/fw/live/paiduiOff', {success:function (rep) {
+                    that.load();
+                }});
+        }
+        ,open2dao:function (v) {
+            this.oitem =v ;
+            this.st.tab = 'one';
+
+        }
+        ,czB2:function (v,job) {
+            var that = this;
+            HC.ajax( '/fw/live/cz/'+job, {data:v,success:function (rep) {
+                    //that.load();
+                    location.href='/app/page/q_cw?tab=cz';
+                }});
+        }
+    }
+ });
+</script>
+</html>

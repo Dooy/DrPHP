@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <?php include "bk_head.phtml";?>
+
+    <style>
+        #bohe ul, #bohe li{ padding: 0 ;margin: 0; list-style: none}
+        #bohe li{width: 187px; float: left; height: 187px; position: relative }
+        @media screen  and (max-width: 374px) {
+            #bohe li{width: 50%;}
+        }
+        #bohe .title{ position: absolute;height: 20px; width: 100%; text-align: center;left: 0;bottom: 0px; background-color: rgba(0,0,0,0.2) ;color: #fff }
+    </style>
+</head>
+<body>
+<bobo>
+    <div class="mui-content">
+        <div id="video" style="height:20px;background-color:#000000;margin:auto;width: 20px;margin-top: -20px;;"></div>
+        <div id="bohe" style=" z-index: 11;">
+            <!--<ul v-if="list.length>0">
+                <li v-for="v in list" @tap="play(v)">
+                    <img :src="v.coverUrl" style="width: 100%;height: 100%">
+                    <div class="title mui-ellipsis" v-html="v.title"></div>
+                </li>
+            </ul>
+            -->
+            <template v-if="list.length>0">
+            <div v-for="(v,k) in list" class="bb_card">
+                <div class="mui-card" @tap="play(v)">
+                    <div class="mui-card-header mui-card-media" :style="{'background-image':'url('+ v.coverUrl+')'}">
+                        <template v-if="v.entity.room">
+                            <div class="fav"><i class="mui-icon icon-touch-location-sign" style="font-size: 12px;"></i> <span v-html="v.entity.room.city"  v-if="v.entity.room.city"></span></div>
+                            <div class="good"><i class="mui-icon icon-touch-user-sign" style="font-size: 12px;color: green"></i> <span v-html="v.entity.room.onlineUserCount"  ></span></div>
+                        </template>
+                        <div class="HD" v-if="v.type==1">直播</div>
+                        <div class="HD" v-if="v.type==2" style="background-color: #c0c0c0">录播</div>
+                    </div>
+                    <div class="mui-card-content">
+                        <div class="mui-card-content-inner">
+                            <p style="color: #333;" v-html="v.title"> </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </template>
+            <div v-else class="bo_loading" @tap="get163()"></div>
+            <div style="clear: both"></div>
+        </div>
+
+    </div>
+
+</bobo>
+</body>
+<script src="<?=$hc_app?>/js/ls.bohe.js<?=$local_version?>"></script>
+</html>

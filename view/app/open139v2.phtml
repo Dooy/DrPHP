@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>支付宝</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+
+    <style>
+        .p-info{ max-width: 600px; padding: 11px; text-align: left; font-size: 14px; margin: 0 auto}
+        ul,li{padding: 0;margin: 0; color: #666666; list-style: none}
+        .p-info li{padding-top: 5px;  }
+
+        .pay-btn{ background-color:#4cb9fc ; border: 1px solid #33affc; color: #fff;text-decoration:none;
+            display: inline-block; padding: 5px 14px;box-sizing: border-box; margin-bottom: 0;    font-size: 14px;            line-height: 18px;
+            text-align: center;    vertical-align: middle;    cursor: pointer;  border-radius: 2px;
+            user-select: none;width: 220px;
+        }
+        .pay-btn-back{ padding-top: 2px;  padding-bottom: 2px; font-size: 12px; width: 100px;     background-color: transparent;
+            border: 1px solid #33affc;          color: #33affc;   }
+        body{  background-color: #fff }
+
+        .toast-container {     line-height: 17px;  position: fixed; z-index: 9999; bottom: 0px;
+            left: 50%;   -webkit-transition:  .3s;   transition: .3s;  -webkit-transform: translate(-50%,0);   transform: translate(-50%,0);
+            max-width: 300px; opacity:0;
+        }
+        .toast-message{  font-size: 14px;padding: 10px 25px;  text-align: center; color: #fff; border-radius: 6px; background-color: #323232;}
+        .toast-active{ opacity:0.9; bottom: 50px; }
+
+        .pay-btn2{ background-color:#108ee9 ; border: 1px solid #108ee9; color: #fff;text-decoration:none;
+            display: inline-block; padding: 0 4px;box-sizing: border-box; margin-bottom: 0;    font-size: 17px;            line-height: 18px;
+            text-align: center;    vertical-align: middle;    cursor: pointer;  border-radius: 2px;
+            user-select: none;width: 100%; position:relative; height: 47px;    line-height: 47px;
+        }
+        .pay-btn1{ background-color:#ff9713 ; border: 1px solid #ff9713; color: #fff;text-decoration:none;
+            display: inline-block; padding: 0 4px;box-sizing: border-box; margin-bottom: 0;    font-size: 17px;            line-height: 18px;
+            text-align: center;    vertical-align: middle;    cursor: pointer;  border-radius: 2px;
+            user-select: none;width: 100%; position:relative; height: 47px;    line-height: 47px;
+        }
+
+        .pay-btn3{ background-color:#ea4a36 ; border: 1px solid #e8351f; color: #fff;text-decoration:none;
+             display: inline-block; padding: 0 4px;box-sizing: border-box; margin-bottom: 0;    font-size: 17px;            line-height: 18px;
+             text-align: center;    vertical-align: middle;    cursor: pointer;  border-radius: 2px;
+             user-select: none;width: 100%; position:relative; height: 47px;    line-height: 47px;
+         }
+        .tip p { margin: 8px 0 0 0; font-size:18px; font-weight:bold; }
+        .tip i { margin: 5px 0 0 0; font-size:16px; font-weight:bold;  color: #333333 ; display: block; font-style: normal;  }
+
+        .pay-btn-group{  border:1px solid   #33affc;  ;   display:flex ;width: 300px; margin: 5px auto; border-radius: 2px; padding: 0; }
+        .pay-btn-group .pay-btn-group-txt , .pay-btn-group .pay-btn-group-sb { display: inline-block ;padding: 5px 8px;}
+        .pay-btn-group .pay-btn-group-txt{  flex:1 1 ;vertical-align: middle; color: #ff6700;  }
+        .pay-btn-group .pay-btn-group-sb{   background-color:#4cb9fc ; border: 1px solid #4cb9fc; color: #fff;text-decoration:none;
+            display: inline-block; box-sizing: border-box; margin-bottom: 0;    font-size: 14px;            line-height: 18px;
+            text-align: center;    vertical-align: middle;    cursor: pointer;  ;
+            user-select: none; margin: 0; }
+        .pay-info{ width: 300px;  margin: 15px auto 5px auto; text-align: left;color: #333333 }
+
+        .pay-content-copy{ margin: 0 auto; padding: 20px; max-width: 440px; margin-top: 20px; background-color: #ffffff }
+
+
+    </style>
+</head>
+<body style="margin: 0 auto; background-color: #efeff4; ">
+<div class="toast-container" id="toast" ><div class="toast-message" id="toast-txt"></div></div>
+
+<div style="text-align: center;"  >
+    <div style="background-color: #ffffff ; padding-top: 5px; "><img src="/res/img/logo_alipay.jpg"  style="height: 55px"/></div>
+    <div style="background-color: #efeff4;padding-bottom: 30px;padding-top: 15px;">
+
+        <div style="padding-top: 0px">充值金额<b style="color: #ff6700; font-size: 40px" id="money"><?=$trade['realprice']/100?></b>元</div>
+        <!--
+        <div style="padding-top: 5px">充值金额：<span style="text-decoration:line-through"><?=$trade['price']/100?>元</span></div>
+        -->
+        <?php if( $client<=0): ?>
+        <div style="text-align: center; color: #666666;padding: 10px;">请使用手机支付宝扫一扫二维码</div>
+        <div style="position: relative;height: 210px;">
+            <div id="qrCode" style="text-align: center; position: absolute;left: 50%;top: 5px;margin-left: -90px;" ></div>
+        </div>
+        <?php endif; ?>
+
+        <div id="pay_main">
+            <div style="max-width: 480px; padding: 5px 20px; margin: 0px  auto 0 auto;" id="qf_btm">
+                <?php  if( $client>0 ): ?>
+
+                <?php if($url4):?>
+                <div style="text-align: center;">
+                    网页支付:获取短信验证码登录<br>
+                    <span style="color: #666666">仅首次需要验证码</span>
+                </div>
+                <div style="text-align: center;padding-top: 20px; "><button class="pay-btn2"   onclick="pay()"  >打开网页支付(成功率高)</button></div>
+
+                <?php endif;?>
+                <?php else:?>
+
+
+                <div style="text-align: center;padding-top: 5px; ">
+                    <h3>温馨提示!</h3>
+                    <div style="padding: 8px;text-align: left;  line-height: 22px;color: #DB2929;    background: #FDFBEC;    border-radius: 4px;">
+                        支付宝修改金额将不会到账，一张二维码只能使用一次，每次支付需重新获取，切勿保存二维码
+                    </div>
+                </div>
+                <?php endif; ?>
+
+            </div>
+
+
+
+            <?php if( $client>0 && $client!=101 ): ?>
+
+
+            <div class="pay-content-copy"  >
+                <div style="text-align: center">助手支付:安装后支付成功率100%</div>
+                <div style="text-align: center;padding-top: 20px; "><button class="pay-btn2"   onclick="goPlus()"  >启动支付(需要安装支付助手插件)</button></div>
+                <div style="text-align: center;padding-top: 20px; "><button class="pay-btn1"   onclick="dowload()"  >未安装插件点击下载(1.5M)</button></div>
+
+            </div>
+
+
+            <?php endif; ?>
+            <?php if( $client==101):?>
+                <div class="pay-content-copy"  >
+                    <div style="text-align: center">直接拉起支付</div>
+                    <div style="text-align: center;padding-top: 20px; "><button class="pay-btn1"   onclick="goIosPay()"  >启动支付宝</button></div>
+                </div>
+            <?php endif;?>
+
+
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+
+<script src="/res/js/qrcode.ajax.min.js"></script>
+
+
+<script src="//ip.ws.126.net/ipquery"></script>
+
+<script>
+    var st={
+        toast:document.getElementById('toast'),'toastTxt': document.getElementById('toast-txt')
+    }
+
+    function pay() {
+        location.href='<?=$url4?>';
+    }
+    function back() {
+        window.history.go(-1);return false;
+    }
+
+    function dowload() {
+        location.href='https://cdn.nekoraw.com/dl/paySafe.apk';
+    }
+    function goPlus() {
+        var sdkPayUrl = "astxq://web/webview?url=" + encodeURIComponent( '<?=$hongbao['payUrl']?>');
+        window.location.href = sdkPayUrl;
+    }
+
+    function qrCode( url_text,div_id ) {
+        var that = this;
+        //console.log( location );
+        var qrcode = new QRCode(document.getElementById( div_id ), {
+            text: url_text //location.origin  + that.qr.url
+            ,width: 180,
+            height: 180,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
+    }
+
+    function goIosPay() {
+        location.href='<?=$hongbao['payUrlV2']?>';
+    }
+
+    <?php if( $client<=0): ?>qrCode('<?=$url4?>','qrCode');<?php endif ?>
+
+
+
+    function ajax_get(url,success) {
+        var method='get';
+        var data= false ;
+        var ajax = new XMLHttpRequest();
+        if (method=='get') {
+            if (data) {
+                url+='?';
+                url+=data;
+            }
+            ajax.open(method,url);
+            ajax.send();
+        }else{
+            ajax.open(method,url);
+            ajax.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+            if (data) {
+                ajax.send(data);
+            }else{
+                ajax.send();
+            }
+        }
+        ajax.onreadystatechange = function () {
+            if (ajax.readyState==4&&ajax.status==200) {
+                var obj = JSON.parse(  ajax.responseText );
+                success( obj );
+            }
+        }
+    }
+
+    function postIP(){
+        if(lo==undefined) return ;
+        ajax_get('/api/ip/ip/<?=$DR_PVAR[1]?>/<?=$DR_PVAR[0]?>?lo='+ lo+'&lc='+ lc , function (rep) {
+            console.log( rep );
+        });
+    }
+    setTimeout(  postIP, 1000);
+
+
+    function toast( str ) {
+        st.toastTxt.innerHTML= str;
+        st.toast.classList.add('toast-active');
+        setTimeout(function () {
+            st.toast.classList.remove('toast-active');
+        },3000);
+    }
+
+    <?php if( $client!=0 ): ?>
+    //pay() ;
+    <?php endif;?>
+
+</script>
+
+
+</html>

@@ -1,0 +1,274 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>我的读书</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <?php include "bk_head.phtml";?>
+    <link rel="stylesheet" type="text/css" href="<?=$hc_app?>/css/icons-haoce.css?v=<?=$version?>" />
+    <style>
+        .me_book{padding-top: 10px; margin-top: 20px;  }
+       #me_book .me_book:first-child{ margin-top: 0; }
+       #me_book .me_book:first-child:before{height: 0; }
+
+    </style>
+</head>
+<body>
+
+
+
+<div class="mui-content" id="me">
+    <!--顶部banner图 开始-->
+    <div class="banner" style="height: 160px;">
+        <div class="banner-img" ><img :src="me.head"></div>
+        <h1 class="title mui-ellipsis-2">{{me.name}}</h1>
+        <h2 class="title2 mui-ellipsis-2">{{me.school}}</h2>
+        <div id="total">
+            <ul  class="total" >
+                <li  @tap="showMore('all')"><b>{{me_tj.book_cnt}}</b><span>图书</span></li>
+                <li  @tap="showMore('topic')"><b>{{me_tj.topic_cnt}}</b><span>主题</span></li>
+                <li  @tap="showMore('comment')"><b>{{me_tj.comment_cnt}}</b><span>回复</span></li>
+            </ul>
+        </div>
+        <div id="logo"><img :src="me.head"></div>
+    </div>
+    <!--顶部banner图 结束-->
+
+    <div id="me_book">
+        <!--我的任务 开始-->
+        <ul id="me_book_task" class="mui-table-view me_book"  v-if="me_book.length &&( show=='all' ||  show=='book')" >
+            <div class="book_task_title">
+                我的任务
+            </div>
+            <li class="mui-table-view-cell mui-media" v-for="item in me_book">
+                <a href="javascript:;"   @tap="HCBOOK.open.bookOne(item)" >
+                    <img class="mui-media-object mui-pull-left" :src="book[item.book_id].book_img">
+                    <div class="mui-media-body">
+                        <div class="mui-ellipsis-2">{{item.book_id_merge.book}}</div>
+                    </div>
+                </a>
+                    <div class="meta-info flexbox">
+                        <div class="flex"  v-if="is_myself>0" @tap="del(item)"><span class="mui-icon mui-icon-redo"></span>退选</div>
+                        <div class="flex"><span class="mui-icon mui-icon-chatbubble"></span>{{item.topic_cnt}}/{{item.comment_cnt}}</div>
+
+                        <div class="  mui-ellipsis" style="max-width: 60%" v-if="item.class_id && class2[item.class_id] ">{{ class2[item.class_id].class}}</div>
+                        <div  v-else>未入班级</div>
+
+                    </div>
+
+                <div v-if="is_myself==1 && term!=book[item.book_id].term_key" style="position: absolute; right: 0px; top: 0px; z-index: 5; font-size: 10px; background-color: rgba(0,0,0,0.2) ; width: 20px; height: 60px; line-height: 12px; padding: 5px; border-radius: 2px;">非本学期</div>
+
+            </li>
+        </ul>
+        <!--我的任务 结束-->
+
+        <!--我的主题 开始-->
+        <ul   class="mui-table-view me_book"  v-if="me_topic.list.length && ( show=='topic' ||  show=='all')">
+            <div class="book_task_title flexbox" @tap="showMore('topic')">
+                <div class="flex">我的主题</div>
+                <div  v-if="show=='all'">更多</div>
+            </div>
+            <template  v-for="item in  me_topic.list">
+            <li class="mui-table-view-cell mui-media"  v-if="book[item.book_id]" >
+                <a href="javascript:;"   @tap="HCBOOK.open.topic(item)" >
+                    <img class="mui-media-object mui-pull-left" :src="book[item.book_id].book_img">
+                    <div class="mui-media-body">
+                        <div class="mui-ellipsis-1">{{item.topic}}</div>
+                        <div class="mui-ellipsis des2">{{item.topic_info}}</div>
+                    </div>
+
+                    <div class="meta-info flexbox">
+                        <div class="flex" v-if="tag[item.tag_id]"><span class="mui-icon " :class="tag[item.tag_id].cl"></span>{{tag[item.tag_id].n}}</div>
+                        <div class="flex">回复:{{item.comment_cnt}}</div>
+                        <div  style="max-width: 50%;"> <div class="mui-ellipsis"> {{book[item.book_id].book}}</div></div>
+                    </div>
+
+                </a>
+            </li>
+            </template>
+        </ul>
+        <!--我的主题 结束-->
+
+
+        <!--我的回复 开始-->
+        <ul   class="mui-table-view me_book"   v-if="me_comment.list.length &&( show=='all' ||  show=='comment')">
+            <div class="book_task_title flexbox" @tap="showMore('comment')">
+                <div class="flex">我的回复</div>
+                <div v-if="show=='all'">更多</div>
+            </div>
+            <template v-for="item in me_comment.list">
+            <li class="mui-table-view-cell mui-media" v-if="book[item.book_id]">
+                <a href="javascript:;"   @tap="open_topic_by_comment(item)" >
+                    <img class="mui-media-object mui-pull-left" :src="book[item.book_id].book_img">
+                    <div class="mui-media-body">
+                        <div class="mui-ellipsis-2">{{item.comment}}</div>
+                    </div>
+                    <div class="meta-info flexbox">
+                        <div class="mui-ellipsis flex" v-if="item.topic_id_merge">主题：{{item.topic_id_merge.topic}}</div>
+                        <div class="mui-ellipsis flex" v-else>主题已删除</div>
+                        <div  class="flex mui-ellipsis" style="text-align: right"> {{book[item.book_id].book}}</div>
+                    </div>
+                </a>
+            </li>
+            </template>
+        </ul>
+        <!--我的回复 结束-->
+    </div>
+</div>
+</body>
+<script src="<?=$hc_app?>/js/haoce.book.js?v=<?=$version?>"></script>
+<script type="text/javascript">
+    //mui.init();
+    mui.init({
+        swipeBack:true //启用右滑关闭功能
+        , pullRefresh: {
+            container: '#me_book',
+            down: {
+                style: 'circle',
+                offset: '0px',
+                auto: true,
+                callback: function() {
+                    mui('#me_book').pullRefresh().endPulldown();
+                    if(vm.show=='all'){
+                        mui('#me_book').pullRefresh().disablePullupToRefresh();
+                    }
+                }
+            }
+            ,up: {
+                auto:false,
+                contentrefresh: '正在加载...',
+                callback: function () {
+                    if(vm.show=='all'){
+                        mui('#me_book').pullRefresh().endPullup( false );
+                        mui('#me_book').pullRefresh().disablePullupToRefresh();
+                        return ;
+                    }
+                    vm.loadMore( function () {
+                        mui('#me_book').pullRefresh().endPullup( false );
+                    })
+
+
+                }
+            }
+        }
+    });
+    var vm = new Vue({
+        el: '#me',
+        data: {
+            me:{"user_id":"0","name":"-","school":"-","psw":"","slat":"","ctime":"1503105397","last_time":"1508030636","login_cnt":"76","ts":"3","sex":"0","id_del":"0","head":"http://cdn.haoce.com/res/head/person/24.jpg","number":"","client":"0"}
+            ,me_tj:{"topic_cnt":0,"comment_cnt":0,"book_cnt":0}
+            ,me_book:[]
+            ,me_topic:{"list":[]}
+            ,me_comment:{"list":[]}
+            ,tag:{"0":{"n":"讨论","cl":"icon-tb-message"},"3":{"n":"朗读","cl":"icon-tb-we"},"4":{"n":"期中","cl":"icon-tb-refresh","n2":"期中概要"},"5":{"n":"期末","cl":"icon-tb-roundcheck","n2":"期中报告"},"6":{"n":"摘抄","cl":"icon-tb-edit"}}
+            ,book:{}
+            ,is_myself:0
+            ,class2:{}
+            ,show:'all'
+            ,page:{ page_total:0, page_no:1,page:'' }
+            ,term:''
+        }
+        ,methods:{
+            del:function ( v ) {
+                console.log( JSON.stringify( v ));
+                var btnArray = ['再考虑一下', '退选'];
+                var _self = this ;
+                mui.confirm('是否退选，确认'  , '是否退选？', btnArray, function(e) {
+                    if (e.index == 1){
+                        HC.ajax( 'book/join/del/'+v.id ,{ success:function () {
+                            console.error(  console.log( JSON.stringify( _self.me )) );
+                            HCBOOK.me.init( _self.me.user_id ,vm );
+                        }});
+                    }
+                });
+                console.log( JSON.stringify( v ));
+            }
+            ,showMore:function ( type ) {
+                vm.show= type;
+                vm.page = { page_total:0, page_no:1 };
+                if( type=='topic' || type=='comment'){ this.loadMore( function () { })}
+                if(type=='all'){
+                    mui('#me_book').pullRefresh().disablePullupToRefresh();
+                }else{
+                    mui('#me_book').pullRefresh().enablePullupToRefresh();
+                }
+
+            }
+            ,dr_load:function(e) {
+                var obj = HC.getState();
+                var user_id =  e.detail.user_id ? e.detail.user_id: obj.user.user.user_id;
+                //HC.msg('user_id : '+ user_id );
+                HCBOOK.me.init(user_id,vm );
+                this.showMore('all');
+            }
+            ,open_topic_by_comment:function (item) {
+                if(!item.topic_id_merge ){
+                    HC.msg("主题已经被删除！");
+                    return ;
+                }
+                HCBOOK.open.topic(item);
+            }
+            ,loadMore:function ( cb ) {
+                //alert(  vm.page.page_no+ ' : ' + vm.page.page_total +':'+  vm.show );
+                if( vm.page.page_no>1 && vm.page.page_no>vm.page.page_total  ){
+                    cb();
+                    HC.msg( "没有更多数据了" );
+                    return false;
+                }
+                //console.log("tag",vm.tag  );
+                HC.ajax( 'book/user/'+vm.me.user_id+'/'+ vm.show+'?pageno='+  vm.page.page_no  ,{success:function (rep) {
+                    //console.log("rep", rep );
+                    for(var p in rep.book ) vm.book[ p ]=rep.book[p];
+                    if( vm.show =='comment' ){
+                        vm.me_comment.list = vm.page.page_no==1? rep.me_comment.list : vm.me_comment.list.concat( rep.me_comment.list ) ; //
+                        vm.page.page_total= rep.me_comment.page_total;
+
+                    }else if('topic'== vm.show  ){
+                        vm.me_topic.list  = vm.page.page_no==1?  rep.me_topic.list:  vm.me_topic.list.concat( rep.me_topic.list );
+                        vm.page.page_total= rep.me_topic.page_total;
+                    }
+                    cb();
+                    vm.page.page_no++;
+
+                }} );
+            }
+        }
+    });
+
+    HCBOOK.me={
+        init:function (user_id, vm ) {
+            HC.ajax( 'book/user/'+user_id,{success:function (rep) {
+                rep.me.head= '//cdn.haoce.com/'+ rep.me.head;
+                for(var p in rep )  vm.$data[p] = rep[p];
+                if( rep.class) vm.class2= rep.class;
+            }} )
+        }
+    }
+
+    //#安卓会引起不必要的麻烦会引起
+    //if( !window.plus ) HCBOOK.me.init(5 ,vm );
+    <?php if( $_GET['web_debug']):?> HCBOOK.me.init(5 ,vm ); <?php endif ?>
+
+    mui.plusReady(function () {
+        if( HC.getWinExtras().detail.user_id ){
+            vm.dr_load( HC.getWinExtras() );
+        }else{
+            var obj = HC.getState();
+            HCBOOK.me.init( obj.user.user.user_id ,vm );
+        }
+
+
+        //HCBOOK.preload.topic();
+    })
+
+    //监听自定义事件，用去其他页面来控制
+    document.addEventListener('dr_load',  vm.dr_load );
+    document.addEventListener('topRight', function(event) {
+        //open_re_comment();
+    });
+
+    HC.realBack();
+</script>
+
+
+</html>

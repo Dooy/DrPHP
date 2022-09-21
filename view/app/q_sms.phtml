@@ -1,0 +1,347 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>HI PAY</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <?php include "bk_head.phtml";?>
+    <style>
+        .title{
+            margin: 20px 15px 7px;
+            color: #6d6d72;
+            font-size: 15px;
+        }
+        .fade-enter-active, .fade-leave-active {
+            transition: opacity .5s;
+        }
+        .fade-enter, .fade-leave-to  {
+            opacity: 0;
+        }
+        .q_warng{  margin: 10px 15px 7px;  color: #ff7300; font-size: 15px;  }
+
+        .q_time{position: absolute; right: 83px; top: 11px;}
+        .q_btn{ position: absolute; right: 10px;top: 13px; }
+        .mui-popup-input input{ height: 40px; font-size: 20px;  font-weight:bolder; }
+    </style>
+</head>
+<body>
+<bobo>
+    <header class="mui-bar mui-bar-nav">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+        <h1 class="mui-title">核销短信收集V2</h1>
+    </header>
+    <div class="mui-content">
+        <div class="mui-input-group" style="margin-top: 5px; ">
+            <!--
+            <div class="mui-input-row">
+
+                <input type="text" placeholder="店铺登录号" v-model="f.mobile">
+            </div>
+            -->
+            <div class="mui-button-row">
+                <button type="button" class="mui-btn mui-btn-primary" @click="start()">开始监听</button>
+                <button type="button" class="mui-btn " @click="clear()">清空</button>
+
+                <button type="button" class="mui-btn " @click="openLogin( )">淘宝</button>
+                <button type="button" class="mui-btn " @click="closeTaobao( )">关闭</button>
+
+
+                <!--
+
+                <button type="button" class="mui-btn " @click="test( )">Test</button>
+-->
+                <!--
+                <button type="button" class="mui-btn " @click="getAll('today')">当日</button>
+                <button type="button" class="mui-btn " @click="getAll('yesterday')">昨日</button>
+                -->
+             </div>
+        </div>
+
+        <div class="title">状态:
+            <span v-if="st.isListening">监听</span>
+            <span v-else style="color: red">未开启</span>，
+            收到短信:<span v-html="f.cnt"></span>条，
+            淘宝:<span v-if="f.code">已登录</span><span v-else style="color: red">未登录</span>
+        </div>
+
+        <ul class="mui-table-view">
+
+            <li class="mui-table-view-cell mui-media" v-for="v in list">
+                <a href="javascript:;" @click="post(v)">
+                    <div class="mui-media-body">
+                        <span style="color: #22cd6e" v-if="v.type_stat>0">[成功]</span>
+                        <span style="color: red" v-if="v.type_stat<0">[失败]</span>
+                        <span style="color: #999999" v-if="v.type_stat==0">[核销中]</span>
+
+                        <span v-html="v.code" v-if="v.code"></span>
+                        <span v-html="v.strAddress" v-else></span>
+                        <p class='mui-ellipsis' v-html="v.rz + v.strbody"> </p>
+                        <span v-html="HC.dateUtils.date_format(v.strDate/1000,'HH:mm')" style="position: absolute;right: 10px; font-size: 13px; top: 8px; color: #999999"></span>
+                    </div>
+                </a>
+            </li>
+
+        </ul>
+
+
+    </div>
+</bobo>
+</body>
+
+<script>
+    new Vue({
+        el: 'bobo',
+        data: {
+            st:{ bekeerSMS:null ,isListening: false }
+            ,f:{mobile:'test',cnt:0,code:''}
+
+            ,list:[{ code:'2843496480',rz:'',tel:'gdd', type_stat:0 , strAddress: '13912345',strbody:'【淘宝网】验证码2843496480.您已成功.这是测试点我提交！]', strType:'接收',strDate: 1569335996000}] //
+        }
+        ,
+        created: function () {
+        },
+        mounted: function () {
+        },
+        methods: {
+            clear:function(){
+              this.list=[];
+            }
+            ,test:function () {
+                //var v={'code':'1234568'};
+                var v= this.list[0];
+
+                this.pushItem(  this.list[0]);
+
+
+                //alert( n );
+                //this.postCode(v);
+            }
+            ,openLogin:function(){
+                //this.closeTaobao();
+                this.openTaobao();
+                var that = this;
+                var url= 'https://ma.taobao.com/consume/code.htm' ;
+                api.ajax({
+                    url: url,
+                    method: 'get'
+                }, function(ret, err) {
+                    if (ret) {
+
+                        var str = ret.body ;//that.cut(ret.body,'window._data =','};');
+                    } else {
+                        var str = err.body ;//that.cut(err.body,'window._data =','};');
+                    }
+                    //alert( str );
+                    var code= that.cut(str, "name='_tb_token_' type='hidden' value='","'" );
+                    //alert( code );
+                    that.f.code= code;
+                });
+
+            }
+            ,closeTaobao:function () {
+                api.closeFrame({
+                    name: 'taobao'
+                });
+            }
+            ,openTaobao:function(){
+                api.openFrame({
+                    name: 'taobao',
+                    url: 'https://trade.taobao.com/trade/itemlist/list_sold_items.htm',//'https://login.taobao.com/member/login.jhtml?redirectURL=https%3A%2F%2Fwww.taobao.com%2F',
+                    //url: 'https://ma.taobao.com/consume/code.htm?spm=0.0.0.0.KMy4O7',
+                    //url: 'html/test.html',
+                    headers:{'User-Agent':'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.75 Safari/537.36'}
+                    ,bounces: true,
+                    rect: { // 推荐使用Margin布局，用于适配屏幕的动态变化
+                        marginTop: 400, // main页面距离win顶部的高度
+                        marginBottom: 0, // main页面距离win底部的高度
+                        w: 'auto' // main页面的宽度 自适应屏幕宽度
+                    }
+                });
+            }
+            ,postCode:function (v, action ) {
+                //【淘宝网】验证码2843496480.您已成功订购zhanghanfyj提供的牙膏盒,有效期2019-09-25~2019-12-23,如有疑问,请联系卖家.查看券详情：http://m.tb.cn/a.1sRa [风险提示：提供验证码即视为确认收货！]
+                var that = this;
+                if( that.f.code==''){
+                    HC.msg('请先登录淘宝');
+                    return ;
+                }
+                var url= 'https://ma.taobao.com/consume/code.htm' ;
+
+
+                if( 'consume/confirm_action'== action ){
+                    var ddata= {
+                        '_tb_token_': that.f.code
+                        ,'action': action
+                        ,'code': v.code
+                        ,'consumeNum': '1'
+                        ,'mobile':''
+                        ,'event_submit_do_confirm':'提交'
+                    };
+                }else{
+                    var ddata= {
+                        '_tb_token_': that.f.code
+                        ,'action': action //'consume/code_action'
+                        ,'_fm.cod._0.co': v.code
+                        ,'_fm.cod._0.m': ''
+                        ,'event_submit_do_validate_code':'提交'
+                    };
+                }
+                api.ajax({
+                    url: url,
+                    method: 'POST'
+                    ,charset:'gbk'
+                    //,dataType:'text'
+                    ,headers:{
+                        'User-Agent':'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.75 Safari/537.36'
+                        ,'referer':url
+                        ,'origin':'https://ma.taobao.com'
+                    }
+                    ,data: {
+                        values:ddata
+                    }
+                }, function(ret, err) {
+                    if (ret) {
+
+                        var str = ret.body ;//that.cut(ret.body,'window._data =','};');
+                    } else {
+                        var str = err.body ;//that.cut(err.body,'window._data =','};');
+                    }
+
+                    //HC.ajax('/client/hxsms' ,{data: {god:str } ,success:function (rep) {   }});
+
+                    var mmst='';
+
+                    //alert( str );
+                    mmst= that.cut(str,'核销成功啦，已消费','份');
+                    if(mmst){
+                        mmst = '核销成功:'+mmst ;
+                        v.type_stat=1;
+
+                    }
+                    if(!mmst) {
+                        mmst = that.cut(str, '还有', '份未使用');
+                        if (mmst) {
+                            mmst = '1分未使用';
+                            //alert(mmst );
+                            if (action == 'consume/code_action') that.postCode(v, 'consume/confirm_action');
+                            return;
+                        }
+                    }
+                    if( !mmst) mmst = that.cut(str,'<em id="J_ConsumeMsg">','</em>');
+                    if(mmst) {
+                        mmst = mmst.replace("\n", '').replace("\t", '');
+                        v.rz = mmst;
+                        if( mmst.indexOf('已被核销')>0 )  v.type_stat=1;;
+                    }else{
+                        v.rz = '可能没登录淘宝';
+                    }
+                    if( v.type_stat<=0)  v.type_stat=-1;
+                    //alert(mmst );
+
+
+
+                });
+            }
+            ,start:function () {
+                var that = this;
+                if( this.f.code=='' ){
+                    HC.msg('请先登录淘宝');
+                    this.openLogin();
+                    return;
+                }
+                this.closeTaobao();
+                console.log("开始监听");
+
+                if( this.st.isListening){
+                    HC.msg('已经开始监听了');
+                    return;
+                }
+
+                // moduleSMSListening
+                var  bekeerSMS = this.loadMd();
+                bekeerSMS.startListening(function (ret, err) {
+                    that.st.isListening=false;
+                    that.start();
+                    if(err){
+                        alert('或者短信失败错误');
+                    }else{
+                        //alert( JSON.stringify( ret));
+                        that.f.cnt++;
+                        that.pushItem( ret );
+                    }
+                });
+                //HC.msg('监听开始');
+                this.st.isListening= true;
+            }
+            ,loadMd:function () {
+                if( this.st.bekeerSMS==null  )     this.st.bekeerSMS= api.require('moduleSMSListening');
+                return    this.st.bekeerSMS;;
+            }
+            ,cut:function (str,start,end) {
+                var s_pos= str.indexOf( start);
+                if(s_pos<0)  return  false;
+                s_pos+= start.length ;
+                var e_pos= str.indexOf(end, s_pos );
+                if(e_pos<0)  return  false;
+
+                return str.substr(s_pos,e_pos-s_pos );
+            }
+            ,getAll:function () {
+                HC.msg("正在开发");
+                return ;
+                var that = this;
+                var  bekeerSMS = this.loadMd();
+                var param = {
+                    address :'',
+                    body:'',
+                    startDate:'',
+                    endDate:'',
+                    type:'',
+                    order:''
+                }
+                bekeerSMS.getMsg(param,function (ret, err) {
+                    if (err) {
+                        alert('获取错误');
+                    }else{
+                        //
+
+                        alert(  JSON.stringify( ret.contact ) )
+                        //var obj= JSON.parse(ret.contact  );
+                        //alert( obj .length );
+                        //for( var p  in ret.contact ) that.pushItem( ret.contact[p] );
+                    }
+                });
+            }
+            ,pushItem:function (v) {
+                v.tel= this.f.mobile;
+                var n= v.strbody.match(/【淘宝网】验证码(\d+).您/g);
+                if(n==null) return ;
+
+                v.code= this.cut(  v.strbody ,'【淘宝网】验证码','.' );
+                v.type_stat=0;
+                v.rz='';
+                this.list.unshift( v);
+                this.post( this.list[ 0] );
+            }
+            ,post:function (v) {
+                /**
+                setTimeout(function ( ) {
+                    v.type=1;
+                }, 1000);
+                 */
+                if( v.type_stat>0 ){
+                    HC.msg('已成功了');
+                    return ;
+                }
+                v.type_stat=0;
+                //this.postCode(v ,'consume/code_action');
+                this.postCode(v ,'consume/confirm_action');
+                HC.ajax('/client/hxsms' ,{data: v ,success:function (rep) {
+                    //v.type_stat=1;
+                    }});
+            }
+
+        }
+    });
+</script>
+</html>

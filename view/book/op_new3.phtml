@@ -1,0 +1,82 @@
+
+<form id="topic-from" class="sui-form" action="<?='modify'!= $p[0]?R('book/topicAdd/tag3'):R('book/topicModify/'. $topic['topic_id'])?>" style="display: <?=$is_display?>">
+    <div class="dr-from-group"><textarea class="input-100   " placeholder="请贴入朗读内容，建议使用APP完成朗读"   name="topic_info" id="topic_info" style="min-height: 80px;"><?=$topic['topic_info']?></textarea></div>
+    <div class="control-group flexbox">
+        <div class="flex">
+            <label class="checkbox-pretty inline  <?php if(isset($topic['attr'][33])): ?>checked <?php endif;?>">
+                <input type="checkbox" name="attr[stop]" value="1" <?php if(isset($topic['attr'][33])): ?>checked <?php endif;?>><span>禁止回复</span>
+            </label>
+            <label class="checkbox-pretty inline <?php if( '1'== $topic['type'] ): ?>checked <?php endif;?>">
+                <input type="checkbox"  name="type" value="1" <?php if(  '1'== $topic['type'] ): ?>checked <?php endif;?>><span>不公开，仅老师可见</span>
+            </label>
+
+        </div>
+        <div class="des2"> 已输入<span class="wordcount">0</span>字</div>
+
+    </div>
+    <input type="hidden" value="<?=$tag_id?>" name="tag_id" id="tag_id" />
+    <input type="hidden" value="<?=$book['book_id']?>" name="book_id"  />
+    <input type="hidden" value="<?=$book['word_cnt']?>" name="word_cnt" id="word_cnt"  />
+    <input type="hidden" value="" name="file" id="new_file"  />
+
+    <div class="flexbox">
+        <div class="flex">
+             <!--<button    class="sui-btn btn-primary" id="recode_ying" title="仅支持mp3、mp4">录音发布</button>-->
+        </div>
+        <div >
+            <span class="sui-text-disabled">格式为mp3<span class="hide-min">，大小不超过10M</span></span>
+            <button    class="sui-btn btn-danger" id="upload_ying" title="格式为mp3、mp4，大小不超过10M">上传发布</button>
+            <button class="sui-btn  btn-primary   dr-submit" style="display: none"><?php if('modify'== $p[0]): ?>修改<?php else: ?>发布<?php endif;?></button>
+
+        </div>
+    </div>
+</form>
+<script src="<?=$_cdn?><?=$WWW_RES?>/mp3recorder/js/recorder.js?d=2017110902"></script>
+<script src="<?=$_cdn?><?=$WWW_RES?>/mp3recorder/js/haoce.recorder.js?d=2017110601"></script>
+
+<script>
+    $(function () {
+        var ui= {
+            'tblist': $('#new-topic-tab li'),
+            'tag_id': $('#tag_id'),
+            'sbmit':$('.dr-submit')
+            ,'wordcount':$('.wordcount')
+            ,'topic_info':$('#topic_info')
+            ,'word_cnt':$('#word_cnt')
+            ,'new_file':$('#new_file')
+            ,'recode':$('#recode_ying')
+            ,fun:{}
+        };
+        ui.tblist.click( function () {
+            var that = $(this);
+            ui.tblist.removeClass('active');
+            that.addClass( 'active');
+            ui.tag_id.val( that.data('v') );
+        });
+
+        ui.fun.submit = function () {
+            //DR.ajaxAndValidate( 'topic-from' );
+            var str = ui.topic_info.val();
+            var wCnt =  DR.wordCount( str);
+            ui.word_cnt.val( wCnt );
+            DR.ajaxForm( 'topic-from' );
+            return false ;
+        }
+
+        ui.sbmit.click( ui.fun.submit );
+
+        ui.recode.click(function () {
+            goRecode({ 'topic_info': ui.topic_info.val() ,'book_id':'<?=$book['book_id']?>'});
+            return false;
+        });
+        var wordFun= function () {
+            var str = ui.topic_info.val();
+            var wCnt =  DR.wordCount( str);
+            ui.wordcount.html( wCnt);
+        }
+        ui.topic_info.keyup( wordFun );
+        wordFun();
+
+        yinUpload('<?=R('ajax/upload/topic_tag3')?>' ,ui );
+    });
+</script>

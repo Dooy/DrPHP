@@ -1,0 +1,73 @@
+
+<div class="dr-min">
+    <ul class="sui-nav nav-list nav-xlarge">
+        <li class="nav-header"><h1>登录前</h1></li>
+        <li  ><a href="<?=R('reg')?>">注册</a></li>
+        <li><a href="<?=R('forgot')?>">找回密码</a></li>
+        <li><a href="<?=R('login')?>">登录</a></li>
+        <li><a href="<?=R('logout')?>">登出</a></li>
+        <li class="nav-header"><h1>登录后</h1></li>
+        <li  ><a href="<?=R('member/setting')?>#index">修改密码</a></li>
+        <li  ><a href="<?=R('member/setting')?>#profile">完善资料</a></li>
+        <li  ><a href="<?=R('member/setting')?>">修改头像</a></li>
+
+        <li class="nav-header"><h1>老师</h1></li>
+        <li  ><a  href="<?=R('cls/new')?>">新建班级</a></li>
+        <li  ><a  href="<?=R('cls/tmy')?>">我的班级</a></li>
+        <li  ><a  href="<?=R('cls/tmy2')?>">归档班级</a></li>
+
+        <li class="nav-header"><h1>学生</h1></li>
+        <li  ><a  href="<?=R('cls/join/4')?>">加入班级 </a></li>
+        <li  ><a  href="<?=R('cls/my')?>">我的班级 </a></li>
+
+        <li class="nav-header"><h1>后台功能</h1></li>
+        <li  ><a  href="<?=R('hcadmin/know')?>">知识点分类 </a></li>
+        <li  ><a  href="<?=R('hcadmin/know/modify?id=1')?>">修改知识点 </a></li>
+
+
+
+        <li class="nav-header"><h1>功能测试</h1></li>
+        <li  ><a id="ajax">ajax测试</a></li>
+        <li  ><a id="ajaxerrr">ajax测试返回错误</a></li>
+        <li  id="uploadcontent"><a id="upload" >上传文件</a></li>
+        <li  id="uploadcontent"><a id="txUpload" >上传文件Cos</a></li>
+        <li  id="uploadcontent"><a id="cfsUpload" >上传文件CFS</a></li>
+        <li  ><a href="/error">redirect错误提示</a></li>
+
+        <li class="nav-header"><h1>动作测试</h1></li>
+        <li  ><span  class="go-zan dr-pointer" id="zan1" style="position: relative; ">赞</span></li>
+
+
+    </ul>
+    <div style="margin-top: 20px;"></div>
+    分页：  <?=$page['page']?>
+</div>
+<script type="text/javascript" src="<?=$_cdn?><?=$WWW_RES?>/js/plupload/plupload.full.min.js"></script>
+<script>
+    $(function () {
+        $('#ajax').click(function (){
+            DR.ajax('/ajax/test');
+        });
+        $('#ajaxerrr').click(function () {
+            DR.ajax('/ajax/test/2');
+        });
+       DR.uploadone( 'upload',{url:'/client/upload',cb:function (rep) {
+           alert(rep.file )
+       },query:'abc=123'} );
+
+        DR.uploadone( 'txUpload',{url:'/ajax/txUpload',cb:function (rep) {
+            alert(rep.file )
+        },query:'abc=123'} );
+        DR.uploadone( 'cfsUpload',{url:'/ajax/cfsUpload',cb:function (rep) {
+            alert(rep.file )
+        },query:'abc=123'} );
+
+       $('#zan1').click( function () {
+           var that = $(this);
+           //var cname = that.cl
+           that.toggleClass('go-zan');//removeClass( 'go-zan').addClass('go-zan')
+           //that.toggleClass('go-zan-del');//removeClass( 'go-zan').addClass('go-zan')
+       });
+    });
+
+</script>

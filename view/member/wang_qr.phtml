@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>旺信产码</title>
+
+    <!--标准mui.css-->
+    <link rel="stylesheet" href="/res/mui/css/mui.min.css">
+    <script src="/res/js/mui.min.js"></script>
+    <script src="/res/js/vue.min.js"></script>
+    <script src="/res/js/hc_v2.js?d=20180722"></script>
+
+    <script src="/res/js/qf.icomet.js?d=123"></script>
+
+    <style>
+        .pay-btn-group-sb{   background-color:#4cb9fc ; border: 1px solid #4cb9fc; color: #fff;text-decoration:none;
+            display: inline-block; box-sizing: border-box; margin-bottom: 0;    font-size: 12px;            line-height: 12px;
+            text-align: center;    vertical-align: middle;    cursor: pointer;  float: right ;
+            user-select: none; margin: 0; }
+
+        .toast-container {     line-height: 17px;  position: fixed; z-index: 9999; bottom: 0px;
+            left: 50%;   -webkit-transition:  .3s;   transition: .3s;  -webkit-transform: translate(-50%,0);   transform: translate(-50%,0);
+            max-width: 300px; opacity:0;
+        }
+        .toast-message{  font-size: 14px;padding: 10px 25px;  text-align: center; color: #fff; border-radius: 6px; background-color: #323232;}
+        .toast-active{ opacity:0.9; bottom: 50px; }
+
+        table{width: 100%}
+        table th,td{ text-align: center}
+
+    </style>
+</head>
+
+<body>
+<bobo>
+        <header class="mui-bar mui-bar-nav">
+            <button class="mui-btn mui-btn-blue mui-btn-link mui-btn-nav mui-pull-left"><span class="mui-icon mui-icon-loop" @click="location.reload()">刷新</span></button>
+            <h1 class="mui-title"><span v-html="sv.acc.account"></span>码池管理统计</h1>
+        </header>
+    <div class="mui-content">
+
+        <div class="mui-content-padded">
+             总码：<span v-html="sv.all_cnt"></span>, 有效<span v-html="sv.yes_cnt"></span>
+        </div>
+
+        <div class="mui-content-padded">
+            <template v-if="st.create>0">
+                <button type="button" @click="stop()" class="mui-btn mui-btn-danger" v-html="'停止'+(st.create/100)+'元的产码'">
+
+                </button>
+            </template>
+            <template v-else>
+                <button  v-for="v in sv.moban" class="mui-btn mui-btn-primary"  v-html="(v/100)+'元'" @click="createQr(v)" style="margin-left: 10px;margin-bottom: 10px;"></button>
+            </template>
+        </div>
+
+        <!--
+
+        <template v-if="sv.qr && sv.qr.length">
+        <div class="mui-card" v-for="(v,k) in sv.qr" >
+            <div class="mui-card-content">
+                <div class="mui-card-header" v-html=" title(v,k)" ></div>
+                <div class="mui-card-content-inner">
+                    <div    :id="'qr_'+k"></div>
+                </div>
+                <div class="mui-card-footer">
+                    <a class="mui-card-link" @click="del(v,k)">删除</a>
+                    <a class="mui-card-link"  @click="update(v)">更新</a>
+                </div>
+            </div>
+        </div>
+        </template>
+        -->
+        <div class="mui-content-padded"  v-if="imsg.length">
+            日志：
+            <div v-html="v" v-for="v in imsg" style="font-size: 12px;color: #666666;border-bottom: 1px dotted #999999"></div>
+        </div>
+        <table v-if="sv.tj">
+            <tr>
+             <th>面值</th>
+             <th>有效</th>
+             <th>使用中</th>
+             <th>过期</th>
+             <th>成功</th>
+             <th>无短信</th>
+            </tr>
+
+            <tr v-for="(v,k) in sv.tj">
+                <td ><span v-html="k/100"></span>元</td>
+                <td ><span v-html="v[139][0].cnt" v-if="v[139]"></span><span v-else>-</span></td>
+                <td ><span v-html="v[138][0].cnt" v-if="v[138]"></span><span v-else>-</span></td>
+                <td ><span v-html="v[137][0].cnt" v-if="v[137]"></span><span v-else>-</span></td>
+                <td ><span v-html="v[136][0].cnt" v-if="v[136]"></span><span v-else>-</span></td>
+                <td ><span v-html="v[135][0].cnt" v-if="v[135]"></span><span v-else>-</span></td>
+            </tr>
+
+        </table>
+    </div>
+</bobo>
+</body>
+<script src="/res/js/qrcode.ajax.min.js"></script>
+<script>
+new Vue({
+    el: 'bobo',
+    data: {
+        sv:<?=json_encode($sv)?>
+        ,st:{create:0 ,timer:null }
+        ,up:{total:0, k:0, txt:'一键更新' }
+        ,imsg:[]
+    }
+    ,
+    created: function () {
+    },
+    mounted: function () {
+        //setTimeout( this.initImg ,300);
+
+        this.startIComet( this.sv.acc.ali_uid);
+    },
+    methods: {
+         qrCode:function( url_text,div_id ) {
+            var qrcode = new QRCode(document.getElementById( div_id ), {
+                text: url_text //location.origin  + that.qr.url
+                ,width: 180,
+                height: 180,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+        }
+        ,stop:function () {
+            this.imsg.unshift("结束："+(this.st.create/100)+'元');
+            this.st.create=0;
+        }
+        ,createQr:function (v) {
+             this.imsg.unshift("开始："+(v/100)+'元');
+            var that = this;
+            that.st.create =v;
+            that.createItem();
+            that.st.timer= setInterval( that.createItem, 2000);
+
+        }
+        ,createItem:function () {
+             var that = this;
+            if(that.st.create==0){
+                clearInterval( that.st.timer );
+                return
+            }
+            HC.ajax('/member/wang/create/'+that.sv.acc.account_id+'/'+ that.st.create );
+            //console.log( that.sv.acc );
+        }
+        ,startIComet:function ( c_user_id) {
+            var that = this;
+            //that.st.isStartIComet= c_user_id ;
+            console.warn("cuser_id="+ c_user_id  );
+            var comet = new iComet({
+                channel: 'WX'+c_user_id ,
+                signUrl: '/icomet/sign',
+                subUrl: '/icomet/sub',
+                callback: function(content){
+                    console.warn('icommet:'+ content);
+                    that.imsg.unshift( content );
+                }
+            });
+
+        }
+        ,title:function (v,k) {
+             //HC.dateUtils.date_format v.ctime
+            //return v.ctime ;
+            var ctime= parseInt(v.ctime );
+            var outtime= ctime+5*3600*24 ;
+            var outtime2= ctime+ 4*3600*24 ;
+            var n= (k+1)+'号群 ';
+            if( HC.timenow()> outtime  ) return n+'已经过期  <span class="mui-badge mui-badge-danger">已过期</span>';
+            if( HC.timenow()> outtime2 )  return n+'创建：'+ HC.dateUtils.date_format(  ctime,'yyyy-MM-dd HH:mm:ss')+' <span class="mui-badge mui-badge-danger">即将过期</span>' ;
+            var str=  n+'创建：'+ HC.dateUtils.date_format(  ctime,'yyyy-MM-dd HH:mm:ss');
+            if( v.type!=150){
+                str=n+'单号：'+v.ali_beizhu +' <span class="mui-badge mui-badge-purple">使用中</span>';
+            }
+            return str;
+        }
+        ,initImg:function () {
+             for(var p in this.sv.qr ){
+                 var d= this.sv.qr[p];
+                 var id = 'qr_'+p;
+                 this.qrCode(d.data.qr , id );
+             }
+        }
+
+        ,update:function (v) {
+             //HC.msg("还在开发中");
+            HC.ajax('/member/aliqr/update',{data:v  });
+        }
+        ,del:function (v,k ) {
+             var f= confirm("确定要删除？");
+             if(f){
+             }
+        }
+        ,updateAll:function () {
+
+             //(v,k) in sv.qr
+            var that = this;
+            that.up.txt='马上开始';
+
+            if( that.up.k>0 ){
+                HC.msg("正在更新");
+                return ;
+            }
+
+            var sum=function () {
+                if(  that.up.k==that.sv.qr.length ){
+                    that.up.txt='完成 请刷新';
+                    return;
+                }
+                var v= that.sv.qr[ that.up.k ];
+                HC.ajax('/member/aliqr/update',{data:v  });
+                that.up.k++;
+                that.up.txt= "更新中" + that.up.k+'/'+ that.sv.qr.length ;
+                setTimeout( sum, 1000+ parseInt(Math.random()*1000) );
+
+            }
+            sum();
+        }
+
+    }
+});
+</script>
+</html>

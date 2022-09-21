@@ -1,0 +1,186 @@
+<?php if( $term_conf['is_school_user']<=0 && !$isSchoolAll  ):?>
+<div style="margin:0 auto; width: 400px;">
+    <h1 class="sui-text-center">开通白名单说明</h1>
+    <p>1.开通后学生注册进来，必须填写<span  class="sui-text-danger">匹配学号</span>，不然学生无法使用系统</p>
+    <p>2.开通后必须导入学生资料（学号、姓名、班级、年级、任课老师），不然无法匹配</p>
+    <p class="sui-text-center"> <a href="javascript:;" class="sui-btn btn-primary ajax-url" data-url="<?=R($_c.'/schoolUser/open')?>">开通</a> </p>
+</div>
+<?php else:?>
+    <div style="padding: 8px 5px 5px 0px;">
+
+        <div class="pull-left">
+            <form id="user-search" action="<?=R($_c.'/'.$_a.'/search?block_id='.$_GET['block_id'])?>"  class="sui-form pull-left">
+                <select name="sq">
+                    <?php foreach ($sq as $k=>$v): ?>
+                        <option value="<?=$k?>" <?php if($k==$get['sq']):?>selected<?php endif;?> ><?=$v?></option>
+                    <?php endforeach; ?>
+                </select>
+                <input type="text" placeholder="班级名称" class="input-medium" name="q" value="<?=$get['q']?>">
+                <button type="submit" class="sui-btn ">查找</button>
+            </form>
+        </div>
+
+        <div class=" pull-right" style="padding: 3px 0 0 3px;">
+            <a class="sui-btn  btn-bordered" href="/school/<?=$_a?>?isNull=1&block_id=<?=$_GET['block_id']?>">仅看未加入</a>
+
+            <button   class="sui-btn  pl"  data-url="<?=R($_c.'/schoolUser/plDel')?>">批量删除</button>
+
+            <button id="upload" class="sui-btn   ">白名单导入</button>
+            <a href="/res/school_user.xlsx">模板下载</a>
+        </div>
+        <div style="clear: both"></div>
+    </div>
+    <?php if($schoolUser['list']):?>
+<table class="sui-table table-bordered">
+    <thead>
+    <tr>
+        <th><label data-toggle="checkbox" class="checkbox-pretty inline  " >
+            <input type="checkbox"  value="<?=$var['id']?>"  id="s_all"><span>#</span>
+            </label> </th>
+        <th>学号</th>
+        <th>姓名</th>
+        <th>班级</th>
+        <?php if($isMjClass):?><th>自然班</th><?php endif;?>
+        <th>班群号</th>
+        <th>年级</th>
+        <th>任课教师</th>
+        <th>选书</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <?php foreach ($schoolUser['list'] as $k=> $var ):?>
+        <tr>
+            <td>
+                <?php if($var['user_id']>0):?>
+                <label data-toggle="checkbox" class="checkbox-pretty   disabled">
+                    <input type="checkbox"  disabled=""><span><?=$k+1?></span>
+                </label>
+                <?php else:?>
+                <label data-toggle="checkbox" class="checkbox-pretty inline  dr-checkbox-w">
+                    <input type="checkbox"  value="<?=$var['id']?>" class="dr-checkbox"><span><?=$k+1?></span>
+                </label>
+                <?php endif;?>
+            </td>
+            <td><?=$var['number']?></td>
+            <td><?=$var['name']?></td>
+            <td class="dr-chang-cls dr-pointer" data-id="<?=$var['id']?>" title="修改<?=$var['name']?>的班级"><?=$var['class']?></td>
+            <?php if($isMjClass):?><td><?=$var['mj_class']?></td><?php endif;?>
+            <td><?=$var['class_id']?></td>
+            <td><?=$var['grade']?></td>
+            <td><?=$var['teacher']?></td>
+            <?php if($var['user_id']>0):?>
+            <td><?=$var['book_cnt']?></td>
+            <td>已加入</td>
+            <?php else:?>
+            <td>-</td>
+            <td> [<a href="javascript:;" class="ajax-url" data-url="<?=R($_c.'/schoolUser/del/'. $var['id'] ,['term_key'=>$term_key_now ] )?>">删除</a> ]</td>
+            <?php endif;?>
+        </tr>
+    <?php endforeach;?>
+</table>
+    <div class="flexbox">
+        <div class="dr-page flex"><?=$schoolUser['page']?></div>
+        <div>
+            <a class="sui-btn  btn-bordered" href="/school/<?=$_a?>?isNull=<?=$_GET['isNull']?>&export=1&start=0&max=2000">导出</a>
+            <a class="sui-btn  btn-bordered ajax-url" href="javascript:;" data-url="/school/schoolUser/close" >关闭白名单</a>
+        </div>
+    </div>
+        <?php endif;?>
+
+    <ul class="dr-info">
+        说明：
+        <li>1.学生注册进来，必须填写<span  class="sui-text-danger">匹配学号</span>，不然学生无法使用系统</li>
+        <li>2.学生进来之前必须先导入学生资料（学号、姓名、班级、年级、任课老师），不然无法匹配</li>
+        <li>3.<a href="/res/school_user.xlsx">通用模板下载</a>；如果学校将“自然班级”打散再组合成“课堂班级”上课，请<a href="/res/school_user_special.xlsx">下载特殊模板</a></li>
+        <li>4.学生如果已经绑定白名单将无法删除修改</li>
+        <li>5.每个学期都必须重新导入白名单</li>
+        <li>6.如果想原用上学期的班级关系必须手工处理请联系管理员 <!--将class的本学校的term_key修改为当前的学期（由201702改为201801），把  school_term_user_201702 本校的用户导入 school_term_user_201801 --></li>
+    </ul>
+<?php endif; ?>
+
+
+<form class="sui-form form-horizontal" action="<?=R('/book23/jddd')?>" id="op-select"   style="display: none" >
+    <div class="control-group">
+        <label for="inputEmail" class="control-label">老师：</label>
+        <div class="controls">
+            <input type="text"   placeholder="任课老师"  data-rules="required"  data-empty-msg="请填写" value="" name="teacher" >
+        </div>
+    </div>
+    <div class="control-group">
+        <label for="inputPassword" class="control-label">班级：</label>
+        <div class="controls">
+            <input  type="text" name="class " placeholder="输入并选择"   autocomplete="off" class="autocomplete">
+            <input type="hidden" name="class_id" class="class_id" value="">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label"></label>
+        <div class="controls">
+            <button type="submit" class="sui-btn btn-primary">修改班级</button>
+        </div>
+    </div>
+</form>
+
+<script src="<?=$_cdn?><?=$WWW_RES?>/js/plupload/plupload.full.min.js"></script>
+<script>
+    $(function () {
+        $('.ajax-url').click(DR.ajaxUrl );
+        DR.uploadone( 'upload'
+            ,{
+                cb:function (rep) {
+                    var str = "插入："+rep.rz.insert+"条\n更新："+  rep.rz.update +'条';
+                    if( rep.rz.no>0){
+                        str+="\n 已绑定（未变更）："+ rep.rz.no +'条';
+                    }
+                    DR.tip2( str ,{'style':'success'} );
+                    setTimeout(function () {
+                        location.reload();
+                    }, 3000 );
+
+                }
+                ,query:'abc=123&isSchoolAll=<?=intval($isSchoolAll)?>&block_id=<?=$block_id?>'
+                ,url:'<?=R('school/schoolUser/import')?>'
+                ,ext:'xls,xlsx'
+            });
+
+        $('#s_all').click( function () {
+            var cl= $(this).find('input');
+            //alert( this.checked  );
+            var tf = this.checked;
+            $('.dr-checkbox').each(function () {
+                this.checked= tf;
+                //DR.log(this.checked,this.value  );
+            });
+            if( tf) $('.dr-checkbox-w').addClass('checked');
+            else $('.dr-checkbox-w').removeClass('checked');
+        });
+        $('.pl').click(function () {
+            var id='';
+            $('.dr-checkbox').each(function () {
+                if(this.checked){
+                    id+= this.value+',';
+                }
+            });
+            if( id==''){
+                DR.tip( "请先勾选！");
+                return false ;
+            }
+            DR.log("id", id );
+            var url= $(this).data('url');
+            DR.ajax( url+'/'+ id );
+        });
+
+    });
+
+
+    var cls = new DR.classSelect();
+    $('.dr-chang-cls').click( function () {
+        var that = $(this);
+        cls.click({title: that.attr('title') ,action:'school/schoolUser/modifyClass/'+ that.data('id') });
+    } );
+
+
+    //changClass();
+
+
+</script>

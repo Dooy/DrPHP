@@ -1,0 +1,109 @@
+<div style="padding: 8px 5px 5px 0px;">
+    <?php if($tb=='list'):?>
+    <div class="sui-btn-group">
+        <a class="sui-btn <?php if($_GET['is_ren']):?> btn-primary<?php endif; ?>" href="<?=R($DR_SELF,['is_ren'=>1 ])?>" >显示人工评分</a>
+    </div>
+    <?php endif; ?>
+</div>
+<?php if ( $list['list']  ) : ?>
+
+
+    <table class="sui-table table-bordered">
+        <thead>
+        <tr>
+            <th>#<br>时间</th>
+            <th>姓名<br>学号</th>
+            <th>书名<br>
+                章节
+            </th>
+            <?php switch ( $tb){
+                case 'comment':
+                ?>
+                    <th>字数/点赞</th>
+                    <th>笔记</th>
+                <?php
+                break;
+                case 'dict':
+                    ?>
+                    <th>单词</th>
+                    <?php
+                    break;
+                default:
+             ?>
+            <th>字数<br>进度/用时   </th>
+             <?php if($tb=='list'):?>
+                    <th>
+                        讨论/报告/摘抄随想/笔记
+                    </th>
+                    <?php if($_GET['is_ren']):?><th>人工分(星星分)<br>讨论/报告/摘抄随想</th> <?php endif;?>
+                <?php endif; ?>
+            <?php  }
+            ?>
+
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ( $list['list'] as $k=> $v ) : ?>
+            <tr>
+                <td><?=$k+1?> <br><?=date("Y-m-d H:i",$tb=='list'?$v['last_time']:$v['ctime'] )?></td>
+                <td><a href="<?=R('school/novelView/uid/'. $v['user_id'].'?tb='. $tb )?>"  title="仅看本人"><?=$user[$v['user_id']]['name']?></a><br> <?=$user[$v['user_id']]['number']?></td>
+                <td>《<?=$v['novel']?>》<br>
+
+                    <?php if( $tb=='list'):?>
+
+                        <a href="<?=R('school/novelView/uid/'.$v['user_id'].'/'. $v['novel_id'])?>" title="查看详情" target="_blank">涉及<?=$v['cp_cnt']?>章</a>
+
+                    <?php else:?><?=$v['chapter']?><?php endif;?>
+                </td>
+            <?php switch ( $tb){
+                case 'comment':
+                    ?>
+                    <td><?=$v['comment_word']?>/<?=$v['good_cnt']?></td>
+                    <td><?=nl2br($v['comment'])?></td>
+                    <?php
+                    break;
+                case 'dict':
+                    ?>
+                    <td><?=$v['word']?></td>
+                    <?php
+                    break;
+                    default:
+                    ?>
+                <td><?=$v['word']?>字<br><?=$v['progress']/100?>% /<?=timeShow($v['dtime'])?></td>
+
+                <?php if($tb=='list'):?>
+                        <td><?=$v['cnt_1']?>/<?=$v['cnt_1']?>/<?=$v['cnt_4']?>/<?=$v['cnt_7']?></td>
+                        <?php if($_GET['is_ren']):?><td>
+                            <?= isset($v['ren_score'][1])?$v['ren_score'][1]:'-' ?>/<?= isset($v['ren_score'][2])?$v['ren_score'][2]:'-' ?>/<?= isset($v['ren_score'][4])?$v['ren_score'][4]:'-' ?>
+                            </td>
+                        <?php endif;?>
+                <?php endif; ?>
+
+                <?php  }
+                ?>
+            </tr>
+        <?php endforeach;?>
+        </tbody>
+    </table>
+    <div class="flexbox">
+        <div class="dr-page flex"><?=$list['page']?></div>
+        <div>
+            <a href="<?=R($DR_SELF,['export'=>1,'max'=>3000,'export_total'=> $list['total_cnt'] ])?>" class="sui-btn ">导出</a>
+        </div>
+    </div>
+    <ul class="dr-info"">
+        说明：
+        <li>1.导出中有带班级，仅支持白名单</li>
+        <li>2.同意类别中提交了多次，成绩则取最高</li>
+    </ul>
+<?php else: ?>
+    <div class="sui-msg msg-large msg-block msg-error">
+        <div class="msg-con">该条件下 无匹配结果 <button type="button" data-dismiss="msgs" class="sui-close">×</button> </div>
+        <s class="msg-icon"></s>
+    </div>
+<?php endif; ?>
+
+
+<script>
+
+</script>

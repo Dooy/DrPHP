@@ -1,0 +1,410 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>收款账号</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <?php include "bk_head.phtml";?>
+    <script src="<?=$hc_app?>/js/dc.js<?=$local_version?>"></script>
+    <style>
+        .title{
+            margin: 20px 15px 7px;
+            color: #6d6d72;
+            font-size: 15px;
+        }
+
+        #addFrom .mui-input-row label{
+            width:30%
+        }
+        #addFrom .mui-input-row label~input{
+            width: 70%;
+        }
+        #addFrom .mui-input-row label~select{
+            float: left;
+            width: 60%;
+            margin-bottom: 0;
+            padding-left: 3px;
+            border: 0;
+
+        }
+
+    </style>
+</head>
+<body>
+<bobo>
+    <header class="mui-bar mui-bar-nav">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+        <h1 class="mui-title">收款账号</h1>
+        <button class="mui-btn mui-btn-blue mui-btn-link mui-pull-right" @tap="add_init()">添加</button>
+    </header>
+
+    <!-- form -->
+    <div class="mui-content" v-show="st.tab=='add' || st.tab=='modify'" id="addFrom">
+
+        <div class="title" v-if="st.tab=='modify'" v-html="'修改:'+st.modify_id">新增账号 </div>
+        <div class="title" v-else>新增账号 </div>
+        <form class="mui-input-group">
+
+            <template v-if="f.type==145">
+                <div class="mui-input-row">
+                    <label>收款人</label>
+                    <input type="text" placeholder="收款人姓名" v-model="f.zhifu_name">
+                </div>
+                <div class="mui-input-row">
+                    <label>卡号</label>
+                    <input type="text" placeholder="银行卡号" v-model="f.zhifu_account">
+                </div>
+                <div class="mui-input-row">
+                    <label>银行</label>
+                    <!--<input type="text" placeholder="银行卡号" v-model="f.bank_id">
+                    -->
+                    <select v-model="f.bank_id" class="mui-btn mui-btn-block">
+                        <option value="0"  >请选择银行</option>
+                        <option  v-for="(v,k) in bank2Type" v-html="v.n" :value="k"></option>
+                    </select>
+                </div>
+                <div class="mui-input-row">
+                    <label>开户行</label>
+                    <input type="text" placeholder="南京支行" v-model="f.zhifu_realname">
+                </div>
+            </template>
+            <template v-else>
+                <div class="mui-input-row">
+                    <label>收款人</label>
+                    <input type="text" placeholder="收款人姓名" v-model="f.zhifu_name">
+                </div>
+                <div class="mui-input-row">
+                    <label>账号</label>
+                    <input type="text" placeholder="支付宝账号" v-model="f.zhifu_account">
+                </div>
+
+                <!--
+                <div class="mui-input-row">
+                    <label>限额</label>
+                    <input type="text" placeholder="" v-model="f.price_max">
+                </div>
+                -->
+                <div class="mui-input-row">
+                    <label>二维码</label>
+                    <div style="display: inline-block;padding-top: 8px; color: #999">
+                        <!--
+                                            <span  @click="renUpload()">传切好的二维码图<span class="mui-icon mui-icon-image"></span></span>
+
+                                            或-->
+                        <span  @click="openMa()">使用扫码<span class="mui-icon mui-icon-redo"></span></span>
+                    </div>
+                </div>
+            </template>
+
+            <div class="mui-button-row">
+                <button type="button" class="mui-btn mui-btn-primary" @click="add()" v-html=" st.tab=='modify'?'修改':'确认'">确认</button>
+
+                <button type="button" class="mui-btn " @click="st.tab=''">取消</button>
+            </div>
+        </form>
+
+
+            <div style="text-align: center;margin: 0 auto ;margin-top: 18px;" v-show="f.qr!='' && f.qr!='img'">
+                <div id="qrCode" style="margin: 0 auto;width: 210px; height: 210px; "></div>
+            </div>
+            <div style="text-align: center;margin: 0 auto ;margin-top: 18px;" v-if="f.img">
+                <div   style="margin: 0 auto;  max-width: 320px; ">
+                    <img :src="'https://cdn.nekoraw.com/'+f.img" style="max-width: 320px;">
+                </div>
+            </div>
+            <div style="text-align: center;margin: 0 auto ;margin-top: 18px;"  v-show="!f.img&& !f.qr && f.type!=145" >
+                <!--<div   style="margin: 0 auto;  height: 210px; " @click="renUpload()">-->
+                <div   style="margin: 0 auto;  height: 210px; " @click="openMa()">
+                    <img src="/res/wo/img/tianjia.png" style="height: 210px;" >
+                </div>
+                <div id="uploads" style="display: none" ></div>
+            </div>
+
+
+        <div v-if="st.tab=='modify'" class="mui-button-row" style="padding-top: 20px">
+            <button type="button" class="mui-btn  " @click="del()"  >删除</button>
+        </div>
+
+    </div>
+    <!-- end form -->
+
+    <!-- list-->
+    <div v-if="st.tab=='add' || st.tab=='modify'"></div>
+    <div class="mui-content" v-else>
+
+        <!--
+        <ul class="mui-table-view mui-table-view-chevron" style="margin-top: 15px">
+            <li class="mui-table-view-cell">
+                <a href="/app/page/q_google" class="mui-navigate-right" style="color: #ff7300">系统将在9月20日启用谷歌验证码请先设置</a>
+            </li>
+        </ul>
+        -->
+
+        <div class="title">
+            我的收款码
+        </div>
+        <template v-if="account.list.length>0">
+
+            <div class="mui-input-group" v-if="st.qd==1">
+                <div class="mui-input-row mui-checkbox mui-left"  v-for="v in account.list" @click="doJob(v)">
+                    <label> [{{v.account}}]  {{v.zhifu_name}} <span style="color: #999;font-size: 12px;" v-if="v.zhifu_name!=v.zhifu_account" v-html="v.zhifu_account"></span>
+                        <!--<span style="color: #999;font-size: 12px;" v-html="'限:'+v.price_max/100"></span>-->
+                    </label>
+                    <input name="checkbox" value="Item 1" type="checkbox"   v-if="v.online==1||v.online==11"  checked>
+                    <input name="checkbox" value="Item 1" type="checkbox"   v-else   >
+                </div>
+                <div class="mui-table-view-cell" @click="loadMore()" v-if="(st.now_page+1)<account.page_total" style="text-align: center">加载更多</div>
+            </div>
+            <ul class="mui-table-view"  v-else>
+                <li class="mui-table-view-cell" v-for="v in account.list">
+                    <a class="mui-navigate-right"  @tap="modify(v)">
+                        [{{v.account}}]  {{v.zhifu_name}}
+                        <span style="color: #999;font-size: 12px;" v-if="v.zhifu_name!=v.zhifu_account" v-html="v.zhifu_account"></span>
+                        <!-- <span style="color: #999;font-size: 12px;" v-html="'限:'+v.price_max/100"></span> -->
+                    </a>
+                </li>
+                <li class="mui-table-view-cell" @click="loadMore()" v-if="(st.now_page+1)<account.page_total" style="text-align: center">加载更多</li>
+            </ul>
+        </template>
+    </div>
+    <!-- end list-->
+
+</bobo>
+</body>
+<script src="<?=$hc_app?>/js/qrcode.ajax.min.js"></script>
+
+<script type="text/javascript" src="<?=$hc_app?>/js/plupload/plupload.full.min.js?d=123"></script>
+
+<script>
+
+    new Vue({
+        el: 'bobo',
+        data: {
+            st:{tab:'<?=trim($_GET['tab'])?>',now_page:0,modify_id:0,qd:'<?=$_GET['qd']?>'}
+            ,f:{type:205,zhifu_account:'',qr:'',price_max:10000,img:'',zhifu_name:'',bank_id:0 }
+            ,account:{list:[], page_total:0}
+            ,ma:{ version:205 },bank2Type:[]
+        }
+        ,
+        created: function () {
+
+        },
+        mounted: function () {
+            setTimeout(this.init, 800);
+            this.load();
+            //this.add_init();
+
+            var that = this;
+            setTimeout(function () {
+                HC.pluploadToOSS('uploads', {
+                    cb:function (rep) {
+                        //alert( rep.file );
+                        that.f.img='/'+rep.file;
+                        that.f.qr='img';
+                    }
+                });
+            },1000)
+
+        },
+        methods: {
+            init:function () {
+                mui.init({
+                    swipeBack:true //启用右滑关闭功能
+                });
+            }
+            ,add_init:function () {
+                this.st.tab='add';
+                this.f.zhifu_account='';
+                this.f.qr='';
+                this.f.price_max=10000 ;
+                this.f.img='' ;
+            }
+            ,doJob:function (v) {
+                //console.log(v );
+                if( v.online==1||v.online==11 ) this.doJin(v,2);
+                else this.testV2(v);
+            }
+            ,loadMore:function () {
+
+                this.st.now_page++;
+                this.load({isAdd: true});
+            }
+            ,load:function () {
+                var that = this;
+                var conf={isAdd:false }
+                if( arguments.length>0 )mui.extend(conf,arguments[0]);
+
+                HC.ajax('/vip/account?pageno='+ (this.st.now_page+1),{success:function (rep) {
+                        console.log('rep',rep );
+                        if(conf.isAdd) {
+                            that.account.list= that.account.list.concat(rep.account.list );
+                            that.account.page_total= rep.account.page_total;
+                        }else{
+                            that.account= rep.account ;
+                        }
+
+                        that.ma= rep._ma;
+                        that.bank2Type= rep.bank2Type;
+
+                        if(that.ma.version==145){
+                            that.f.type=145;
+                        }
+
+                    }})
+            }
+            ,add:function () {
+                var url ='/vip/account/add';
+                if(this.st.tab=='modify') url ='/vip/account/modify/'+this.st.modify_id;
+                var that = this;
+                HC.ajax(url,{data:this.f, success:function (rep) {
+                        that.st.tab='list';
+                        if( that.st.tab!='modify') that.st.now_page=0;
+                        that.load();
+                    } } );
+            }
+            ,del:function () {
+                var r= confirm( '确定要删除');
+                if(!r) return;
+                var that= this;
+                //DR.ajax('/vip/account/del/'+v.account_id );
+                HC.ajax('/vip/account/del/'+this.st.modify_id,{  success:function (rep) {
+                        that.st.tab='list';
+                        that.st.now_page=0;
+                        that.load();
+                    } } );
+
+            }
+            ,modify:function (v) {
+                console.log(v);
+                this.st.modify_id=v.account_id;
+                this.f.zhifu_account= v.zhifu_account;
+                this.f.zhifu_name= v.zhifu_name;
+                var that = this  ;
+                HC.ajax('/vip/account/loadQr/'+v.account_id  ,{success:function (rep) {
+                        console.log( rep );
+                        that.f.qr='';
+                        that.st.tab = 'modify';
+                        if( rep.qr  ) {
+                            that.f.qr= rep.qr.qr_text;
+                            setTimeout(function () {
+                                that.qrCode( that.f.qr,'qrCode' );
+                            },800);
+
+                        }
+
+                    }} );
+
+            }
+            ,openMa:function () {
+
+                var that = this;
+                if( typeof api =='undefined'){
+                    HC.msg( "请使用APP扫码");
+                    return;
+                }
+                var FNScanner = api.require('FNScanner');
+                //alert( FNScanner );
+                FNScanner.open({
+                    autorotation: true
+                }, function(ret, err) {
+                    if (ret && ret.eventType=='success'   ) {
+                        if( ret.content ){
+                            that.f.qr = ret.content;
+                            that.f.img='' ;
+                            setTimeout(function () {
+                                that.qrCode( that.f.qr,'qrCode' );
+                            },800);
+                        }
+                    } else {
+                        //alert(JSON.stringify(err));
+                    }
+                });
+            }
+            ,qrCode:function ( url_text,div_id ) {
+                var that = this;
+                //console.log( location );
+                var dobj = document.getElementById( div_id );
+                dobj.innerHTML='';
+                var qrcode = new QRCode(dobj, {
+                    text: url_text //location.origin  + that.qr.url
+                    ,width: 210,
+                    height: 210,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+            }
+            ,testV2:function ( v  ) {
+                HC.ajax('/vip/account/one2/'+v.account_id ,{success:function (rep) {
+                        v.online= 3 ;
+                    }
+                });
+            }
+            ,doJin:function (v,t ) {
+
+                HC.ajax('/vip/account/online/'+v.account_id+'/'+t   ,{success:function (rep) {
+                        v.online=t;
+                    }
+                });
+            }
+            ,upLoadFile:function (file, opt ) {
+                var that = this;
+                var data= {kk:'123'  };
+
+                HC.msg( "正在上传...");
+                DC.ajax('https://'+location.hostname+'/vip/account/upload', {
+                    data: data
+                    , files: {file: file}
+                    , success: that.uploadFinish
+                    , error: function (rep) {
+                        //alert('error');
+                        api.alert({msg: JSON.stringify(rep)});
+                    }
+                });
+
+
+            }
+            ,uploadFinish:function (rep) {
+                var that = this;
+                //alert(JSON.stringify(rep));
+                //alert(rep.file );
+                HC.msg( "上传成功");
+                this.f.img='/'+rep.file;
+                this.f.qr='img';
+
+            }
+            ,renUpload:function () {
+                var that = this;
+
+
+                api.getPicture({
+                    sourceType: 'album',
+                    encodingType: 'jpg',
+                    mediaValue: 'pic',
+                    destinationType: 'url',
+                    //allowEdit: true,
+                    quality: 100,
+                    //targetWidth: 100,
+                    //targetHeight: 100,
+                    saveToPhotoAlbum: false
+                }, function(ret, err) {
+                    if (ret) {
+                        //alert(JSON.stringify(ret));
+
+                        that.upLoadFile( ret.data , {'qr_text':  '123' });
+
+                    } else {
+                        alert(JSON.stringify(err));
+                    }
+                });
+
+
+
+
+            }
+
+        }
+    });
+</script>
+
+</html>

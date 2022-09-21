@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>银联云闪付</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <style>
+        .p-info{ max-width: 600px; padding: 11px; text-align: left; font-size: 14px; margin: 0 auto}
+        ul,li{padding: 0;margin: 0; color: #666666; list-style: none}
+        .p-info li{padding-top: 5px; }
+
+        .pay-btn{ background-color:#4cb9fc ; border: 1px solid #33affc; color: #fff;text-decoration:none;
+            display: inline-block; padding: 5px 14px;box-sizing: border-box; margin-bottom: 0;    font-size: 14px;            line-height: 18px;
+            text-align: center;    vertical-align: middle;    cursor: pointer;  border-radius: 2px;
+            user-select: none;width: 220px;
+        }
+        .pay-btn-back{ padding-top: 2px;  padding-bottom: 2px; font-size: 12px; width: 100px;     background-color: transparent;
+            border: 1px solid #33affc;          color: #33affc;   }
+
+    </style>
+</head>
+<body>
+<div style="padding-top: 30px;text-align: center;"  >
+
+    <div ><img src="/res/img/ysf.jpg"  style="height: 55px"/></div>
+    <div style="padding-top: 20px">金额<b style="color: #ff6700; font-size: 50px"><?=$trade['realprice']/100?></b>元</div>
+    <div style="color: #999999;font-size: 12px">订单号：<?=$trade['order_no']?></div>
+
+    <div id="pay_main">
+        <div style="position: relative;height: 210px">
+            <div id="qrCode" style="text-align: center; position: absolute;left: 50%;top: 10px;margin-left: -90px;" ></div>
+            <div id="qrText" style="text-align: center; top: 10px; border: 1px solid #999999;  display: none;position: absolute;left: 50%; width: 180px; height: 180px;margin-left: -90px;">
+                <div style="padding-top: 55px;color: #333333">二维码已过期<br><br>请重新下单</div>
+            </div>
+        </div>
+        <div  style="color: #ff6700; font-size: 16px">请使用另一台手机的云闪付进行扫一扫支付</div>
+    </div>
+
+    <div id="pay_success" style="height: 230px;display: none">
+        <div style="text-align: center; padding: 50px 10px 20px 10px;font-size: 22px; color: green;">亲，订单支付成功！</div>
+        <div><button class="pay-btn pay-btn-back" onclick="back()">返回商城</button></div>
+    </div>
+
+
+
+    <div class="p-info" id="p-info">
+        <ul>
+            说明：
+            <li>1.支付方式二 截图-><a href="upwallet://cfpay.ss">启动云闪付</a>->扫一扫->打开相册</li>
+            <li>2.支付方式三 支持工商、建设、农业、中国、邮政、招商、中信等银行APP的扫一扫</li>
+            <li>3.如果您还未安装银联云闪付，请入<a href="https://youhui.95516.com/hybrid_v3/html/help/download.html" target="_blank">官网下载</a>安装 </li>
+            <li>4.每张<span style="color: red">二维码仅能支付一次</span>，请勿重复支付！</li>
+            <li>5.当前下单时间:<span style="color: red"><?=date("m-d H:i:s", $trade['ctime'])?></span>,请在3分钟内完成支付 </li>
+        </ul>
+    </div>
+
+</div>
+</body>
+<script src="/res/js/qrcode.ajax.min.js"></script>
+<script>
+    var st={ctime:<?=intval($trade['ctime'])?>,timer:null, qrCode:document.getElementById('qrCode'), qrText:document.getElementById('qrText')
+        , pay_main: document.getElementById('pay_main'), pay_success:document.getElementById('pay_success'),p_info:document.getElementById('p-info') };
+
+    function timeCount(){
+        if( Math.round(new Date() / 1000)> (st.ctime+150) ){
+            st.qrCode.style.display='none';
+            st.qrText.style.display='block';
+            //clearInterval( st.timer );
+        }
+
+        ajax_get('/api/checkPay/<?=$trade['merchant_id']?>/<?=$trade['trade_id']?>',function (obj) {
+            console.log( obj );
+            if(obj.data.is_fu){
+                st.pay_main.style.display='none';
+                st.p_info.style.display='none';
+                st.pay_success.style.display='block';
+                clearInterval( st.timer );
+            }
+        });
+
+        if(Math.round(new Date() / 1000)> (st.ctime+300) ){
+            clearInterval( st.timer );
+        }
+
+    }
+    st.timer= setInterval( timeCount,1000 );
+
+    function qrCode( url_text,div_id ) {
+        var that = this;
+        //console.log( location );
+        var qrcode = new QRCode(document.getElementById( div_id ), {
+            text: url_text //location.origin  + that.qr.url
+            ,width: 180,
+            height: 180,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
+    }
+    qrCode('<?=$url?>','qrCode');
+
+
+    function ajax_get(url,success) {
+        var method='get';
+        var data= false ;
+        var ajax = new XMLHttpRequest();
+        if (method=='get') {
+            if (data) {
+                url+='?';
+                url+=data;
+            }
+            ajax.open(method,url);
+            ajax.send();
+        }else{
+            ajax.open(method,url);
+            ajax.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+            if (data) {
+                ajax.send(data);
+            }else{
+                ajax.send();
+            }
+        }
+        ajax.onreadystatechange = function () {
+            if (ajax.readyState==4&&ajax.status==200) {
+                var obj = JSON.parse(  ajax.responseText );
+                success( obj );
+            }
+        }
+    }
+    function back() {
+        window.history.go(-1);return false;
+    }
+</script>
+</html>

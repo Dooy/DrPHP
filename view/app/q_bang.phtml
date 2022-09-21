@@ -1,0 +1,203 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>首页榜单</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <?php include "wo_head.phtml";?>
+    <style>
+        .img2{
+            width: 100%;
+            margin-top: 50px;
+        }
+        .mui-table-view-cell>.mui-badge{left: 15px;right: auto}
+        .bgcolor10{background: #8A6DE9;}
+        .bgcolor9{background:grey;}
+        .bgcolor8{background: darkslateblue;}
+        .bgcolor7{background: darkgray;}
+        .bgcolor6{background: #EC971F;}
+        .bgcolor5{background: #007aff;}
+        .bgcolor4{background: orange;}
+        .bgcolor3{background: burlywood;}
+        .bgcolor2{background:  blue;}
+        .bgcolor1{background: red;}
+        .mui-table-view  {
+            background-color: #1f253d;
+        }
+        #tabs, #tabs *{ touch-action: none; }
+
+        html{  touch-action: none;}
+        .mui-bar-tab .mui-tab-item2 .mui-icon~.mui-tab-label {
+            font-size: 11px;
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .mui-bar-tab .mui-tab-item2 .mui-icon {
+            top: 3px;
+            width: 24px;
+            height: 24px;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+        .mui-bar-tab .mui-tab-item2 {
+            display: table-cell;
+            overflow: hidden;
+            width: 1%;
+            height: 50px;
+            text-align: center;
+            vertical-align: middle;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            color: #929292;
+        }
+        .mui-bar-tab .mui-tab-item2.mui-active {
+            color: #007aff;
+        }
+
+    </style>
+</head>
+<body  >
+<bobo>
+    <div   class="mui-content">
+        <header class="mui-bar mui-bar-nav header">
+            <h1 class="mui-title h1">排行榜</h1>
+        </header>
+        <img src="https://cdn.nekoraw.com/res/wo/img/phbbg.png" class="img2">
+
+        <div class="mui-card-content">
+            <div style="padding: 20px; text-align: center">稍后呈现</div>
+        </div>
+
+        <!--
+        <div class="mui-card-content">
+            <ul class="mui-table-view ul">
+                <li class="mui-table-view-cell mui-collapse mui-collapse-content">
+						<span class="phblist">
+							<img src="/res/wo/img/logoer.png" style="width: 40px;/">
+							<span class="phbacc">封*</span>
+							<span class="phbaac">1422129.00</span>
+						</span>
+                    <span class="mui-badge mui-badge-primary bgcolor1">1</span>
+                </li>
+                <li class="mui-table-view-cell mui-collapse mui-collapse-content">
+						<span class="phblist">
+							<img src="/res/wo/img/logoer.png" style="width: 40px;/">
+							<span class="phbacc">q***9</span>
+							<span class="phbaac">1252423.75</span>
+						</span>
+                    <span class="mui-badge mui-badge-primary bgcolor2">2</span>
+                </li>
+                <li class="mui-table-view-cell mui-collapse mui-collapse-content">
+						<span class="phblist">
+							<img src="/res/wo/img/logoer.png" style="width: 40px;/">
+							<span class="phbacc">颖*</span>
+							<span class="phbaac">1015005.94</span>
+						</span>
+                    <span class="mui-badge mui-badge-primary bgcolor3">3</span>
+                </li>
+                <li class="mui-table-view-cell mui-collapse mui-collapse-content">
+						<span class="phblist">
+							<img src="/res/wo/img/logoer.png" style="width: 40px;/">
+							<span class="phbacc">李*</span>
+							<span class="phbaac">980345.56</span>
+						</span>
+                    <span class="mui-badge mui-badge-primary bgcolor4">4</span>
+                </li>
+                <li class="mui-table-view-cell mui-collapse mui-collapse-content">
+						<span class="phblist">
+							<img src="/res/wo/img/logoer.png" style="width: 40px;/">
+							<span class="phbacc">杨***琳</span>
+							<span class="phbaac">976154.94</span>
+						</span>
+                    <span class="mui-badge mui-badge-primary bgcolor5">5</span>
+                </li>
+                <li class="mui-table-view-cell mui-collapse mui-collapse-content">
+						<span class="phblist">
+							<img src="/res/wo/img/logoer.png" style="width: 40px;/">
+							<span class="phbacc">孔***军</span>
+							<span class="phbaac">915256.81</span>
+						</span>
+                    <span class="mui-badge mui-badge-primary bgcolor6">6</span>
+                </li>
+                <li class="mui-table-view-cell mui-collapse mui-collapse-content">
+						<span class="phblist">
+							<img src="/res/wo/img/logoer.png" style="width: 40px;/">
+							<span class="phbacc">战*</span>
+							<span class="phbaac">909467.38</span>
+						</span>
+                    <span class="mui-badge mui-badge-primary bgcolor7">7</span>
+                </li>
+                <li class="mui-table-view-cell mui-collapse mui-collapse-content">
+						<span class="phblist">
+							<img src="/res/wo/img/logoer.png" style="width: 40px;/">
+							<span class="phbacc">海*</span>
+							<span class="phbaac">868066.69</span>
+						</span>
+                    <span class="mui-badge mui-badge-primary bgcolor8">8</span>
+                </li>
+                <li class="mui-table-view-cell mui-collapse mui-collapse-content">
+						<span class="phblist">
+							<img src="/res/wo/img/logoer.png" style="width: 40px;/">
+							<span class="phbacc">甘*</span>
+							<span class="phbaac">839055.75</span>
+						</span>
+                    <span class="mui-badge mui-badge-primary bgcolor9">9</span>
+                </li>
+                <li class="mui-table-view-cell mui-collapse mui-collapse-content">
+						<span class="phblist">
+							<img src="/res/wo/img/logoer.png" style="width: 40px;/">
+							<span class="phbacc">水***花</span>
+							<span class="phbaac">785109.06</span>
+						</span>
+                    <span class="mui-badge mui-badge-primary bgcolor10">10</span>
+                </li>
+
+            </ul>
+        </div>
+        -->
+    </div>
+
+    <nav class="mui-bar mui-bar-tab" style="background:#1f253d;" id="tabs" >
+        <template v-for="v in tabArr" >
+            <a class="mui-tab-item2 " :href="'/app/page/'+v.url+'#'" :class="{'mui-active': v.url==st.ts}" @click="toTab(v)">
+                <span class="mui-icon " :class="v.cls"></span>
+                <span class="mui-tab-label" v-html="v.name">我的</span>
+            </a>
+        </template>
+    </nav>
+
+
+
+
+</bobo>
+</body>
+<script>
+new Vue({
+    el: 'bobo',
+    data: {
+        st:{ ts:'q_bang'}
+        ,tabArr:[
+            {cls:'mui-icon-home',name:'首页',url:'q_bang'}
+            //,{cls:'mui-icon-email',name:'收单',url:'q_dan'}
+            ,{cls:'mui-icon-email',name:'收单',url:'q_danv2'}
+            ,{cls:'mui-icon-contact',name:'我的',url:'wo_me'}
+        ]
+    }
+    ,
+    created: function () {
+    },
+    mounted: function () {
+    },
+    methods: {
+        toTab:function (v) {
+
+            if(v.url== this.st.ts) return ;
+            //alert( v.url );
+            location.href='/app/page/'+v.url;
+
+        }
+    }
+});
+</script>
+</html>

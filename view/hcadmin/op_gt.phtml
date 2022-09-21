@@ -1,0 +1,26 @@
+<div class="content-block-title">沟通记录</div>
+<?php if($gt_list['list']):?>
+    <?php foreach ($gt_list['list'] as $v ):?>
+        <div class="card">
+            <div class="card-content">
+                <div class="card-content-inner"><div class="color-gray"><?=$user[$v['user_id']]['name']?> <?=$gt_list['type'][$v['opt_type']]['n']?>于 <?=date("Y-m-d H:i", $v['ctime'])?></div>
+                    <?php if($v['opt_value']):?><p ><?=nl2br($v['opt_value'])?></p><?php endif;?>
+                </div>
+            </div>
+        </div>
+    <?php endforeach;?>
+    <div class="dr-page"><?=$gt_list['page']?></div>
+<?php endif; ?>
+
+<form class="sui-form form-inline"  id="form-gt" action="<?=$gt_action?>">
+    <!--
+    <div class="input-append" style="margin-left: 10px; ">
+        <input  name="opt_value" placeholder="这里放一些沟通记录" type="text" class="span2" style="width: 278px;">
+        <button type="submit" class="sui-btn btn-primary"  >记录</button>
+    </div>
+    -->
+    <div style="padding:9px 19px 0 9px; ">
+        <div><textarea rows="<?=$gt_opt['row']>0?$gt_opt['row']:3?>" style="width: 100%;" placeholder="<?=$gt_opt['placeholder']?$gt_opt['placeholder']:'这里放一些沟通记录'?>"  name="opt_value" ></textarea></div>
+    </div>
+    <div style="padding: 5px 10px 0px;text-align: right"  ><button type="submit" class="sui-btn btn-primary"  ><?=$gt_opt['btName']?$gt_opt['btName']:'记录'?></button></div>
+</form>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <title><?=($site_title?$site_title.'-':'')?></title>
+   <!--
+    <link href="<?=$WWW_RES?>/sui/css/sui.min.css" rel="stylesheet">
+    <link href="<?=$WWW_RES?>/js/art/dialog.css" rel="stylesheet">
+    -->
+    <link href="<?=$_cdn?><?=$WWW_RES?>/css/dr.css" rel="stylesheet">
+
+    <script type="text/javascript" src="<?=$_cdn?><?=$WWW_RES?>/js/jquery.min.js"></script>
+    <!--
+    <script type="text/javascript" src="https://cdn.nekoraw.com/res/js/jquery.min.js"></script>
+    <script type="text/javascript" src="<?=$WWW_RES?>/sui/js/sui.min.js"></script>
+    <script type="text/javascript" src="<?=$WWW_RES?>/js/dr.js"></script>
+    <script type="text/javascript" src="<?=$WWW_RES?>/js/art/dialog.js"></script>
+    -->
+
+    <style>
+        body{margin: 0 auto;padding: 0; }
+        .dr-box-padding{border: 0px; }
+        .ad-head2{height:60px; background-color: #fff;  position: relative; margin: 0 auto; color: #666}
+        .ad-head-link{ margin : 15px 15px 0 0;}
+        .ad-head-link i{   display: inline-block;  width: 20px;  text-align: center; font-size: 12px;  color: #ccc;     font-family: \5b8b\4f53;font-style: normal; }
+        .ad-head-link a{ display: inline-block; color: #666; text-decoration:none; font-size: 14px;}
+        .ad-head-link a:hover{ text-decoration:underline; }
+        .ad-head-menu{ position: absolute; width: 190px; top:61px; bottom: 50px; background-color: #f6f7fb;   list-style: none; padding: 0;  }
+        .ad-head-iframe{ position: absolute; top:61px; left: 191px;right: 0; bottom: 50px; background-color: #fff; z-index: 10 }
+        .ad-head-top{ position: absolute; top:65px; left: 200px; font-size: 14px;display: none; }
+
+
+        .ad-head-menu a{display: block; padding: 8px; text-decoration:none;  color:#333;font-size: 14px;   }
+        .ad-head-menu a:hover, .ad-head-menu .select{background-color: #00a0e9; text-decoration:none; color:#fff }
+        ul,li{ margin: 0; padding: 0px; display: block;  }
+        .leafmenu{ display: none    }
+        .leafmenu li a{   padding-left: 22px; position: relative;  }
+        .leafmenu li a:before{content: " ";background-color: #666; position: absolute; top:16px; left:12px; width: 6px;height:6px;overflow: hidden;border-radius: 2px;}
+        .leafmenu li a:hover:before, .ad-head-menu .select:before{ background-color: #fff; }
+        .logo-txt{padding-top: 20px; padding-left: 15px; display: block; text-decoration:none;}
+        .ad-head-open{ background-color: #fff; }
+
+        .menu-one{  position: relative;  }
+        .menu-one:before{ content: " "; background-color: #666; position: absolute;   top:16px; right:12px; width: 12px;height:6px;overflow: hidden; background: url("/res/img/arrow.png") no-repeat;  }
+        .ad-head-open .menu-one:before{ background: url("/res/img/arrow.png") no-repeat  right 0; }
+        .ad-head-open  .leafmenu{ display: block    }
+    </style>
+</head>
+<body style="background-color: #e8ecf0">
+<div class="ad-head2">
+    <div class="flexbox">
+        <div class="flex"><a class="logo-txt" href="<?=R('hcadmin')?>" >群富</a></div>
+        <div class="ad-head-link">
+            <a  >欢迎<?=$_cu['name']?>回来</a><i>|</i>
+            <a href="/">返回好策</a><i>|</i>
+            <a href="<?=R('logout')?>">登出</a>
+        </div>
+    </div>
+</div>
+
+<ul class="ad-head-menu">
+
+    <li> <a  href="javascript:;" data-url="<?=R('hcadmin/userList')?>"  >用户</a></li>
+    <li> <a  href="javascript:;" data-url="<?=R('hcadmin/merchant')?>">商户</a></li>
+    <li> <a  href="javascript:;" data-url="<?=R('hcadmin/tool')?>">小工具</a></li>
+    <li> <a  href="javascript:;" data-url="<?=R('member/log')?>">登录日志</a></li>
+    <li> <a  href="javascript:;" data-url="<?=R('member/log/sys')?>">系统日志</a></li>
+
+    <!--
+    <li >
+        <a class="menu-one" href="javascript:;">读书</a>
+        <ul class="leafmenu">
+            <li> <a  href="javascript:;" data-url="<?=R('hcadmin/bookList')?>">书单</a></li>
+            <li> <a  href="javascript:;" data-url="<?=R('hcadmin/bookSchool')?>">学校</a></li>
+            <li> <a  href="javascript:;" data-url="<?=R('hcadmin/novel')?>">书单内容</a></li>
+            <li> <a  href="javascript:;" data-url="<?=R('hcadmin/snt')?>">翻译</a></li>
+        </ul>
+    </li>
+    <li> <a  href="javascript:;" data-url="<?=R('hcadmin/block')?>"  >阅读模块化</a></li>
+    <li >
+        <a class="menu-one" href="javascript:;">日志</a>
+        <ul class="leafmenu">
+            <li> <a  href="javascript:;" data-url="<?=R('hcadmin/smsList')?>">短信日志</a></li>
+            <li> <a  href="javascript:;" data-url="<?=R('hcadmin/recycleList')?>">回收站</a></li>
+        </ul>
+    </li>
+    <?php if( in_array('p1', $_cu['attr'])): ?>
+    <li> <a  href="javascript:;" data-url="<?=R('hcadmin/know')?>">知识点</a></li>
+    <li> <a  href="javascript:;" data-url="<?=R('hcadmin/tool')?>">小工具</a></li>
+    <?php endif;?>
+    <li> <a  href="javascript:;" data-url="<?=R('hcadmin/fqa')?>"  >FQA</a></li>
+    -->
+
+
+</ul>
+<div class="ad-head-top">
+  <span>菜单名称</span>
+</div>
+<div class="ad-head-iframe" style="overflow: hidden">
+    <iframe src="<?=R('hcadmin/main')?>" style="width: 100%; height: 100%;border: 0px; overflow:auto " id="ad-iframe"></iframe>
+</div>
+
+<?php
+include "footer.phtml";
+?>
+
+</body>
+
+<script>
+    $(function () {
+        var ui={
+            iframe:$('#ad-iframe')
+            ,a: $('.ad-head-menu a')
+            ,menu: $('.menu-one')
+        };
+        ui.a.click(function () {
+            var that = $(this);
+            var url = that.data('url');
+            if( 'undefined'== typeof  url ) return false ;
+            ui.iframe.attr('src', url );
+            ui.a.removeClass('select' );
+            that.addClass('select');
+            return false ;
+            //alert( url );
+        });
+        ui.menu.click(function () {
+            var that = $(this);
+            var pli = that.parents( 'li');
+            var clname = pli.attr('class');
+
+            if('undefined' != typeof  clname && clname.indexOf( 'ad-head-open')>=0) pli.removeClass( 'ad-head-open');
+            else pli.addClass( 'ad-head-open');
+        });
+    });
+</script>
+
+</html>
+
+
+

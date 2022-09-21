@@ -1,0 +1,166 @@
+<bobo>
+<form class="sui-form form-horizontal">
+
+    <div class="control-group">
+        <label class="control-label"> </label>
+        <div class="controls">
+            <h2>移动测试</h2>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">手机A：</label>
+        <div class="controls">
+            <input type="text" class="input-medium" v-model="f.telA">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">验证码：</label>
+        <div class="controls">
+
+            <div class="input-append">
+                <input id="appendedInputButton" type="number" class="span2 input-small" placeholder="6位数字"v-model="f.yzm" >
+                <button type="button" class="sui-btn" @click="yzm()">获取</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label"></label>
+        <div class="controls">
+            <button type="button" class="sui-btn btn-primary" @click="login()">登录</button>
+            <button type="button" class="sui-btn " @click="checkOrderList()">查询订单</button>
+
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label"></label>
+        <div class="controls">
+
+            <div >登录凭证:<span v-html="st.cookie"></span></div>
+        </div>
+    </div>
+
+
+
+   <!--
+    <div class="control-group">
+        <label class="control-label">手机B：</label>
+        <div class="controls">
+            <input type="text" class="input-medium"   v-model="f.telB">
+        </div>
+    </div>
+    -->
+
+
+
+
+    <div class="control-group">
+        <label class="control-label">充值：</label>
+        <div class="controls">
+            <input type="text" class="input-small"   v-model="f.money">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">支付：</label>
+        <div class="controls">
+            <label data-toggle="radio" class="radio-pretty inline" v-for="(v,k) in st.pay">
+                <input type="radio" name="gender" :value="k" v-model="f.pay"><span v-html="v"></span>
+            </label>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label"></label>
+        <div class="controls">
+            <button type="button" class="sui-btn btn-primary" @click="chongzhi()">充值</button>
+        </div>
+    </div>
+</form>
+
+    <form id="pf" :action="payObj.url">
+        <input type="hidden" name="bankAbbr" v-model="f.pay" />
+        <template v-for="(v,k) in payObj.data">
+        <input  type="hidden" :name="k"  :value="v" />
+        </template>
+    </form>
+</bobo>
+
+<script>
+    new Vue({
+        el: 'bobo',
+        data: {
+            f:{telA:'15309267747',yzm:'',telB:'15702910085',money:'10',pay:''}
+            ,st:{pay:{'ALIPAY':'支付宝','WXPAY':'微信'}
+                ,cookie:'channel=0705; ssologinprovince=null; CmLocation=100|100; CmProvid=bj; cart_code_key=pau7jv2sl5upjhi2jkoo5hiuj4; cmcc_guide=20151117; collect_id=oh8n0s2pn5cch53n6vwf3b29ph8urbau; chargeresource=s%3D~e%3D~c%3D~taskId%3D~tag%3D; registerName=XNL4zgSy/z5dRXE7JhtewQ==; MSESSID=i2snm7op83etdbh3460nq1s7f1; mobile=; lgToken=fd0bcf31fa154614894ad2720e3a4da4; jsessionid-echd-cpt-cmcc-jt=5669DD3764A8E7E76FAA311F82EC8E61; CaptchaCode=tIoRiM; cmccssotoken=3a2dbde22b8e4c49957a56ab9bdec3a9@.10086.cn; is_login=true; defaultloginuser_p=izr73fwOUuimT7R+YElqbvQdIEKrmWCpu49KY4pe7ciMaCnvRGGKQ5C9HR/8Dc7ufDnEseMbY9i4cAM0dx4I3HJijpPO2TeIbk2iaOlHOM0quUTpfe17WT3AMWu5XPbp8nUTGxohmRS8MKjblhsnXQ==; c=3a2dbde22b8e4c49957a56ab9bdec3a9; verifyCode=658799f5797bd1205c7865fe8f102ab7216ce609; sendflag=20200106093503982060; WT_FPC=id=28f14d126683ea62caf1577701341218:lv=1578274453290:ss=1578272805015'}
+            ,payObj:{"url":"https://pay.shop.10086.cn/paygw/mobileAndBankPayH5"
+                ,"data":{"orderId":"470955109178144981","type":"C","ipAddress":"10.255.254.8","ts":"1578228710155","hmac":"00cb7f41da5fe6bccc7d31e2e2e16ebf","channelId":"20"}}
+            }
+        ,
+        created: function () {
+        },
+        mounted: function () {
+        },
+        methods: {
+            chongzhi:function () {
+
+                var that = this;
+                if(that.f.pay==''){
+                    DR.tip("请选择支付通道");
+                    return
+                }
+                //this.gotoPay();                return;
+
+                if( that.f.telB.length!=11){
+                    DR.tip("请输入正确手机号码（手机B）");
+                    return;
+                }
+                if( that.f.money<10 ){
+                    DR.tip("充值金额必须大于10");
+                    return;
+                }
+
+                var data= that.f;
+                data.cookie= that.st.cookie;
+                DR.ajax('/test/huafei/getBill/',{data:that.f},{success:function (rep) {
+                        console.log(rep );
+                        that.payObj=rep.data.pay;
+                        that.gotoPay();
+                    } });
+            }
+            ,gotoPay:function () {
+                setTimeout( function () {
+                    var df=document.getElementById('pf');
+                    df.submit();
+                }, 500);
+            }
+            ,login:function () {
+                var that = this;
+                if( that.f.telA.length!=11){
+                    DR.tip("请输入正确手机号码（手机A）");
+                    return;
+                }
+                if( that.f.yzm.length!=6){
+                    DR.tip("请填写短信验证码");
+                    return;
+                }
+                DR.ajax('/test/huafei/login/',{data:that.f},{success:function (rep) {
+                        console.log(rep );
+                        that.st.cookie=rep.data.cookie;
+                    } });
+            }
+            ,yzm:function () {
+                var that = this;
+                if( that.f.telA.length!=11){
+                    DR.tip("请输入正确手机号码（手机A）");
+                    return;
+                }
+                DR.ajax('/test/huafei/10086LoginSms/'+  that.f.telA);
+            }
+            ,checkOrderList:function () {
+                DR.ajax('/test/huafei/order/'+  this.f.telA, {data:{cookie: this.st.cookie }});
+            }
+
+        }
+    });
+</script>
+

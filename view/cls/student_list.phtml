@@ -1,0 +1,229 @@
+<style>
+    .v-hide input{ width: 30px; text-align: center }
+</style>
+<div class="dr-container">
+    
+
+    <div class="dr-box-padding"  id="school-banner"  >
+
+        <div class="pull-left" id="school-name">
+
+            <h3><?=$site_title?></h3>
+            <h4><?=$class['class']?></h4>
+        </div>
+        <ul class="pull-right total" id="school-total">
+            <li>
+                <b><?=$class['stu_cnt']?></b>
+                <span>人数</span>
+            </li>
+            <li>
+                <b><?=$class['class_id']?></b>
+                <span>班群号</span>
+            </li>
+            <!--
+            <li>
+                <b>10</b>
+                <span>任务</span>
+            </li>
+            <li>
+                <b>10</b>
+                <span>读书</span>
+            </li>
+            -->
+
+
+        </ul>
+        <br style="clear: both"/>
+    </div>
+
+    <div  class="sp-v2"  >
+        <div class="sp6">
+            <div class="dr-box-padding" >
+                <form>
+                <table class="sui-table ">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>姓名</th>
+                        <th><a href="<?=R($DR_SELF,['sort'=>'number','ds'=>$_GET['ds']=='asc'?'desc':'asc'])?>">学号<i class="sui-icon icon-tb-<?php if($_GET['ds']=='asc') echo 'un' ?>fold"></i></a> </th>
+                        <?php if($switch=='book'):?>
+                            <th>选书/完成(终分)<div class="v-hide"><button   class="sui-btn btn-small">设置权重</button></div></th>
+                            <th>发帖/回帖(成绩)<div class="v-hide"><input type="text"  class="input-mini" name="d0" value="<?=$term['dafen'][0]?>"></div></th>
+                            <?php foreach ( $tags as $k=>$v): if( $k<=0 ) continue;  ?>
+                            <th><?=$v['n']?>(成绩)<div class="v-hide"><input type="text"  class="input-mini" name="d<?=$k?>" value="<?=$term['dafen'][ $k ]?>"></div></th>
+                            <?php endforeach; ?>
+
+                        <?php elseif( $switch=='daka' ):?>
+                            <th>阅读<br>本数/章节/耗时/字数/天数</th>
+                            <th>查词<br>本数/次数</th>
+                        <?php else:?>
+                        <th>加入时间</th>
+                        <?php endif;?>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach ( $studentList as $k=> $v ) : if($is_order_class_teacher &&  !isset($v['ct']['A']) ){  ; continue; }  ?>
+                        <tr>
+                            <td><?=$is_order_class_teacher?$v['ct']['A']:$k+1?></td>
+                            <td><a  href="<?=R('book/user/'.$v['user_id'])?>" target="_blank"><?=$v['name']?></a></td>
+                            <td><?=$v['number']?></td>
+
+                            <?php if($switch=='book'):?>
+                                <?php if( $v['tjrz']['book_cnt']<=0 ):?>
+                                    <td style="color: #999" colspan="6">未加入</td>
+                                <?php else:?>
+                                <td><?=$v['tjrz']['book_cnt']?>/<?=isset($v['finish']['wc_cnt'])? $v['finish']['wc_cnt'] :'-'?>(<?=isset($v['finish']['score']['last'])? $v['finish']['score']['last'] :'-'?> )</td>
+                                <td><?=$v['tjrz']['topic_cnt']?>/<?=$v['tjrz']['comment_cnt']?>(<?=isset($v['finish']['score'][0])? $v['finish']['score'][0] :'-'?>)</td>
+                                    <?php foreach ( $tags as $k2=>$v2):  if( $k2<=0 ) continue;  ?>
+                                <td><?=$v['tjrz']['tag_'.$k2.'_cnt']?>(<?=isset($v['finish']['score'][$k2])? $v['finish']['score'][$k2] :'-'?>)</td>
+                                    <?php  endforeach ?>
+                                <?php endif;?>
+                            <?php elseif( $switch=='daka' ):?>
+                                <td>
+                                    <?php if( isset($daka[$v['user_id']])): $tem= $daka[$v['user_id']];  ?>
+                                        <?=$tem['novel']?>本/<?=$tem['cp']?>章/<?=timeShow($tem['time'])?>/<?=$tem['word']?>字/<?=$tem['day']?>天
+                                    <?php else:?>-<?php endif;?>
+                                </td>
+                                <td>
+                                    <?php if( isset($dict[$v['user_id']])): $tem= $dict[$v['user_id']];  ?>
+                                        <?=$tem['novel']?>本/<?=$tem['cp']?>次
+                                    <?php else:?>-<?php endif;?>
+                                </td>
+                            <?php else:?>
+                                <td><?=($v['ctime']?date('Y-m-d H:i',$v['ctime']):'-')?></td>
+                            <?php endif;?>
+                        </tr>
+                    <?php endforeach;?>
+                    </tbody>
+                </table>
+                </form>
+            </div>
+
+            <?php if($is_order_class_teacher):?>
+
+            <div class="dr-box-padding" >
+                <h3>外加入</h3>
+            <table class="sui-table ">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>姓名</th>
+                    <th><a href="<?=R($DR_SELF,['sort'=>'number','ds'=>$_GET['ds']=='asc'?'desc':'asc'])?>">学号<i class="sui-icon icon-tb-<?php if($_GET['ds']=='asc') echo 'un' ?>fold"></i></a> </th>
+                    <?php if($switch=='book'):?>
+                        <th>选书(完成)</th>
+                        <th>发帖/回帖(成绩)</th>
+                        <th>朗读(成绩)</th>
+                        <th>期中(成绩)</th>
+                        <th>期末(成绩)</th>
+                        <th>摘要(成绩)</th>
+                    <?php else:?>
+                        <th>加入时间</th>
+                    <?php endif;?>
+                </tr>
+                </thead>
+                <tbody>
+                <?php foreach ( $studentList as $k=> $v ) : if( isset($v['ct']['A']) ){  ; continue; }  ?>
+                    <tr>
+                        <td><?=$k+1?></td>
+                        <td><a  href="<?=R('book/user/'.$v['user_id'])?>" target="_blank"><?=$v['name']?></a></td>
+                        <td><?=$v['number']?></td>
+                        <?php if($switch=='book'):?>
+                            <td><?=$v['tjrz']['book_cnt']?>(<?=isset($v['finish']['wc_cnt'])? $v['finish']['wc_cnt'] :'-'?>)</td>
+                            <td><?=$v['tjrz']['topic_cnt']?>/<?=$v['tjrz']['comment_cnt']?>(<?=isset($v['finish']['score'][0])? $v['finish']['score'][0] :'-'?>)</td>
+                            <td><?=$v['tjrz']['tag_3_cnt']?>(<?=isset($v['finish']['score'][3])? $v['finish']['score'][3] :'-'?>)</td>
+                            <td><?=$v['tjrz']['tag_4_cnt']?>(<?=isset($v['finish']['score'][4])? $v['finish']['score'][4] :'-'?>)</td>
+                            <td><?=$v['tjrz']['tag_5_cnt']?>(<?=isset($v['finish']['score'][5])? $v['finish']['score'][5] :'-'?>)</td>
+                            <td><?=$v['tjrz']['tag_6_cnt']?>(<?=isset($v['finish']['score'][6])? $v['finish']['score'][6] :'-'?>)</td>
+                        <?php else:?>
+                            <td><?=date('Y-m-d H:i',$v['ctime'])?></td>
+                        <?php endif;?>
+                    </tr>
+                <?php endforeach;?>
+                </tbody>
+            </table>
+            </div>
+
+            <?php endif;?>
+
+
+            <div class="flexbox">
+                <div class="dr-page flex"> </div>
+                <div><a href="<?=R($DR_SELF,  ['export'=>1] )?>" class="sui-btn  btn-info">导出</a> </div>
+            </div>
+
+
+        </div>
+        <div class="sp3">
+            <div class="dr-box-padding">
+                <div class="dr-box-title">创建人</div>
+                <a class="book-create" >
+                    <div class="head-large"><img src="<?=H($user[$class['user_id']]['head'])?>"></div>
+                    <div href=""><?=$user[$class['user_id']]['name']?></div>
+                </a>
+            </div>
+            <?php if($class_role):?>
+            <div class="dr-box-padding">
+                <div class="dr-box-title">任课教师</div>
+                <div class="dr-box-content book-admin">
+                    <?php   foreach( $class_role  as $bk ): ?>
+                        <a class="book-admin-item" >
+                            <div class="head"><img src="<?=H($user[$bk['user_id']]['head'])?>"></div>
+                            <?=$user[$bk['user_id']]['name']?>
+                        </a>
+                    <?php endforeach;?>
+                </div>
+            </div>
+            <?php endif;?>
+
+
+            <div class="dr-box-padding">
+                <div class="dr-box-title">白名单</div>
+                <div class="dr-box-content">
+                    <?php if( $class_teacher ):?>
+                        <h4>导入老师</h4>
+                    <div class="book-admin" style="padding-bottom: 30px; ">
+                        <?php   foreach( $class_teacher  as $bk ): ?>
+                            <a class="book-admin-item"  style="height: 90px; <?php if($bk['ct_id']==$_GET['ct_id'] ): ?> color: red;<?php endif; ?>  " href="<?=R('/cls/studentList/book/'.$class['class_id'].'?ct_id='.$bk['ct_id'] )?>">
+                                <div class="head"><img src="<?=H($user[$bk['user_id']]['head'])?>"></div>
+                                <div><?=$bk['cnt']?>人</div>
+                                <div><?=$user[$bk['user_id']]['name']?></div>
+                            </a>
+                        <?php endforeach;?>
+                    </div>
+                    <div style="clear: both"></div>
+                    <?php endif; ?>
+                    <div class="des2">导入说明：表头必须为 序号/学号/姓名</div>
+                    <p><button   class="sui-btn btn-primary" id="upload">导入白名单</button> <a href="/res/class_teacher.xlsx">模板下载</a></p>
+
+                </div>
+            </div>
+
+            <div  class="dr-box-padding">
+                <div class="dr-box-title">终分（最终成绩）说明</div>
+                <div class="dr-box-content">
+                    <div class="des2">
+                        1.多本书先取完成的
+                        <br>2.多本书完成条件相同，取成绩高的
+                        <br>3.每本书都有自己的任务，权重仅考虑本书相关的任务
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+<script src="<?=$_cdn?><?=$WWW_RES?>/js/plupload/plupload.full.min.js"></script>
+<script>
+    $(function () {
+        DR.uploadone( 'upload'
+            ,{
+                cb:function (rep) {  }
+                ,query:'class_id=<?=$class['class_id']?>'
+                ,url:'<?=R('cls/studentList/implode')?>'
+                ,ext:'xls,xlsx'
+            });
+
+    });
+</script>

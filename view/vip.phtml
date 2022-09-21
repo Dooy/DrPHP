@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <htitle>
+    <title v-html="st.fee+':'+ u.n" v-if="st.fee"><?=($site_title?$site_title.'-':'')?></title>
+    <title v-html="u.n"><?=($site_title?$site_title.'-':'')?></title>
+    </htitle>
+    <link href="<?=$_cdn?><?=$WWW_RES?>/sui/css/sui.min.css" rel="stylesheet">
+    <link href="<?=$_cdn?><?=$WWW_RES?>/css/dr.css?d=0929" rel="stylesheet">
+    <link href="<?=$_cdn?><?=$WWW_RES?>/js/art/dialog.css" rel="stylesheet">
+
+
+    <script type="text/javascript" src="<?=$_cdn?><?=$WWW_RES?>/js/jquery.min.js"></script>
+    <script type="text/javascript" src="<?=$_cdn?><?=$WWW_RES?>/js/vue.min.js"></script>
+    <script type="text/javascript" src="<?=$_cdn?><?=$WWW_RES?>/js/dr.js?d=2005"></script>
+    <script type="text/javascript" src="<?=$_cdn?><?=$WWW_RES?>/js/art/dialog.js"></script>
+
+
+    <style>
+        body{margin: 0 auto;padding: 0; }
+        .slide-fade-enter-active {
+            transition: all .3s ease;
+        }
+        .slide-fade-leave-active {
+            transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+        }
+        .slide-fade-enter, .slide-fade-leave-to{
+            transform: translateX(300px);
+            opacity: 0;
+        }
+        @media screen and (max-width: 540px) {
+            .ad-head-open .leafmenu.hide2 {
+                display: none
+            }
+        }
+
+    </style>
+</head>
+<body style="background-color: #e8ecf0">
+<bobo>
+<div class="ad-head2">
+    <div class="flexbox">
+        <div class="flex"><a class="logo-txt"  ><?=$site_title?> </a></div>
+        <div class="ad-head-link">
+            <span  >欢迎<?=$_cu['name']?></span><i>|</i>
+            <a href="<?=R('logout')?>">登出</a>
+        </div>
+    </div>
+</div>
+
+<ul class="ad-head-menu">
+
+    <?php if($ma['role']==21): ?>
+        <li> <a  href="javascript:;" data-url="<?=R('vip/mc/tj')?>"   ><i class="sui-icon icon-tb-similar"></i> <span>概况</span></a></li>
+        <li> <a  href="javascript:;" data-url="<?=R('vip/mc')?>"   ><i class="sui-icon icon-tb-refund"></i> <span>商户</span></a></li>
+        <li> <a  href="javascript:;" data-url="<?=R('vip/tj')?>"   ><i class="sui-icon icon-tb-explore"></i> <span>收银统计</span></a></li>
+        <li> <a  href="javascript:;" data-url="<?=R('vip/bu/search')?>"   ><i class="sui-icon icon-tb-sort"></i> <span>订单明细</span></a></li>
+        <!--
+        <li> <a  href="javascript:;" data-url="<?=R('vip/cw')?>"   ><i class="sui-icon icon-tb-refund"></i> <span>财务</span></a></li>
+        <li> <a  href="javascript:;" data-url="<?=R('vip/ma2')?>"   ><i class="sui-icon icon-tb-friend"></i> <span>代理</span></a></li>
+        <li> <a  href="javascript:;" data-url="<?=R('vip/map')?>"   ><i class="sui-icon icon-tb-explore"></i> <span>视图</span></a></li>
+        -->
+    <?php else:?>
+
+    <li> <a  href="javascript:;" data-url="<?=R('vip/dan')?>" class="select" ><i class=" sui-icon icon-tb-time"></i> <span>收单</span></a></li>
+    <li> <a  href="javascript:;" data-url="<?=R('vip/account')?>"   ><i class="sui-icon icon-tb-similar"></i> <span>收款账号</span></a></li>
+    <li> <a  href="javascript:;" data-url="<?=R('vip/bu/search')?>"   ><i class="sui-icon icon-tb-sort"></i> <span>订单明细</span></a></li>
+    <li> <a  href="javascript:;" data-url="<?=R('vip/payLog')?>"   ><i class="sui-icon icon-tb-form"></i> <span>收款凭证</span></a></li>
+
+    <li>
+        <a class="menu-one" href="javascript:;"><i class="sui-icon icon-tb-refund"></i> <span >财务</span></a>
+        <ul class="leafmenu">
+            <li><a  href="javascript:;" data-url="<?=R('vip/cw')?>"   ><i class="sui-icon icon-tb-refund"></i> <span>全部明细</span></a></li>
+            <?php foreach ( $cwTab as $k2=>$v2): ?>
+                <li><a  href="javascript:;" data-url="<?=R('vip/cw?tab='.$k2)?>"   ><span><?=$v2['n']?></span></a></li>
+            <?php endforeach; ?>
+        </ul>
+    </li>
+
+    <li> <a  href="javascript:;" data-url="<?=R('vip/ma2')?>"   ><i class="sui-icon icon-tb-friend"></i> <span>代理</span></a></li>
+    <li> <a  href="javascript:;" data-url="<?=R('vip/map')?>"   ><i class="sui-icon icon-tb-explore"></i> <span>归集视图</span></a></li>
+    <?php endif; ?>
+    <!--
+    <li> <a  href="javascript:;" data-url="<?=R('vip/account/accMather')?>"   ><i class="sui-icon icon-tb-like"></i> <span>地区分布</span></a></li>
+    -->
+
+
+    <li >
+        <a class="menu-one" href="javascript:;"><i class="sui-icon icon-tb-settings"></i> <span >设置</span></a>
+        <ul class="leafmenu">
+            <li> <a  href="javascript:;" data-url="<?=R('member/changPsw')?>"  >修改登录密码</a></li>
+            <li> <a  href="javascript:;" data-url="<?=R('vip/psw')?>"  >修改支付密码</a></li>
+            <li> <a  href="javascript:;" data-url="<?=R('member/vip')?>"  >个人信息</a></li>
+            <li> <a  href="javascript:;" data-url="<?=R('member/google')?>">谷歌验证绑定</a></li>
+            <li> <a  href="javascript:;" data-url="<?=R('member/log')?>"  >登录日志</a></li>
+        </ul>
+    </li>
+
+
+
+
+
+</ul>
+<div class="ad-head-top">
+  <span>菜单名称</span>
+</div>
+<div class="ad-head-iframe" style="overflow: auto;-webkit-overflow-scrolling: touch;">
+    <iframe src="<?= in_array($ma['role'],[21] )? R('vip/mc/tj'):R('vip/dan')?>" style="width: 100%; height: 100%;border: 0px; overflow:auto " id="ad-iframe"></iframe>
+</div>
+
+
+
+    <transition name="slide-fade">
+        <div v-if="st.if_url!=''" style="background-color:#FFFFFF;overflow: hidden;bottom: 0;right: 0;width: 450px;top:61px;position: absolute;z-index: 20; box-shadow :-1px 0px 1px #666 ">
+            <iframe :src="st.if_url" style="width: 100%; height: 100%;border: 0px; overflow:auto "  ></iframe>
+            <div style="z-index: 21; border-radius:0 0  0  50%; top: -50px; position: absolute;
+        width: 100px; height: 100px; background-color:rgba(0,0,0,0.3);right: -50px;" @click="st.if_url=''"></div>
+            <div style="z-index: 22; cursor: pointer;position: absolute; right: 5px; top:5px; "  @click="st.if_url=''"> <i class="sui-icon icon-tb-close" style="font-size: 30px;color: #fff"></i></div>
+        </div>
+    </transition>
+
+</bobo>
+</body>
+
+<script>
+    $(function () {
+        var ui={
+            iframe:$('#ad-iframe')
+            ,a: $('.ad-head-menu a')
+            ,menu: $('.menu-one')
+        };
+        ui.a.click(function () {
+            var that = $(this);
+            var url = that.data('url');
+            if( 'undefined'== typeof  url ) return false ;
+            ui.iframe.attr('src', url );
+            ui.a.removeClass('select' );
+            that.addClass('select');
+            return false ;
+            //alert( url );
+        });
+        ui.menu.click(function () {
+            var that = $(this);
+            var pli = that.parents( 'li');
+            var clname = pli.attr('class');
+
+            if('undefined' != typeof  clname && clname.indexOf( 'ad-head-open')>=0) pli.removeClass( 'ad-head-open');
+            else pli.addClass( 'ad-head-open');
+        });
+    });
+    window.goo=function (str) {
+        //alert( str );
+        hvm.st.fee= str;
+    }
+
+    var hvm= new Vue({
+        el: 'htitle',
+        data: {
+            u:{n:'<?=$_cu['name']?>'},
+            st:{fee:''}
+        }
+        ,
+        created: function () {
+        },
+        mounted: function () {
+
+        },
+        methods: {}
+    });
+
+    var vm = new Vue({
+        el: 'bobo',
+        data: {
+            st:{if_url:'',is_min_tab:false, is_click:false}
+            ,notice:{cnt:0}
+        }
+        ,
+        created: function () {
+        },
+        mounted: function () {
+            //this.showGoogle();
+            //this.loadNotice();
+            //setInterval( this.loadNotice, 1000*45);
+
+            <?php if( !$ma['isGoogle']):?>
+            //this.showGoogle();
+            <?php endif;?>
+        },
+        methods: {
+            loadNotice:function () {
+
+                return ;
+                var that = this;
+                var d = dialog({
+                    title: '群富' ,
+                    content: '您有新的提现转账请求需要处理！'
+                    ,cancelValue: '暂不处理'
+                    ,okValue: '去处理',
+                    cancel: function () {
+                        //location.reload();
+                    }
+                    ,ok:function(){
+                        //alert('ok');
+                        var _if= $('#ad-iframe');
+                        _if.attr('src',  '/console/transfer2' );
+                    }
+                });
+
+                DR.ajax('/console/tool/tr'  ,{ loadingstr:false},{success:function (rep) {
+                    if( rep.data.cnt>that.notice.cnt ) d.showModal();
+                    that.notice.cnt= rep.data.cnt ;
+                    //console.log( rep );
+                }});
+            }
+            ,showGoogle:function () {
+                var d = dialog({
+                    title: '通知' ,
+                    content: '<div style="width: 320px">系统将在 2019-09-20全面启用登录需谷歌验证码，请大家先下载谷歌验证器，并先验证绑定！</div>'
+                    ,cancelValue: '先放放'
+                    ,okValue: '验证绑定'
+                    ,cancel: function () {
+                    }
+                    ,ok:function(){
+                        var ui= {
+                            iframe: $('#ad-iframe')
+                        };
+                        ui.iframe.attr('src', '/member/google' );
+                    }
+                });
+                d.showModal();
+            }
+        }
+    });
+
+    window.goo2=function (obj) {
+        vm.st.if_url=  obj.url ;
+        //hvm.st.fee= str;
+    }
+</script>
+
+</html>
+
+
+

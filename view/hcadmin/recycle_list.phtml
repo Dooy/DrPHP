@@ -1,0 +1,33 @@
+<div style="padding: 8px 5px 5px 0px;">
+    <div class="sui-btn-group">
+        <?php foreach($type as $k=>$v ): ?>
+        <a class="sui-btn <?=$tid==$k?'btn-primary':'btn-bordered'?> " href="/hcadmin/recycleList?tid=<?=$k?>"><?=$v['n']?></a>
+        <?php endforeach; ?>
+    </div>
+
+</div>
+<table class="sui-table table-bordered">
+    <thead>
+    <tr>
+        <th>操作ID</th>
+        <th>操作人</th>
+        <th>删除时间</th>
+        <th>内容</th>
+        <!--<th>状态</th>-->
+
+    </tr>
+    </thead>
+    <tbody>
+    <?php foreach ( $list['list'] as $v ) : ?>
+        <tr>
+            <td><?=$v['opt_id']?> </td>
+            <td><a href="/hcadmin/user/edit/<?=$v['user_id']?>" target="_blank"><?=$user[$v['user_id']]['name']?></a> </td>
+            <td><?=date("Y-m-d H:i:s",$v['ctime'])?></td>
+            <td><?=$v['opt_value']?></td>
+            <!--<td><?=$v['code']==100?'待发':$v['code']?></td>-->
+        </tr>
+    <?php endforeach;?>
+    </tbody>
+</table>
+
+<div class="dr-page"><?=$list['page']?></div>

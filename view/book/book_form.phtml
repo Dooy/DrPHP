@@ -1,0 +1,211 @@
+<link href="<?=$WWW_RES?>/sui/css/sui-append.min.css" rel="stylesheet">
+<div class="dr-container">
+    <form id="form-book" class="sui-form form-horizontal" novalidate="novalidate " action="<?=$action?>">
+        <div class="control-group-cart"  >
+            <div class="flexbox control-group-cart-title">
+                <div class="flex"><b >书刊基础资料</b></div>
+                <div class="group-cart-op">
+                    <!-- <i class="sui-icon icon-tb-right"></i> -->
+                     <i class="sui-icon icon-tb-unfold"></i>
+                </div>
+            </div>
+            <div class="control-group-cart-content" style="display: block">
+                <div class="control-group">
+                    <label class="control-label sui-text-xlarge "  ></label>
+                    <div class="controls">
+                        <div class="book-detail-img" title="点击图片增加或者修改"  id="upload"  ><img src="<?=$book['book_img']?$book['book_img']:'/res/img/feng.png'?>" id="bk_img"   ></div>
+
+                        <div class="sui-msg msg-tips msg-naked  help-block">
+                            <div class="msg-con">大小：300px*450px,点击图片就能上传</div>
+                            <s class="msg-icon"></s>
+                        </div>
+                        <input type="hidden" value="<?=$book['book_img']?>" name="book_img" id="book_img"/>
+                    </div>
+                </div>
+                <div class="control-group ">
+                    <label class="control-label v-top"  >书名：</label>
+                    <div class="controls">
+                        <input type="text" data-rules="required"  id="book"  name="book" placeholder="请填写书名" data-empty-msg="请填写书名" value="<?=$book['book']?>">
+
+                    </div>
+                </div>
+
+
+                <div class="control-group ">
+                    <label class="control-label v-top"  >指定学期：</label>
+                    <div class="controls">
+                       <select name="term_key">
+                           <?php foreach( $termList as $k=>$v ):?>
+                           <option value="<?=$k?>" <?php if($k==$term_key ):?> selected<?php endif;?>><?=$v['term']?></option>
+                           <?php endforeach; ?>
+                       </select>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label v-top"  >任务：</label>
+                    <div class="controls">
+                        <label data-toggle="checkbox" class="checkbox-pretty inline checked  disabled">
+                            <input type="checkbox" checked="checked"  value="1"  disabled=""><span style="color: #333">讨论</span>
+                        </label>
+
+                        <label data-toggle="checkbox" class="checkbox-pretty inline <?php if($book['tag_3_config'] || !isset( $book['tag_3_config'] ) ):?> checked<?php endif;?>">
+                            <input type="checkbox" <?php if($book['tag_3_config'] ||! isset( $book['tag_3_config'] ) ):?>checked="checked"<?php endif;?> name="tag_3_config" value="1"><span>朗读</span>
+                        </label>
+                        <label data-toggle="checkbox" class="checkbox-pretty inline <?php if($book['tag_4_config']  ):?> checked<?php endif;?>">
+                            <input type="checkbox" name="tag_4_config" value="1" <?php if($book['tag_4_config'] ):?>checked="checked"<?php endif;?>><span>期中概要</span>
+                        </label>
+
+                        <label data-toggle="checkbox" class="checkbox-pretty inline <?php if($book['tag_5_config']||! isset( $book['tag_5_config'] )):?> checked<?php endif;?>">
+                            <input type="checkbox" name="tag_5_config" value="1" <?php if($book['tag_5_config']||! isset( $book['tag_5_config'] )):?>checked="checked"<?php endif;?>><span>期末报告</span>
+                        </label>
+
+
+                        <label data-toggle="checkbox" class="checkbox-pretty inline <?php if( $book['tag_6_config'] ):?> checked<?php endif;?>">
+                            <input type="checkbox" name="tag_6_config" value="1" <?php if($book['tag_6_config'] ):?>checked="checked"<?php endif;?>><span>摘抄</span>
+                        </label>
+
+                        <div class="sui-msg msg-tips msg-naked  ">
+                            <div class="msg-con">勾选与否直接在前台显示</div>
+                            <s class="msg-icon"></s>
+                        </div>
+                    </div>
+                </div>
+
+
+                <?php if (!$_is_admin): ?>
+                    <input type="hidden"    name="school"   value="<?=$_cu['school']?>">
+                <?php else: ?>
+                <div class="control-group">
+                    <label class="control-label"  >学校：</label>
+                    <div class="controls">
+                        <input type="text"  data-rules="required"  class="" name="school" placeholder="请填写所属学校" data-empty-msg="请填写学校" value="<?=$book['school']?$book['school']:$_cu['school']?>">
+                    </div>
+                </div>
+                <?php endif; ?>
+
+
+
+                <div class="control-group">
+                    <label class="control-label"  >作者：</label>
+                    <div class="controls">
+                        <input type="text"  data-rules="required"  name="book_writer" placeholder="请填写作者" data-empty-msg="请填写作者" value="<?=$book['book_writer']?>">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label"  >ISBN：</label>
+                    <div class="controls">
+                        <input type="text"  name="book_isbn" placeholder="ISBN唯一号" data-empty-msg="管理员必须添加isbn" value="<?=$book['book_isbn']?>" <?php if($_is_admin):?>data-rules="required"<?php endif;?>>
+                    </div>
+                </div>
+
+
+
+
+
+
+
+                <div class="control-group ">
+                    <label class="control-label "  >PDF：</label>
+                    <div class="controls">
+                        <a href="<?=$book['book_pdf']?$book['book_pdf']:$book['isbn']['book_pdf']?>" id="bk_pdf" style="display:<?php if($book['book_pdf']|| $book['isbn']['book_pdf']) :?> <?php else:?> none<?php endif;?>">下载</a>
+                        <a href="javascript:;" id="upload_pdf" class="sui-btn btn-warning"><i class="sui-icon icon-pencil"></i> 上传PDF</a>
+                        <input type="hidden" value="<?=$book['book_pdf']?$book['book_pdf']:$book['isbn']['book_pdf']?>" name="book_pdf" id="book_pdf"/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="inputNick" class="control-label v-top hide-min">介绍：</label>
+                    <div class="controls">
+                        <textarea id="info" name="book_info" style="width:450px;height:200px;"  data-empty-msg="请填写描述" placeholder="请填写描述" ><?=$book['book_info']?></textarea>
+                    </div>
+                </div>
+
+                <!--
+                <div class="control-group">
+                    <label for="inputNick" class="control-label v-top hide-min">导读：</label>
+                    <div class="controls">
+                        <textarea id="info" name="book_plan" style="width:450px;height:200px;"  data-empty-msg="请填写读书计划" placeholder="请填写读书计划、引导学生如何读" ><?=$book['book_plan']?></textarea>
+                    </div>
+                </div>
+                -->
+                <?php if( $_is_school && $teacher): ?>
+                    <div class="control-group">
+                        <label for="inputNick" class="control-label v-top" title="为本书指定指导教师">指导教师：</label>
+                        <div class="controls">
+                            <?php foreach ($teacher as $tu) :?>
+                            <label class="checkbox-pretty inline <?php if( isset( $bookAdminUser[ $tu['user_id']] )):?> checked<?php endif;?>">
+                                <input type="checkbox" <?php if( isset( $bookAdminUser[ $tu['user_id']] )):?>checked="checked"<?php endif;?>  name="teacher[]" value="<?=$tu['user_id']?>"><span><?=$tu['name']?></span>
+                            </label>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    <input name="teacher_display" value="1" type="hidden">
+                <?php endif;?>
+
+
+            </div>
+        </div>
+
+
+        <?php
+        include "bf_select.phtml";
+        include "bf_task.phtml";
+       include "bf_isbn.phtml" ;
+        ?>
+
+
+
+        <div class="control-group">
+            <label for="inputNick" class="control-label sui-text-xlarge v-top "> </label>
+            <div class="controls">
+                <button type="submit" class="sui-btn btn-primary btn-xlarge">提交</button>
+            </div>
+        </div>
+
+
+
+
+    </form>
+</div>
+<script type="text/javascript" src="<?=$_cdn?>/res/js/plupload/plupload.full.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="<?=$_cdn?>/res/ueditor/ueditor.me.config.js"></script>
+<script type="text/javascript" charset="utf-8" src="<?=$_cdn?>/res/ueditor/ueditor.all.min.js"> </script>
+<script type="text/javascript" charset="utf-8" src="<?=$_cdn?>/res/ueditor/lang/zh-cn/zh-cn.js"></script>
+
+<script>
+    var ue = UE.getEditor('info');
+
+    $(function () {
+        DR.ajaxAndValidate( 'form-book');
+        DR.uploadone( 'upload',{cb:function (rep) {
+            //alert(rep.file )
+            var file= '/'+ rep.file;
+            $('#bk_img').attr('src',file);
+            $('#book_img').val( file );
+        },query:'from=book'} );
+
+
+        DR.uploadone( 'upload_pdf',{cb:function (rep) {
+            //alert(rep.file )
+            var file= '/'+ rep.file;
+            $('#bk_pdf').attr('href',file).show();
+            $('#book_pdf').val( file );
+        },query:'from=bookpdf'
+            ,max_file_size:'30mb'
+        } );
+        $('.upload').click( function () {
+            $('#upload').click();
+        });
+
+        $('.control-group-cart-title').click( function () {
+            var that = $(this);//
+            var p =that.parents('.control-group-cart').find('.control-group-cart-content');
+            var display= p.css('display');
+            p.slideToggle();
+            that.find('.group-cart-op').html( display!='none'?'<i class="sui-icon icon-tb-right"></i>':'<i class="sui-icon icon-tb-unfold"></i>' );
+        });
+
+
+    })
+</script>

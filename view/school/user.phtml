@@ -1,0 +1,58 @@
+
+<div style="margin-top: 20px;  max-width: 600px;">
+    <?php
+        include dirname(  dirname(__FILE__)) ."/hcadmin/op_user.phtml";
+    ?>
+
+    <hr>
+
+    <form class="sui-form form-inline"  id="form-psw" action="<?=R($_c.'/user/edit_psw/'. $me['user']['user_id'])?>">
+        <div class="input-append">
+            <input id="passwd" name="passwd" placeholder="密码至少6位" type="text" class="span2">
+            <button type="button" class="sui-btn" id="psw-btn">重置密码</button>
+        </div>
+    </form>
+
+    <hr>
+
+    <table class="sui-table table-bordered table-sideheader">
+        <thead>
+        <tr>
+            <th width="100">类型</th>
+            <th>账号</th>
+            <th>绑定时间</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ( $me['oauth'] as $k=>$v ): ?>
+        <?php foreach ($v as $k2=>$v2 ): ?>
+        <tr>
+            <td><?=$from_type[$k]?></td>
+            <td><?=$v2['openid']?></td>
+            <td><?=date("Y-m-d",$v2['ctime'])?></td>
+        </tr>
+        <?php endforeach; ?>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+
+</div>
+
+<script>
+    $(function () {
+//        $('.attr_checkbox').change(function () {
+//            //alert(this.value );
+//            var that = $(this);
+//            var attr= { };
+//            attr[ that.attr('name') ]=  that.val();
+//            DR.ajax( that.data('url'),{'data':{'attr':attr } })
+//        });
+        DR.ajaxAndValidate( 'form-user');
+        $('#psw-btn').click(function () {
+            DR.ajaxForm( 'form-psw' );
+        });
+//        $('#bindOpenId').click(function () {
+//            DR.ajaxForm( 'form-bind' );
+//        });
+    });
+</script>

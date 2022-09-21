@@ -1,0 +1,22 @@
+<div class="dr-container">
+  <div class="dr-box-padding">
+
+        <h1><?php if('modify'== $p[0]): ?>修改<?php else: ?>发布新主题<?php endif;?> </h1>
+        <ul class="sui-nav nav-tabs nav-large book-nav" id="new-topic-tab">
+
+            <!--<li class="active" data-v="0"><a data-toggle="tab">讨论</a></li>
+            <li class="active"><a href="#" data-toggle="tab">问答</a></li>
+            <li><a href="#" data-toggle="tab">任务</a></li>
+
+            <?php foreach ( $tags as $k=>$v): ?>
+                <li class="<?php if( ($k==0 && !$topic) || $k==$topic['tag_id'] ): ?>active<?php endif;  ?>"  data-v="<?=$k?>"><a href="javascrpt:;" data-toggle="tab"><i class="sui-icon <?=$v['cl']?>"></i> <?=$v['n']?></a></li>
+            <?php endforeach; ?>
+            -->
+            <li class="active"  data-v="<?=$tag_id?>"><a href="javascrpt:;" data-toggle="tab"><i class="sui-icon <?=$tags[$tag_id]['cl']?>"></i> <?=$tags[$tag_id]['n']?></a></li>
+
+        </ul>
+      <?php include "op_new.phtml" ;?>
+    </div>
+</div>
+
+

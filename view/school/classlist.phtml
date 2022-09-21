@@ -1,0 +1,131 @@
+<script src="<?=$_cdn?><?=$WWW_RES?>/js/plupload/plupload.full.min.js"></script>
+
+<div style="padding: 8px 5px 5px 0px;">
+
+    <form id="user-search" action="<?=$p[0]=='block'?R($DR_SELF):R( $_c.'/classList/search')?>"  class="sui-form pull-left">
+        <input type="text" placeholder="班级名称" class="input-medium" name="q" value="<?=$get['q']?>">
+        <input type="hidden" name="block_id" value="<?=$block_id?>">
+        <button type="submit" class="sui-btn ">查找</button>
+    </form>
+
+    <div class=" pull-right" style="padding: 3px 0 0 3px;">
+        <?php if($p[0]!='block'): ?>
+          <span class="sui-dropdown dropdown-bordered select"><span class="dropdown-inner"><a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle"><span class="dropdown-value"><?=($termList[$term_key]['term'])? $termList[$term_key]['term'] :'全部学期'?></span> <i class="caret"></i></a>
+            <ul id="menu1" role="menu" aria-labelledby="drop1" class="sui-dropdown-menu">
+                <?php if($term_key): ?>  <li role="presentation" ><a role="menuitem" tabindex="-1" href="<?=R($_c.'/classList' )?>">全部学期</a></li><?php endif;  ?>
+                <?php foreach ($termList as $k2=>$v2): ?>
+                    <li role="presentation" ><a role="menuitem" tabindex="-1" href="<?=R($_c.'/classList/school/'.$k2 )?>"><?php if($k2==$term_now): ?>(当前)<?php endif; ?> <?=$v2['term']?></a></li>
+                <?php  endforeach; ?>
+            </ul></span>
+          </span>
+        <?php endif; ?>
+
+            <a class="sui-btn" href="<?=R($DR_SELF, ['export'=>'teacher'])?>">按老师导出</a>
+            <button id="upload" class="sui-btn   ">班级导入</button>
+            <a href="/res/class.xlsx">模板下载</a>
+    </div>
+    <div style="clear: both"></div>
+</div>
+<?php if ( $classList['list']  ) : ?>
+
+
+    <table class="sui-table table-bordered">
+        <thead>
+        <tr>
+            <th>班群号/名称</th>
+            <th>年级<br>学期</th>
+            <th>实加人数<br>白名单人数</th>
+            <th>创建</th>
+            <th>任务</th>
+            <th>任课教师</th>
+            <th>属性</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ( $classList['list'] as $v ) : ?>
+            <tr>
+                <td><?=$v['class_id']?><br><?=$v['class']?> </td>
+                <td>
+                    <?=$grade[$v['grade']]?>
+                    <br>
+                    <?=$termList[$v['term_key']]['term']?>
+                    <!--
+                    <span class="sui-dropdown"><span class="dropdown-inner"><a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle"><span class="dropdown-value"><?=$termList[$v['term_key']]['term']?></span> <i class="caret"></i></a>
+                        <ul id="menu1" role="menu" aria-labelledby="drop1" class="sui-dropdown-menu">
+                            <?php foreach ($termList as $k2=>$v2): ?>
+                                <li role="presentation" class="booktype" data-url="<?=R($_c.'/classList/edit_term/'.$v['class_id'].'/'.$k2)?>"><a role="menuitem" tabindex="-1" href="javascript:;"><?=$v2['term']?></a></li>
+                            <?php  endforeach; ?>
+                        </ul></span>
+                     </span>
+                     -->
+
+                </td>
+                <td><?=$v['stu_cnt']?>/<?=$v['school_user_cnt']?></td>
+                <td><?=$users[$v['user_id']]['name']?><?php if($users[$v['user_id']]['ts']=='2') :?><span style="color: red">(学生)</span><?php endif;?><br><?=date("Y-m-d", $v['ctime'])?></td>
+                <td><?=array_sum( $v['tj'])?></td>
+                <td>
+                    <?php foreach ( $v['role'] as $uid=>$role): ?>
+                        <span data-url="<?=R($_c.'/user/edit/'.$uid )?>" class="dr-iframe dr-pointer" ><?=$users[$uid]['name']?></span>
+                    <?php endforeach; ?>
+                </td>
+                <td><?=$cls_type[$v['type']]?></td>
+                <td>
+                    [<a  href="<?=R($_c.'/class/edit/'. $v['class_id'])?>"  >编辑</a>]
+                    [<a  href="<?=R('cls/studentList/def/'. $v['class_id'])?>" target="_blank" >实际加入</a>]<br>
+                    [<a  href="<?=R('cls/studentList/book/'. $v['class_id'])?>"  target="_blank">读书情况</a>]
+                    [<a  href="javascript:;"  data-url="<?=R($_c.'/class/realdel/'. $v['class_id'])?>" class="ajax-url"   >删除</a>]
+                    <?php if($term_conf['is_school_user']):?>[<a  href="<?=R($_c.'/schoolUserList/search/?sq=class_id&q='. $v['class_id'])?>"   target="_blank"  >白名单</a>]<?php endif;?>
+                </td>
+            </tr>
+        <?php endforeach;?>
+        </tbody>
+    </table>
+    <div class="dr-page"><?=$classList['page']?></div>
+<?php else: ?>
+    <div class="sui-msg msg-large msg-block msg-notice">
+        <div class="msg-con">该条件下 无匹配结果 <button type="button" data-dismiss="msgs" class="sui-close">×</button> </div>
+        <s class="msg-icon"></s>
+    </div>
+<?php endif; ?>
+
+
+
+
+
+<div class="dr-info">
+    <ul>
+        说明：
+        <li>1.利用excel批量导入班级,能指定任课教师</li>
+        <li>2.一个班级可指定多名任课教师</li>
+        <li>3.任课教师作为班群共享者、而非创建者，不可对班级进行编辑</li>
+        <li>4.不支持更改学期</li>
+        <li>5.同一个学期下，班级不重复（不同学期班级可重复）！</li>
+    </ul>
+</div>
+
+<script>
+    $(function () {
+        DR.uploadone( 'upload'
+            ,{
+                cb:function (rep) {
+                    DR.tip("插入："+rep.rz.insert+"条\n更新："+  rep.rz.update +'条',{'style':'success'} );
+                    setTimeout( function () {    location.reload()      } , 2500 ) ;
+                }
+                ,query:'abc=123&block_id=<?=$block_id?>'
+                ,url:'<?=R('school/classList/implode')?>'
+                ,ext:'xls,xlsx'
+            });
+        $('.ajax-url').click(DR.ajaxUrl );
+        $('.dr-iframe').click( DR.iframe_fun );
+
+//        $('.booktype').click(function () {
+//            var that = $(this);
+//            var p= that.parents('.dropdown-inner');
+//            //alert( that.data('url') );
+//            DR.ajax( that.data('url') );
+//            p.find('.dropdown-value').html( that.text()  );
+//        });
+
+    });
+</script>

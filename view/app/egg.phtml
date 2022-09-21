@@ -1,0 +1,117 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <?php include "bk_head.phtml";?>
+    <link rel="stylesheet" type="text/css" href="<?=$hc_app?>/css/icons-haoce.css?v=<?=$version?>" />
+    <style>
+        #bohe ul, #bohe li{ padding: 0 ;margin: 0; list-style: none}
+        #bohe li{width: 187px; float: left; height: 187px; position: relative }
+        @media screen  and (max-width: 374px) {
+            #bohe li{width: 50%;}
+        }
+        #bohe .title{ position: absolute;height: 20px; width: 100%; text-align: center;left: 0;bottom: 0px; background-color: rgba(0,0,0,0.2) ;color: #fff }
+    </style>
+</head>
+<body>
+<bobo>
+    <div class="mui-content">
+        <div id="video" style="height:20px;background-color:#000000;margin:auto;width: 20px;margin-top: -20px;;"></div>
+        <div id="bohe" style=" z-index: 11;">
+            <ul>
+                <template v-for="v in list" >
+                <li @tap="play(v)" v-if="v.url!=''&& v.url!='http://zhibocdnvideo.aafsasd.com:88/oldlivesource/'">
+                    <img :src="v.pic" style="width: 100%;height: 100%">
+                    <div class="title mui-ellipsis" v-html="v.name"></div>
+                </li>
+                </template>
+            </ul>
+        </div>
+
+    </div>
+</bobo>
+</body>
+
+<script src="https://apps.bdimg.com/libs/crypto-js/3.1.2/components/core-min.js"></script>
+<script src="https://apps.bdimg.com/libs/crypto-js/3.1.2/components/enc-base64-min.js"></script>
+<script src="https://apps.bdimg.com/libs/crypto-js/3.1.2/components/cipher-core-min.js"></script>
+<script src="https://apps.bdimg.com/libs/crypto-js/3.1.2/components/mode-ecb-min.js"></script>
+<script src="https://apps.bdimg.com/libs/crypto-js/3.1.2/components/aes-min.js"></script>
+
+
+
+<script>
+
+    new Vue({
+        el: 'bobo',
+        data: {
+            list: []
+            , hc_video: null
+            , cp:{key:'aaaabbbbccccdddd' }
+            ,st:{ str:''}
+        },
+        created: function () {
+            //this.load();
+            //console.log( str );
+            mui.plusReady(this.plusInit);
+        },
+        mounted: function () {
+        },
+        methods: {
+            plusInit:function () {
+                this.load();
+                this.hc_video= new HC.video('video');
+                this.hc_video.local_play_init();
+            },
+            test:function(){
+                var str = this.enCode( 'I am a good student');
+                console.log(str);
+                this.deCode( str );
+            },
+            load:function () {
+                mui.getJSON('http://api.egffdfs.com:81/live/zhubo',  this.anly);
+            }
+            ,anly:function (rep) {
+                this.st.str =   this.deCode(rep.data);
+                //console.log( this.st.str);
+                //return ;
+                eval('var arr='+ this.deCode(rep.data) +';');
+                this.list = arr ;
+                console.log( arr);
+            }
+            ,deCode:function (content) {
+                var key=  CryptoJS.enc.Utf8.parse( this.cp.key );
+                console.log('key',key );
+                //return ;
+
+                var bytes = CryptoJS.AES.decrypt(content , key, {
+                    //iv: key,
+                    mode: CryptoJS.mode.ECB,
+                    padding: CryptoJS.pad.Pkcs7
+                });
+                var decryptResult = bytes.toString(CryptoJS.enc.Utf8);
+                return decryptResult.toString();
+            }
+            ,enCode:function (content) {
+                var key=  CryptoJS.enc.Utf8.parse( this.cp.key );
+                var encryptResult = CryptoJS.AES.encrypt(content, key, {
+                    //iv: key,
+                    mode: CryptoJS.mode.ECB,
+                    padding: CryptoJS.pad.Pkcs7
+                });
+                return encryptResult.toString().toUpperCase();
+            }
+            ,play:function (v) {
+                console.log( v.url );
+                var url = v.url.replace( /{position}/,'1');
+                console.log( url );
+                this.hc_video.play(url);
+                //this.hc_video.play( v.pull );
+            }
+        }
+    });
+
+</script>
+</html>

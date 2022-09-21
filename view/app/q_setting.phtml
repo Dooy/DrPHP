@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>设置</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <?php include "bk_head.phtml";?>
+    <script src="<?=$hc_app?>/js/dc.js<?=$local_version?>"></script>
+    <style>
+        .title{
+            margin: 20px 15px 7px;
+            color: #6d6d72;
+            font-size: 15px;
+        }
+        #info .mui-btn-outlined{padding: 3px 6px;}
+
+        .button{
+            position:absolute;
+            color:aquamarine;
+            font-family:'微软雅黑';
+            width:80%;
+            line-height:2em;
+            border-radius:20px;
+            background:linear-gradient(45deg,BLUE,purple);
+            border:0px solid;
+            top:25%;
+            left: 10%;
+        }
+        .ul{
+            margin-top:15%;
+            background:#1a1d2e;
+            line-height:2em;
+        }
+        .li{
+            margin-left:10%;
+            font-family:'微软雅黑';
+            color:aquamarine;
+        }
+        .right{
+            position:absolute;
+            right:35px;
+            bottom:12px;
+            font-family:'微软雅黑';
+            color:#fff;
+        }
+    </style>
+</head>
+<body>
+<bobo>
+    <header class="mui-bar mui-bar-nav">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+
+        <h1 class="mui-title"  >设置</h1>
+
+    </header>
+    <div class="mui-content"  >
+        <ul class="mui-table-view ">
+
+            <li class="mui-table-view-cell mui-collapse-content"><p class="li">联系客服</p> </li>
+            <li class="mui-table-view-cell mui-collapse-content" ><p class="li">当前版本</p><p class="right">v2.0.0</p> </li>
+            <li class="mui-table-view-cell mui-collapse-content" ><p class="li">安全</p><p class="right" @click="location.href='/app/page/q_google'">绑定谷歌身份验证器</p> </li>
+            <li class="mui-table-view-cell mui-collapse-content" ><p class="li">登录安全</p><p class="right" @click="location.href='/app/page/q_psw'">密码修改</p> </li>
+            <li class="mui-table-view-cell mui-collapse-content" ><p class="li">实验室</p><p class="right" @click="location.href='/app/page/q_lab'">研究的力量</p> </li>
+        </ul>
+
+        <a href="javascript:void(0)"> <button type="button" class="button"style="margin-top:120px;" @click="loginout()" >退出登录</button></a>
+    </div>
+
+</bobo>
+</body>
+<script src="/res/js/clipboard.min.js"></script>
+<script>
+    new Vue({
+        el: 'bobo',
+        data: {
+            st:{tab:'<?=$_GET['tab']?>',nKey:'today' }
+            ,f:{price:5000, img:'',beizhu:''}
+            ,sv:{}
+            ,tx:{price:'' }
+            ,bill:{list:[],page:''}
+
+        }
+        ,
+        created: function () {
+            //this.load();
+        },
+        mounted: function () {
+            //this.initCopy();
+        },
+        methods: {
+            loginout:function () {
+                var  that = this;
+                HC.ajax('/logout', { success:function (rep) {
+                        //that.st.tab='login';
+                        location.href='/app/page/wo';
+                    }});
+            }
+        }
+    });
+</script>
+</html>

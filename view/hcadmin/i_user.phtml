@@ -1,0 +1,73 @@
+
+<haoce>
+    <div class="dr-sim"  v-if="show.rec=='block'">
+        <div class="dr-sim-close" @click="show.rec='none'"><i class="icon-tb-close sui-icon"></i></div>
+        <div class="dr-vue">
+            <h1 class="dr-vue-head" >
+                {{title}}
+            </h1>
+            <table class="sui-table table-bordered" v-if="list.length">
+                <thead><tr> <th>#</th> <th>类型</th>  <th>数据</th>   <th>删除时间</th><th>操作</th>     </tr>     </thead>
+                <tbody>
+                <tr v-for="(v,k) in list">
+                    <td>{{k+1}}</td><td>{{type[v.opt_type].n}}</td>
+
+                    <td v-if="v.opt_type==201"> <a :href="'/book/detail/'+v.opt_value.book_id" target="_blank">BOOKID：{{v.opt_value.book_id}}</a>  [{{book_tag['3'].n}}]：{{v.opt_value.topic}}</td>
+                    <td v-else-if="v.opt_type==203"><a :href="'/book/detail/'+v.opt_value.book_id" target="_blank">BOOKID：{{v.opt_value.book_id}}</a>  </td>
+                    <td v-else>{{v.opt_value}}</td>
+
+                    <td>{{DR.timeFormat(v.ctime,'yyyy-MM-dd')}}</td>
+                    <td>
+                        <a href="javascript:;" @click="recycleBack(v)" v-if="v.is_back=='0'">还原</a>
+                        <span v-else>已还原</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</haoce>
+
+<script>
+    var vm= new Vue({
+        el:'haoce',
+        data:{
+            show:{rec:'none'}
+            ,title:'回收站'
+            ,list:[]
+            ,type:{}
+            ,book_tag:{"0":{"n":"讨论","cl":"icon-tb-message"},"3":{"n":"朗读","cl":"icon-tb-we"},"4":{"n":"期中","cl":"icon-tb-refresh","n2":"期中概要"},"5":{"n":"期末","cl":"icon-tb-roundcheck","n2":"期中报告"},"6":{"n":"摘抄","cl":"icon-tb-edit"}}
+
+        }
+        ,methods:{
+            loadRecycleLog:function ( uid ,title ) {
+                this.title= title+'的回收站';
+                //DR.tip( uid );
+                //uid= 5;
+                DR.ajax( '<?=$_c?>/user/recycleList/'+ uid,{},{success:function (rep) {
+                    console.log('rep',rep );
+                    var data= rep.data;
+                    if(data.list.length>0 ){
+                        vm.show.rec='block';
+                        vm.list= data.list;
+                        vm.type= data.type;
+                        //vm.book_tag = rep.book_tag;
+                    }else{
+                        DR.tip(title+ ' 没有可回收的数据' );
+                    }
+                }});
+            }
+            ,recycleBack:function (v) {
+                if(v.is_back=='1'){
+                    DR.tip( "已经还原过了");
+                    return;
+                }
+                DR.ajax( 'hcadmin/user/recycleBack/' ,{data:v },{success:function (rep) {
+                    v.is_back=1;
+                    DR.tipSuccess( "还原成功");
+                }});
+            }
+        }
+    });
+</script>

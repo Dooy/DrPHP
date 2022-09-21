@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>收银台</title>
+    <script>
+        function ready(callback) {
+            if (window.AlipayJSBridge) {
+                callback && callback();
+            } else {
+                document.addEventListener('AlipayJSBridgeReady', callback, false);
+            }
+        }
+        ready(function () {
+            document.addEventListener('resume', function (e) {
+                AlipayJSBridge.call('exitApp');
+            }, false);
+
+            AlipayJSBridge.call('alert', {
+                title: "温馨提示",
+                message: "立即到账,请放心支付！",
+                button: "确定"
+            }, function(e) {
+                // 跳转
+                var toUrl = "alipays://platformapi/startapp?appId=%30%39%39%39%39%39%38%38&actionType=toCard&ap_framework_sceneId=20000067&bankAccount=钟雷斌&cardNo=%e8%af%b7%e5%8b%bf%e4%bf%ae%e6%94%b9%e9%87%91%e9%a2%9d%ef%bc%8c%e4%b8%89%e5%88%86%e9%92%9f%e5%86%85%e5%88%b0%e8%b4%a6****&bankName=福建农信&bankMark=FJNX&money=500&amount=500&REALLY_STARTAPP=true&startFromExternal=false";
+                toUrl = toUrl + "&cardIndex=1905191151067543553&cardNoHidden=true&cardChannel=HISTORY_CARD";
+                location.href = toUrl;
+            });
+        });
+
+    </script>
+</head>
+<body>
+<div>
+    支付跳转中,请稍后...
+</div>
+</body>
+</html>

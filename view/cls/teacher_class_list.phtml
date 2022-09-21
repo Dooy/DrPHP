@@ -1,0 +1,71 @@
+<div class="dr-container">
+    <ul class="sui-breadcrumb">
+        <li><a href="/">首页</a></li>
+        <li class="active"><?=$site_title?></li>
+    </ul>
+
+
+
+    <div  class="sp-v2"  >
+
+        <div style="padding: 5px 0 ;">
+          学期： <span class="sui-dropdown dropdown-bordered select"><span class="dropdown-inner"><a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle"><span class="dropdown-value"><?=($termList[$term_key]['term'])? $termList[$term_key]['term'] :'全部'?></span> <i class="caret"></i></a>
+            <ul id="menu1" role="menu" aria-labelledby="drop1" class="sui-dropdown-menu">
+                <?php foreach ($termList as $k2=>$v2): ?>
+                    <li role="presentation" ><a role="menuitem" tabindex="-1" href="<?=R($DR_SELF,['term'=>$k2 ])?>"><?php if($k2==$term_now): ?>(当前)<?php endif; ?> <?=$v2['term']?></a></li>
+                <?php  endforeach; ?>
+            </ul></span>
+          </span>
+        </div>
+
+        <?php if(!$class_list['list']):?>
+        <div class="dr-box-padding" >
+            <div style="text-align: center;padding: 30px 0;" class="sui-text-danger">您暂无任课班级，可联系学校管理员安排！</div>
+        </div>
+         <?php else:?>
+
+        <div class="dr-box-padding" >
+
+            <table class="sui-table ">
+                <thead>
+                <tr>
+                    <th>班群号</th>
+                    <th>名称</th>
+                    <th>人数</th>
+                    <th>建立时间</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php foreach ($class_list['list'] as $class):?>
+                <tr>
+                    <td><?=$class['class_id']?></td>
+                    <td><?=$class['class']?></td>
+                    <td><?=$class['stu_cnt']?></td>
+                    <td><?=date('Y-m-d', $class['ctime']) ?></td>
+                    <td>[<a href="<?=R('cls/studentList/def/'. $class['class_id'])?>" target="_blank">查看加入</a>]  [<a href="<?=R('cls/studentList/book/'. $class['class_id'])?>" target="_blank">读书成绩</a>]
+                    <?php if($school_term['is_school_user']):?>[<a href="<?=R('cls/studentList/while/'. $class['class_id'])?>" target="_blank">白名单</a>]<?php endif;?>
+                        [<a href="<?=R('cls/studentList/daka/'. $class['class_id'])?>" target="_blank">阅读过程</a>]
+                    </td>
+
+                </tr>
+                <?php endforeach;?>
+                </tbody>
+            </table>
+        </div>
+        <?php endif;?>
+        <!--
+        <div class="sp6">
+        </div>
+        <div class="sp3"> </div>
+        <div class="dr-box-padding">
+            <div class="dr-box-title">创建人</div>
+            <a class="book-create" >
+                <div class="head-large"><img src="<?=H($user[$class['user_id']]['head'])?>"></div>
+                <div href=""><?=$user[$class['user_id']]['name']?></div>
+            </a>
+        </div>
+        -->
+
+    </div>
+</div>

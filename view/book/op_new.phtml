@@ -1,0 +1,98 @@
+
+<form id="topic-from" class="sui-form" action="<?='modify'!= $p[0]?R('book/topicAdd'):R('book/topicModify/'. $topic['topic_id'])?>">
+    <?php if( $tag_id==6):?>
+        <div class="dr-from-group"><textarea class="input-100   " placeholder="请摘抄原文的美文美句"   name="topic_info_yanwen" rows="5" ><?=$topic['topic_info_yanwen']?></textarea></div>
+    <?php else:?>
+        <div class="dr-from-group"><input class="input-100 " placeholder="标题不允许为空" value="<?=$topic['topic']?>" name="topic" id="topic" /></div>
+    <?php endif;?>
+    <div class="dr-from-group"><textarea class="input-100   " placeholder="<?php if( $tag_id==6):?>对原文美文美句写写你的见解<?php else:?>请输入主题内容 <?php endif;?>"   name="topic_info" id="topic_info" ><?=$topic['topic_info']?></textarea></div>
+    <div class="control-group flexbox">
+        <div class="flex">
+            <label class="checkbox-pretty inline  <?php if(isset($topic['attr'][33])): ?>checked <?php endif;?>">
+                <input type="checkbox" name="attr[stop]" value="1" <?php if(isset($topic['attr'][33])): ?>checked <?php endif;?>><span>禁止回复</span>
+            </label>
+            <label class="checkbox-pretty inline <?php if( '1'== $topic['type'] ): ?>checked <?php endif;?>">
+                <input type="checkbox"  name="type" value="1" <?php if(  '1'== $topic['type'] ): ?>checked <?php endif;?>><span>不公开，仅老师可见</span>
+            </label>
+            <?php if( $tag_id==0 && $_is_teacher==3 ):?>
+            <label class="checkbox-pretty inline <?php if( '1'== $topic['is_html'] ): ?>checked <?php endif;?>">
+                <input type="checkbox"  name="is_html" value="1" <?php if(  '1'== $topic['is_html'] ): ?>checked <?php endif;?> id="is_html"><span>开启编辑器</span>
+            </label>
+            <?php endif;?>
+
+
+        </div>
+        <div class="des2" id="wordcount-des" style="<?php if( '1'== $topic['is_html'] ): ?>display: none <?php endif;?>"><?php if($book['word_topic']>0 ):?>要求不少于<b><?=$book['word_topic']?></b>字<?php endif;?> 已输入<span class="wordcount">0</span>字</div>
+
+    </div>
+    <input type="hidden" value="<?=$tag_id?>" name="tag_id" id="tag_id" />
+    <input type="hidden" value="<?=$book['book_id']?>" name="book_id"  />
+    <input type="hidden" value="<?=$book['word_cnt']?>" name="word_cnt" id="word_cnt"  />
+    <div class="sui-text-right"><button class="sui-btn  btn-primary btn-xlarge dr-submit"><?php if('modify'== $p[0]): ?>修改<?php else: ?>发布<?php endif;?></button></div>
+</form>
+<script>
+    $(function () {
+        <?php  if($topic['is_html']):?> var  ue = UE.getEditor('topic_info');     <?php else:?>  var ue= null;       <?php endif;?>
+        var ui= {
+            'tblist': $('#new-topic-tab li'),
+            'tag_id': $('#tag_id'),
+            'sbmit':$('.dr-submit')
+            ,'wordcount':$('.wordcount')
+            ,'topic_info':$('#topic_info')
+            ,'word_cnt':$('#word_cnt')
+            ,'wordcount_des':$('#wordcount-des')
+        };
+        ui.tblist.click( function () {
+            var that = $(this);
+            ui.tblist.removeClass('active');
+            that.addClass( 'active');
+            ui.tag_id.val( that.data('v') );
+        });
+        ui.sbmit.click(function () {
+            //DR.ajaxAndValidate( 'topic-from' );
+//            var str = ui.topic_info.val();
+//            var wCnt =  DR.wordCount( str);
+//            ui.word_cnt.val( wCnt );
+            wordFun();
+            DR.ajaxForm( 'topic-from' );
+            return false ;
+        });
+        var wordFun= function () {
+
+            var str = ue==null ? ui.topic_info.val():ue.getContentTxt() ;;//ui.topic_info.val();
+            var wCnt =  DR.wordCount( str);
+            ui.wordcount.html( wCnt);
+            ui.word_cnt.val( wCnt );
+        }
+        ui.topic_info.keyup( wordFun );
+        if( ue==null ) wordFun();
+
+
+
+        $('#is_html').click(function () {
+            var str = ue==null ? ui.topic_info.val():ue.getContentTxt() ;
+            if( str!='' ) {
+                var rf = confirm("切换编辑器内容格式会变化，请问是否需要切换？ ");
+                if (!rf) return false;
+            }
+            //topic_info
+            if( this.checked){
+                ue = UE.getEditor('topic_info');
+                ui.wordcount_des.hide();
+            }else{
+                ue=  UE.getEditor('topic_info');
+                var ptext= ue.getPlainTxt()
+                ue.destroy();
+                ue= null;
+                $('#topic_info').val( ptext );
+                ui.wordcount_des.show();
+            }
+
+        });
+
+    });
+</script>
+
+<script type="text/javascript" charset="utf-8" src="<?=$_cdn?>/res/ueditor/ueditor.me.config.js"></script>
+<script type="text/javascript" charset="utf-8" src="<?=$_cdn?>/res/ueditor/ueditor.all.min.js"> </script>
+<script type="text/javascript" charset="utf-8" src="<?=$_cdn?>/res/ueditor/lang/zh-cn/zh-cn.js"></script>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>淘宝短链接</title>
+
+    <!--标准mui.css-->
+    <link rel="stylesheet" href="/res/mui/css/mui.min.css">
+    <script src="/res/js/mui.min.js"></script>
+    <script src="/res/js/vue.min.js"></script>
+    <script src="/res/js/hc_v2.js?d=20180722"></script>
+
+    <script src="/res/js/qf.icomet.js?d=123"></script>
+    <script src="//cdn.nekoraw.com/res/js/clipboard.min.js"></script>
+
+    <style>
+        .pay-btn-group-sb{   background-color:#4cb9fc ; border: 1px solid #4cb9fc; color: #fff;text-decoration:none;
+            display: inline-block; box-sizing: border-box; margin-bottom: 0;    font-size: 12px;            line-height: 12px;
+            text-align: center;    vertical-align: middle;    cursor: pointer;  float: right ;
+            user-select: none; margin: 0; }
+
+        .toast-container {     line-height: 17px;  position: fixed; z-index: 9999; bottom: 0px;
+            left: 50%;   -webkit-transition:  .3s;   transition: .3s;  -webkit-transform: translate(-50%,0);   transform: translate(-50%,0);
+            max-width: 300px; opacity:0;
+        }
+        .toast-message{  font-size: 14px;padding: 10px 25px;  text-align: center; color: #fff; border-radius: 6px; background-color: #323232;}
+        .toast-active{ opacity:0.9; bottom: 50px; }
+
+        table{width: 100%}
+        table th,td{ text-align: center}
+        .login {
+            line-height: 2em;
+            font-size: 0.9em;
+            width: 80%;
+            font-family: 微软雅黑;
+            border-radius: 5px;
+            border-width: 0px;
+            border-style: solid;
+            border-color: initial;
+            border-image: initial;
+            background: linear-gradient(45deg, blue, purple);
+        }
+
+    </style>
+</head>
+
+<body>
+<bobo>
+        <header class="mui-bar mui-bar-nav">
+            <!--
+            <button class="mui-btn mui-btn-blue mui-btn-link mui-btn-nav mui-pull-left"><span class="mui-icon mui-icon-loop" @click="location.reload()">刷新</span></button>
+            <h1 class="mui-title"><span v-html="sv.acc.account"></span>码池管理统计</h1>
+            -->
+            <h1 class="mui-title">淘宝短链接</h1>
+        </header>
+    <div class="mui-content">
+
+        <div class="mui-input-row" style="margin: 10px 5px;">
+            <textarea id="textarea" rows="8" placeholder="必须是淘宝域名" v-model="f.url"></textarea>
+        </div>
+        <div class="mui-button-row">
+            <button type="button"  @click="sendUrl()"  class="mui-btn mui-btn-danger login" >点我生成短链接</button>
+        </div>
+
+        <div class="title">
+            结果
+        </div>
+        <ul class="mui-table-view">
+            <li class="mui-table-view-cell mui-media copy" v-for="v in rz"  :data-clipboard-text="v.shortUrl">
+                <a href="javascript:;">
+                    <img class="mui-media-object mui-pull-left" src="//img.alicdn.com/sns_logo/i3/TB1yeWeIFXXXXX5XFXXuAZJYXXX-210-210.png">
+                    <div class="mui-media-body">
+                        {{v.shortUrl}}
+                        <p class='mui-ellipsis' v-html="v.longUrl"></p>
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </div>
+</bobo>
+</body>
+<script src="/res/js/qrcode.ajax.min.js"></script>
+<script>
+new Vue({
+    el: 'bobo',
+    data: {
+        sv:<?=json_encode($sv)?>
+        ,st:{create:0 ,timer:null,shortUrl:'' }
+        ,up:{total:0, k:0, txt:'一键更新' }
+        ,rz:[ {shortUrl:'https://tb.cn/abcd', longUrl:'http://d.m.taobao.com/goAlipay.htm?service=%22alipay.fund.stdtrustee.order.create.pay%22&partner=%222088401309894080%22&_input_charset=%22utf-8%22&notify_url=%22https://wwhongbao.taobao.com/callback/alipay/notifyPaySuccess.do%22&out_order_no=%2212621186_5859_1593132251_9b2817306a9e3df9805e4c4847738e45_1%22&out_request_no=%2212621186_5859_1593132251_9b2817306a9e3df9805e4c4847738e45_1_p%22&product_code=%22SOCIAL_RED_PACKETS%22&scene_code=%22MERCHANT_COUPON%22&amount=%22495.00%22&pay_strategy=%22CASHIER_PAYMENT%22&receipt_strategy=%22INNER_ACCOUNT_RECEIPTS%22&platform=%22DEFAULT%22&channel=%22APP%22&order_title=%22%E6%B7%98%E5%AE%9D%E7%8E%B0%E9%87%91%E7%BA%A2%E5%8C%85%22&master_order_no=%222020062610002001960535211136%22&order_type=%22DEDUCT_ORDER%22&extra_param=%22{%22payeeShowName%22:%22%E6%B7%98%E5%AE%9D%E7%8E%B0%E9%87%91%E7%BA%A2%E5%8C%85%22}%22&pay_timeout=%2230m%22&order_expired_time=%22360d%22&sign=%22UVNPAkrLBqLqaOpDgsliaW8Wh0zKkfxVkCgGG8mRLvvpQjJhuvKxEjKaRmbBzIINeNIzwTvV%2FsEBKMdRlcRoVausVdDU4Rcq00328dWgUNMxWV9iOW9FUM6QsNn%2Bxs12plWSTbmMIpubARCk4cbkwhsgCcZ%2Fm482XqeYUPoCd5m4nZm9%2BchtXp1%2BH3W6BVv67wDlnd%2B5f%2BvoKE%2FyhZLiYeWzMgeJwud7XTrwXQbS9%2BtZmSgLi9PS9SGIXi97tBq7SN4CHb84166v5Ur8mVs2cWKG9U02CUiVaSD4nR%2FtcYCu2c%2FPh09HsW%2B8ihSD3dfr9Fom2JjNugQjXPKb49VP5g%3D%3D%22&sign_type=%22RSA%22&taobaoCheckPayPasswordAction=true'}]
+        ,f:{ url:'http://d.m.taobao.com/goAlipay.htm?service=%22alipay.fund.stdtrustee.order.create.pay%22&partner=%222088401309894080%22&_input_charset=%22utf-8%22&notify_url=%22https://wwhongbao.taobao.com/callback/alipay/notifyPaySuccess.do%22&out_order_no=%2212621186_5859_1593132251_9b2817306a9e3df9805e4c4847738e45_1%22&out_request_no=%2212621186_5859_1593132251_9b2817306a9e3df9805e4c4847738e45_1_p%22&product_code=%22SOCIAL_RED_PACKETS%22&scene_code=%22MERCHANT_COUPON%22&amount=%22495.00%22&pay_strategy=%22CASHIER_PAYMENT%22&receipt_strategy=%22INNER_ACCOUNT_RECEIPTS%22&platform=%22DEFAULT%22&channel=%22APP%22&order_title=%22%E6%B7%98%E5%AE%9D%E7%8E%B0%E9%87%91%E7%BA%A2%E5%8C%85%22&master_order_no=%222020062610002001960535211136%22&order_type=%22DEDUCT_ORDER%22&extra_param=%22{%22payeeShowName%22:%22%E6%B7%98%E5%AE%9D%E7%8E%B0%E9%87%91%E7%BA%A2%E5%8C%85%22}%22&pay_timeout=%2230m%22&order_expired_time=%22360d%22&sign=%22UVNPAkrLBqLqaOpDgsliaW8Wh0zKkfxVkCgGG8mRLvvpQjJhuvKxEjKaRmbBzIINeNIzwTvV%2FsEBKMdRlcRoVausVdDU4Rcq00328dWgUNMxWV9iOW9FUM6QsNn%2Bxs12plWSTbmMIpubARCk4cbkwhsgCcZ%2Fm482XqeYUPoCd5m4nZm9%2BchtXp1%2BH3W6BVv67wDlnd%2B5f%2BvoKE%2FyhZLiYeWzMgeJwud7XTrwXQbS9%2BtZmSgLi9PS9SGIXi97tBq7SN4CHb84166v5Ur8mVs2cWKG9U02CUiVaSD4nR%2FtcYCu2c%2FPh09HsW%2B8ihSD3dfr9Fom2JjNugQjXPKb49VP5g%3D%3D%22&sign_type=%22RSA%22&taobaoCheckPayPasswordAction=true' }
+
+    }
+    ,
+    created: function () {
+    },
+    mounted: function () {
+        //setTimeout( this.initImg ,300);
+
+        this.startIComet( this.sv.ck);
+
+        setTimeout(this.copy,2000);
+    },
+    methods: {
+
+         qrCode:function( url_text,div_id ) {
+            var qrcode = new QRCode(document.getElementById( div_id ), {
+                text: url_text //location.origin  + that.qr.url
+                ,width: 180,
+                height: 180,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+        }
+        ,sendUrl:function () {
+            //HC.ajax('/member/wang/create/'+that.sv.acc.account_id+'/'+ that.st.create );
+            if( this.f.url=='' ){
+                HC.msg("请填写长链接");
+                return ;
+            }
+            HC.ajax('/test/tburl/send',{data:{url:this.f.url  }});
+            HC.msg("请求已发出，成功在结果中呈现");
+        }
+        ,startIComet:function ( c_user_id) {
+            var that = this;
+            //that.st.isStartIComet= c_user_id ;
+            console.warn("cuser_id="+ c_user_id  );
+            var comet = new iComet({
+                channel: 'DU'+c_user_id ,
+                signUrl: '/icomet/sign',
+                subUrl: '/icomet/sub',
+                callback: function(content){
+                    //console.warn('icommet:'+ content);
+                    //that.imsg.unshift( content );
+                    //that.pushMesg( content );
+                    var o = JSON.parse(content);
+                    that.rz.unshift( o );
+                    //console.log( o );
+                    setTimeout(that.copy,1000);
+                }
+            });
+
+        }
+        ,copy:function () {
+            var cp=new ClipboardJS('.copy');
+            if( cp ) {
+                cp.on('success', function (e) {
+                    console.info('Action:', e.action);
+                    console.info('Text:', e.text);
+                    console.info('Trigger:', e.trigger);
+                    e.clearSelection();
+                    HC.msg("复制成功");
+                    //toast("复制成功");
+                    //goV40();
+                });
+            }
+        }
+
+
+
+
+
+    }
+});
+</script>
+</html>

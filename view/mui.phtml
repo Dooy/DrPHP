@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <title><?=($site_title?$site_title :'')?></title>
+    <?php
+    include "header.phtml";
+    ?>
+    <!--
+    <link href="<?=$WWW_RES?>/css/hcadmin.css" rel="stylesheet">
+    <script type="text/javascript" src="<?=$WWW_RES?>/js/hcadmin.js"></script>
+    -->
+<style>
+    .dr-box-padding{border: 0px; }
+</style>
+    <script type="text/javascript" src="/res/js/vue.min.js"></script>
+</head>
+<body style="background-color: <?php if($bgcolor):?><?=$bgcolor?><?php else:?>#fff<?php endif; ?>">
+
+<div class="dr-max">
+<?php
+include $tpl_file;
+?>
+</div>
+</body>
+<script>
+    var _iframe_now="1";
+</script>
+<script>
+    $(function () {
+
+        <?php if( $_DREEOR ): ?>
+        try {
+            var _DERROR = <?=$_DREEOR?>;
+            DR.tip2(_DERROR.msg,_DERROR );
+        }catch (e){
+        }
+        <?php  endif ; ?>
+
+    });
+</script>
+</html>
+
+
+

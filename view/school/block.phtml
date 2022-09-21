@@ -1,0 +1,462 @@
+<link rel="stylesheet" type="text/css" href="/res/hcapp/css/icons-haoce.css?v=<?=$version?>" />
+<link rel="stylesheet" type="text/css" href="/res/hcapp/css/mui.min.css?v=<?=$version?>" />
+<link rel="stylesheet" type="text/css" href="/res/hcapp/css/iconfont.css?v=<?=$version?>" />
+
+<style>
+    body {
+        margin: 0;
+        font-family: tahoma, arial,"Hiragino Sans GB", "Microsoft Yahei", \5b8b\4f53, sans-serif;
+        font-size: 12px;
+        line-height: 18px;
+        color: #333;
+        background-color: #fff;
+    }
+    body .input-date{width: 160px; }
+    body .ds{color: #ccc  }
+</style>
+<link href="<?=$WWW_RES?>/sui/css/sui-append.min.css" rel="stylesheet">
+<haoce>
+    <h3 ><span class="mui-icon" :class="block.icon" style="color: #fff;" :style="{'background-color': block.bg_color}"></span><b v-html="block.block"></b></h3>
+    <div style="padding: 8px 5px 5px 0px;">
+        <div class="sui-btn-group">
+            <a class="sui-btn" href="javascript:;" @click="st.f=!st.f">新增书单</a>
+            <a class="sui-btn" href="javascript:;" @click="plUpdate()" v-if="st.up_k<0">批量更新统计</a>
+            <a class="sui-btn" href="javascript:;" v-else v-html="st.up_msg"></a>
+            <a class="sui-btn" href="<?=R($DR_SELF, ['export'=>1 ])?>" >导出</a>
+            <a class="sui-btn" href="<?=R('school/block/allUser/'.$block_id , ['export'=>1 ])?>" >导出用户</a>
+            <a class="sui-btn" href="javascript:;" @click="st.is_setting= !st.is_setting">设置</a>
+            <!--<a class="sui-btn" href="<?=R('school/novelView?tb=list&block_id='.$block_id )?>" >选书详情</a> -->
+
+        </div>
+    </div>
+
+    <div class="sui-form form-horizontal sui-validate" v-show="st.is_setting">
+        <div class="control-group">
+            <label for="inputEmail" class="control-label"> </label>
+            <div class="controls">
+                <h4>设置</h4>
+            </div>
+        </div>
+
+
+        <div class="control-group-cart"  >
+            <div class="flexbox control-group-cart-title" @click="st.d_1=!st.d_1">
+                <div class="flex"><b >基础资料</b></div>
+                <div class="group-cart-op">
+                    <i class="sui-icon icon-tb-unfold"></i>
+                </div>
+            </div>
+            <div   v-show="st.d_1" style="display: block">
+                <div class="control-group">
+                    <label for="inputEmail" class="control-label v-top">封面图片：</label>
+                    <div class="controls">
+                        <a    id="upload">上传</a>
+                        <div v-if="block.img!=''"><img :src="block.img"  style="max-width: 500px;"></div>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="inputEmail" class="control-label">名称：</label>
+                    <div class="controls">
+                        <input type="text" placeholder="请填写板块名称" data-rules="required" v-model="block.block">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label for="inputEmail" class="control-label">口号或校训：</label>
+                    <div class="controls">
+                        <input type="text" placeholder="口号、校训等，不超过12中文字" data-rules="required" v-model="block.slogen">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="inputEmail" class="control-label v-top">介绍：</label>
+                    <div class="controls">
+                        <textarea :rows="block.info.length>50?10:3" v-model="block.info" style="width: 500px;"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-group-cart"  >
+            <div class="flexbox control-group-cart-title" @click="st.d_3=!st.d_3">
+                <div class="flex"><b >任务设置</b></div>
+                <div class="group-cart-op">
+                    <i class="sui-icon icon-tb-unfold"></i>
+                </div>
+            </div>
+            <div v-show="st.d_3" style="padding-top: 20px;">
+                <div class="control-group">
+                    <label   class="control-label v-top">任务：</label>
+                    <div class="controls">
+
+
+                        <table class="sui-table table-bordered">
+                            <tr><th>名称</th><th>权重<div style="font-size: 10px; color: #999">0表示不需要此任务</div></th>
+                                <th>篇数</th>
+                                <th>字数<div style="font-size: 10px; color: #999">0表示不限制</div></th>
+                                <th>任务简述</th>
+                            </tr>
+                            <template v-for="(bv,bk) in block.opt.task">
+                                <tr>
+                                    <td  :title="bk"> <span  v-html="attr.task[bk].n " v-if="bv>0"></span><del v-html="attr.task[bk].n " class="ds" v-else></del></td>
+                                    <td> <input type="text" placeholder="权重" data-rules="required|number"  style="width: 50px;" v-model="block.opt.task[bk]"></td>
+                                    <td> <input type="text" placeholder="篇数" data-rules="required|number"  style="width: 50px;" v-model="block.opt.cnt[bk]" v-if="block.opt.cnt[bk]">
+                                        <span v-else>1</span>
+                                    </td>
+                                    <td> <input type="text" placeholder="字数" data-rules="required|number"  style="width: 50px;" v-model="block.opt.word[bk]" v-if="typeof block.opt.word[bk]!='undefined'"></td>
+                                    <td>
+                                        <textarea :rows="block.opt.info[bk].length>10?5:1" v-model="block.opt.info[bk]" v-if="typeof block.opt.info[bk]!='undefined'" style="width: 250px;" ></textarea>
+                                    </td>
+                                </tr>
+                                <tr v-if="bk==1 && bv>0">
+                                    <td>回复</td>
+                                    <td ></td>
+                                    <td><input type="text" placeholder="篇数" data-rules="required|number"  style="width: 50px;" v-model="block.opt.cnt['101']" ></td>
+                                    <td> <input type="text" placeholder="字数" data-rules="required|number"  style="width: 50px;" v-model="block.opt.word['101']"  ></td>
+                                    <td></td>
+                                </tr>
+                            </template>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+
+
+        <!--<div style="padding-left: 50px;"><a href="javascript:;" @click="st.showCtrl= !st.showCtrl" v-html="!st.showCtrl?'显示附加选项':'隐藏附加选项'"></a> </div>-->
+        <div class="control-group-cart"  >
+            <div class="flexbox control-group-cart-title" @click="st.showCtrl= !st.showCtrl">
+                <div class="flex"><b >选书控制</b></div>
+                <div class="group-cart-op">
+                    <i class="sui-icon icon-tb-unfold"></i>
+                </div>
+            </div>
+
+            <div id="control"  v-show="st.showCtrl">
+                <div class="control-group">
+                    <label class="control-label" :class="{ds:block.s_start_time==''&&block.s_end_time==''}">  选书时间：</label>
+                    <div class="controls">
+                        <input  v-model="block.s_start_time"  type="text"  name="s_start_time"  class="input-date" placeholder="不限制"   data-rules="required|datetime" data-toggle="datepicker" data-date-timepicker="true" >
+                        -
+                        <input v-model="block.s_end_time"   type="text" name="s_end_time"  class=" input-date" placeholder="不限制"    data-rules="required|datetime" data-toggle="datepicker" data-date-timepicker="true" >
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label"  :class="{ds:block.book_limit_min==0&&block.book_limit==0}"> 选书本数限制：</label>
+                    <div class="controls">
+                        <div class="input-append">
+                            <input   type="text" class="span2 input-xfat input-small"  v-model="block.book_limit_min" data-rules="required|number|gt=-1"    >
+                        </div>~
+                        <div class="input-append">
+                            <input   type="text" class="span2 input-xfat input-small"   v-model="block.book_limit"  data-rules="required|number|gt=-1"    >
+                        </div>
+                        <div class="sui-msg msg-tips msg-naked">
+                            <div class="msg-con">0表示不限制</div>
+                            <s class="msg-icon"></s>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label"  :class="{ds:block.book_limit_min==0&&block.book_limit==0}"> 单书不超过：</label>
+                    <div class="controls">
+                        <div class="input-append">
+                            <input   type="text" class="span2 input-xfat input-small"  v-model="block.book_max" data-rules="required|number|gt=-1"    >
+                        </div>人
+                        <div class="sui-msg msg-tips msg-naked">
+                            <div class="msg-con">0表示不限制</div>
+                            <s class="msg-icon"></s>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">补选：</label>
+                    <div class="controls">
+                        <label data-toggle="radio" class="radio-pretty inline " :class="{checked: block.is_bu=='1'}">
+                            <input type="radio"    name="is_bu" v-model="block.is_bu"  value="1"><span>允许</span>
+                        </label>
+                        <label data-toggle="radio" class="radio-pretty inline  " :class="{checked: block.is_bu=='2'}">
+                            <input type="radio" name="is_bu"  v-model="block.is_bu"   value="2"><span>禁止</span>
+                        </label>
+                    </div>
+                </div>
+
+
+
+                <div class="control-group">
+                    <label class="control-label" :class="{ds:block.sub_end_time==''}">  任务截止：</label>
+                    <div class="controls">
+                        <input v-model="block.sub_end_time" type="text" name="sub_end_time"  class=" input-date" placeholder="不限制" data-empty-msg="答题截止别忘记了"  data-rules="required|datetime" data-toggle="datepicker" data-date-timepicker="true" >
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="control-group-cart"  >
+            <div class="flexbox control-group-cart-title" @click="st.d_2=!st.d_2">
+                <div class="flex"><b >前端显示设置</b></div>
+                <div class="group-cart-op">
+                    <i class="sui-icon icon-tb-unfold"></i>
+                </div>
+            </div>
+        <div v-show="st.d_2">
+            <div class="control-group">
+                <label for="inputEmail" class="control-label">Icon：</label>
+                <div class="controls">
+                    <span class="sui-dropdown">
+                        <span class="dropdown-inner">
+                            <a role="button" href="javascript:void(0);" data-toggle="dropdown" data-trigger="hover" class="dropdown-toggle">
+                                <span class="mui-icon" :class="block.icon" style="color: #fff;" :style="{'background-color': block.bg_color}"></span> <i class="caret"></i>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop1" class="sui-dropdown-menu">
+                              <li role="presentation" :class="{active:v2==block.icon}"  v-for=" v2  in attr.icon " @click="block.icon=v2" >
+                                  <a role="menuitem" tabindex="-1" href="#"   class="mui-icon" :class="v2"></a>
+                              </li>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <div class="control-group">
+                <label for="inputEmail" class="control-label">背景颜色：</label>
+                <div class="controls">
+                    <span class="sui-dropdown">
+                        <span class="dropdown-inner">
+                            <a role="button" href="javascript:void(0);" data-toggle="dropdown" data-trigger="hover" class="dropdown-toggle"><b  v-html="block.bg_color"></b> <i class="caret"></i></a>
+                            <ul role="menu" aria-labelledby="drop1" class="sui-dropdown-menu">
+                              <li role="presentation" :class="{active:v2==block.bg_color}"  v-for=" v2  in attr.bg_color " @click="block.bg_color=v2" :style="{backgroundColor: v2} ">
+                                  <a role="menuitem" tabindex="-1" href="#" v-html="v2"></a>
+                              </li>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <!--
+            <div class="control-group">
+                <label for="inputEmail" class="control-label">加班方式：</label>
+                <div class="controls">
+                    <span class="sui-dropdown">
+                        <span class="dropdown-inner">
+                            <a role="button" href="javascript:void(0);" data-toggle="dropdown" data-trigger="hover" class="dropdown-toggle"><b  v-html="attr.is_class[block.is_class]"></b> <i class="caret"></i></a>
+                            <ul role="menu" aria-labelledby="drop1" class="sui-dropdown-menu">
+                              <li role="presentation" :class="{active:k2==block.is_class}"  v-for="(v2,k2) in attr.is_class " @click="block.is_class=k2">
+                                  <a role="menuitem" tabindex="-1" href="#" v-html="v2"></a>
+                              </li>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+            -->
+
+        </div>
+        </div>
+
+
+
+
+        <div class="control-group">
+            <label class="control-label"></label>
+            <div class="controls">
+                <button  class="sui-btn btn-primary" @click="setting()">保持设置</button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- end is_setting -->
+    <div class="sui-form form-horizontal sui-validate" v-show="st.f || ! list.length">
+        <div class="control-group" >
+            <label for="inputEmail" class="control-label v-top">书单内容ID：</label>
+            <div class="controls">
+                <textarea rows="8" v-model="f.novel_id" placeholder="请输入书单内容的ID一行一个" data-rules="required" ></textarea>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label"></label>
+            <div class="controls">
+                <button  class="sui-btn btn-primary" @click="post()">新增</button>
+            </div>
+        </div>
+    </div>
+
+    <table class="sui-table table-bordered" v-if="list.length">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>ID</th>
+            <th>书</th>
+            <th>排序</th>
+            <th>选读/完成/领取</th>
+            <th>耗时/字数</th>
+            <th>任务<br>笔记/随想/报告/讨论</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(v,k) in list">
+            <td v-html="k+1"></td>
+            <td v-html="v.novel_id"></td>
+            <td v-html="novel[v.novel_id].novel"></td>
+            <td >
+                <div v-if="st.order_k==k">
+                    <input  style="width: 30px; text-align: center" v-model="v.order"/>
+                    <a class="sui-btn btn-primary" href="javascript:;" @click="saveOrder(v)">保存</a>
+                </div>
+                <span v-html="v.order" @click="st.order_k=k" v-else></span>
+            </td>
+            <td>
+                <a v-html="v.read_cnt" :href="'/school/novelView/novel/'+v.novel_id+'?tb=list'"></a>/
+                <span v-html="v.finish_cnt"></span>/
+                <span v-html="v.xuefen_cnt"></span>
+            </td>
+            <td>
+                <span  v-html="HC.timeShow(v.dtime)+'/'+HC.intShow(v.word)"></span>
+            </td>
+            <td>
+                <span v-html="HC.intShow(v.comment_cnt)"></span>
+                /<a :href="'/app/page/wendaOne?dafen=1&novel_id='+v.novel_id+'&cat_id=4'" v-html="HC.intShow(v.cnt_think)" title="随想" target="_blank"></a>
+                /<a :href="'/app/page/wendaOne?dafen=1&novel_id='+v.novel_id+'&wenda_id=1001'" v-html="HC.intShow(v.cnt_report)" title="报告" target="_blank"></a>
+                /<a :href="'/app/page/wendaOne?dafen=1&novel_id='+v.novel_id+'&cat_id=1'" v-html="HC.intShow(v.cnt_discuss)" title="讨论" target="_blank"></a>
+            </td>
+            <td>
+                [<a href="javascript:;" @click="update(v)">更新</a>]
+                [<a href="javascript:;" @click="del(v,k )">删除</a>]
+                <!--[<a :href="'/school/wendaList/novel/'+v.novel_id">任务列表</a>]-->
+                <!--[<a href="javascript:;" @click="addTiwen(v )">新增提问</a>]-->
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="dr-page"><?=$list['page']?></div>
+    <div class="des2">
+        说明：<br>
+        1.排序：排序值越大拍在越前面
+    </div>
+
+</haoce>
+
+
+<?php include "wenda_form.phtml"; ?>
+<script src="/res/hcapp/js/haoce.js?d=2018042801"></script>
+<script type="text/javascript" src="/res/js/plupload/plupload.full.min.js"></script>
+
+<script>
+
+
+    var vm = new Vue({
+        el: 'haoce',
+        data: {
+            st:{f:false, order_k:-1,up_k:-1 ,up_msg:'',is_setting:false,showCtrl:false,d_1:true,d_2:false,d_3:true}
+            ,list:<?=json_encode($list['list'])?>
+            ,block:<?=json_encode($block)?>
+            ,attr:<?=json_encode($attr)?>
+            ,novel:<?=json_encode($novel)?>
+            ,f:{novel_id:'',block_id:<?=$block_id?> }
+        }
+        ,mounted:function () {
+            //alert('good nd');
+            this.datepicker();
+        }
+        ,
+        methods:{
+            post:function () {
+                if(this.f.novel_id==''){
+                    //DR.msg("请输入书单内容的ID");
+                    return;
+                }
+
+                DR.ajax('/school/block/add/'+ this.f.block_id ,{'data':this.f});
+            }
+            ,datepicker:function () {
+                var that = this;
+                $(function () {
+                    $('.input-date').datepicker({ 'timepicker':true }).on( 'changeDate',function (e) {
+                        //alert('good news');
+                        var obj = $(this);
+                        var name = obj.attr('name')
+                        //console.log( name );
+                        that.setBlockKV( name,obj.val() );
+
+                    });
+
+                    DR.uploadone( 'upload',{cb:function (rep) {
+                            //alert(rep.file )
+                            var file= '/'+ rep.file;
+                            that.block.img = file ;
+                            //$('#bk_img').attr('src',file);
+                            //$('#logo').val( file );
+                        },query:'from=block'} );
+                });
+
+
+
+            }
+            ,setBlockKV:function (k,v) {
+                this.block[k]=v ;
+            }
+            ,setting:function () {
+                DR.ajax('/school/block/setting' ,{'data':{ block: this.block }});
+            }
+            ,addTiwen:function (v) {
+                console.warn('vue',v, ve_wenda.f );
+                ve_wenda.st.title="《"+this.novel[v.novel_id].novel +"》";
+                ve_wenda.f = { text: '',title:'',cat_id:3  ,novel_id:v.novel_id  };
+                ve_wenda.st.edit= 1;
+                ve_wenda.st.success= function (rep) {
+                    console.log('success',rep );
+                };
+                //block.go(v);
+            }
+            ,saveOrder:function (v) {
+                DR.ajax('/school/block/order/'+ v.id ,{'data':v});
+                this.st.order_k = -1;
+            }
+            ,update:function (v) {
+                console.log("v", v );
+                DR.ajax('/school/block/tjOne/'+ v.id ,{ },{success:function (rep) {
+                    console.log('tjOne', rep );
+                    for(var p in rep.data.opt.re ){ v[p]=rep.data.opt.re[p]; }
+                }});
+            }
+            ,del:function (v,k) {
+                DR.ajax('/school/block/del/'+v.id,{ },{success: function () {
+                    vm.list.splice(k,1);
+                }});
+            }
+            ,plUpdate:function () {
+                var all=[];
+                var _update=function ( ) {
+                    //console.log('all2', all );
+                    if( all.length<=vm.st.up_k ){
+                        vm.st.up_k=-1;
+                        return ;
+                    }
+                    var id =all[ vm.st.up_k].id ;
+                    vm.st.up_k++;
+                    vm.st.up_msg='正在更新 '+    vm.st.up_k+'/'+ all.length ;
+                    //console.log('go', all[ vm.st.up_k] );
+                    DR.ajax('/school/block/tjOne/'+id,{ },{success: _update});
+                }
+
+                DR.ajax('/school/block/all/'+ this.f.block_id ,{ },{success:function (rep) {
+                    console.log('all', rep );
+                    all = rep.data.all ;
+                    vm.st.up_k=0;
+                    _update();
+                    //DR.tip("大约："+ rep.all.length +'条');
+                    //for(var p in rep.data.opt.re ){ v[p]=rep.data.opt.re[p]; }
+                }});
+            }
+        }
+    });
+</script>

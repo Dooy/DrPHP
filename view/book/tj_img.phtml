@@ -1,0 +1,205 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>统计</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+
+    <!--标准mui.css-->
+    <link rel="stylesheet" href="/res/hcapp/css/mui.min.css">
+    <script src="<?=$_cdn?>/res/hcapp/js/mui.min.js"></script>
+    <script src="<?=$_cdn?>/res/hcapp/js/vue.min.js"></script>
+    <script src="<?=$_cdn?>/res/hcapp/js/haoce.js?d=2018032501"></script>
+
+
+
+    <link rel="stylesheet" type="text/css" href="<?=$_cdn?>/res/hcapp/css/book.css?v=20180320" />
+    <style>
+        .chart{height: 300px; width: 100%;}
+    </style>
+</head>
+<body>
+<haoce>
+    <div class="mui-content " style="max-width: 800px; margin: 0 auto;background-color: #fff">
+        <!--顶部banner图 开始-->
+        <div style="position: relative;"><div id="logo" style="z-index: 5;top:25px;"><img src="https://cdn.haoce.com/res/img/512.png"  ></div></div>
+        <div class="banner" style="height: 100px">
+            <div class="banner-img" ><img src="https://cdn.haoce.com/res/img/512.png"></div>
+            <h1 class="title mui-ellipsis-2"  style="color: #F4F4F4;text-align: center; top:35px;">阅读可视化</h1>
+
+        </div>
+
+        <div class="mui-content-padded"  v-if="st.isShow"  >
+                <div v-for="(v,k) in file.ka.obj">
+                    <div v-if="file.dict.obj[k]">
+                        <h4 v-html="bigFile[k]"></h4>
+                        <h5 v-html="v.name+'+'+file.dict.obj[k].name"></h5>
+                    </div>
+                    <h4 v-html="v.name" v-else> </h4>
+                    <div class="chart" :id="'p_'+k" v-if="file.dict.obj[k]" style="height: 450px;">
+                        <div style="text-align: center;padding-top:120px;color: #999">Loading...</div>
+                    </div>
+                    <div class="chart" :id="'p_'+k"  v-else>
+                        <div style="text-align: center;padding-top:120px;color: #999">Loading...</div>
+                    </div>
+                </div>
+        </div>
+        <div v-else style="padding: 50px; color: #999; text-align: center; background-color: #efeff4" v-html="st.msg"></div>
+
+
+    </div>
+</haoce>
+<!--
+<script src="http://lab.pigai.org/hello3/libs/echarts-all.js"></script>
+-->
+<script src="https://img.hcharts.cn/highcharts/highcharts.js"></script>
+<script src="https://img.hcharts.cn/highcharts/modules/exporting.js"></script>
+<script src="https://img.hcharts.cn/highcharts/modules/oldie.js"></script>
+<script src="https://img.hcharts.cn/highcharts-plugins/highcharts-zh_CN.js"></script>
+
+<script>
+
+    var opt={
+        chart: {
+            type: 'bar'
+            //,backgroundColor:'#fafafa'
+        },
+        title: {
+            text: null
+        },
+        subtitle: {
+            //text: '数据来源: 学生打卡数据'
+        },
+        xAxis: {
+
+            categories: [],//[20180325,20180324,20180323,20180322,20180321,20180320,20180319,20180318,20180317,20180316,20180315,20180314,20180313,20180312,20180311,20180310],
+            title: {
+                text: null
+            }
+            /*
+            labels: {
+                formatter: function() {
+                    var xtitle= [20180325,20180324,20180323,20180322,20180321,20180320,20180319,20180318,20180317,20180316,20180315,20180314,20180313,20180312,20180311,20180310];
+                    return xtitle[this.value]; // clean, unformatted number for year
+                }
+            }*/
+
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: null,// 'haoce.com',
+                align: 'high'
+            },
+            labels: {
+                overflow: 'justify'
+            }
+        },
+        tooltip: {
+            valueSuffix: ' '
+        },
+        plotOptions: {
+            bar: {
+                dataLabels: {
+                    enabled: true,
+                    allowOverlap: true
+                }
+            }
+
+
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'top',
+            x: 240,
+            y: 100,
+            floating: true,
+            borderWidth: 1,
+            backgroundColor: ((Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'),
+            shadow: true
+        },
+        credits: {
+            enabled: false
+        },
+
+        series: [   ]
+
+    };
+
+</script>
+<script>
+
+    var vm= new Vue({
+        el:'haoce',
+        data:{
+            list:[]
+            ,bigFile:{user:'人数（单位:人）',cp:'次数（单位:次）'}
+            ,file:{ka:{ isShow:true, obj:{'user':{name:'阅读人数',data:[]},'cp':{name:'阅读次书',data:[]},'time':{name:'阅读耗时(单位:秒)',data:[]},'word':{name:'阅读字数（单位:万字）',data:[]} } }
+                 ,dict:{obj:{'user':{name:'查词人数',data:[]},'cp':{name:'查词次数',data:[] } }} }
+            ,st:{msg:'发送错误！',isShow:true }
+        },
+        created:function () {
+            //console.log('created', this.book_school);
+            //this.loadLog();
+        },
+        mounted:function () {
+            this.loadTjKa( );
+        },
+        methods:{
+            loadTjKa:function () {
+                HC.ajax('/book/tj/daka?'+'<?=$query?>',{waitMsg:null,isLocal:false
+                    ,success:function (rep) {
+                    console.log('rep', rep.tj  );
+                    if( rep.tj.length<=0){
+                        vm.st.msg='本书赞无同学完成章节阅读';
+                        vm.st.isShow= false;
+                        return false ;
+                    }
+                    if( rep.tj ){
+                        var cat=[], ik=0;
+                        for( var p in  rep.tj ){
+                            ik++;if( ik>=15) break;
+                            cat.push( rep.tj[p].key );
+                            for(var p2 in vm.file.ka.obj )   vm.file.ka.obj[p2].data.push( p2=='word'? parseInt( rep.tj[p][p2]/10000+0.5 ) : rep.tj[p][p2] );
+
+                        }
+                        opt.xAxis.categories = cat;
+                        for(var p2 in vm.file.dict.obj ){
+                            for( var i=0; i<cat.length; i++ ){
+                                vm.file.dict.obj[p2].data.push( typeof rep.tjDict[ cat[i]] =='undefined'?0 :    rep.tjDict[ cat[i]][ p2] )
+                               // vm.file.ka.obj[p2].data.push( rep.)
+                            }
+                        }
+                        console.log('dict', vm.file.dict.obj );
+                        for(var p2 in vm.file.ka.obj ){
+                            opt.series=[];
+                            opt.series.push( vm.file.ka.obj[p2] );
+                            if(  vm.file.dict.obj[p2] ) opt.series.push( vm.file.dict.obj[p2] );
+                            Highcharts.chart( 'p_'+p2,opt );
+                        }
+
+                    }
+                }
+                ,error:function (rep) {
+                    //console.log('rep',rep );
+                        vm.st.isShow=false ; vm.st.msg = '错误：'+rep.error_des+'['+rep.error +']';
+                    }
+                });
+
+            }
+        }
+
+    });
+
+    mui.init( );
+
+
+
+
+
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,18 @@
+<script>
+    $(function () {
+
+        <?php if( $_DREEOR ): ?>
+        try {
+            var _DERROR = <?=$_DREEOR?>;
+            DR.tip(_DERROR.msg,_DERROR );
+        }catch (e){
+        }
+        <?php  endif ; ?>
+
+        try{
+            DR.user('_haoce_user');
+        }catch (e){
+        }
+
+    });
+</script>

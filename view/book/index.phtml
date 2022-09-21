@@ -1,0 +1,149 @@
+<h1 class="dr-baidu-txt">好策读书为各类学校提供分级分类图书并进行导读，为学校定制个性化读书教学方案，帮助教师对学生读书过程进行引导，并激发学生进行读后讨论、分享、交流及互评，起到以读促写、以读促学之作用。</h1>
+<div class="dr-container">
+
+    <div class="dr-box-padding"  id="school-banner"  >
+        <div class="pull-left">
+            <img src="<?=$_cdn?><?=$book_school['logo']?>" width="80px;" height="80px;">
+        </div>
+        <div class="pull-left" id="school-name">
+            <!--
+            <h2>中山大学</h2>
+            <h5>博学 审问 慎思 明辨 笃行</h5>
+            -->
+            <h2><?=$is_copy?'好策书库':$book_school['school']?></h2>
+            <h4><?=$book_school['school_slogan']?> </h4>
+        </div>
+        <ul class="pull-right total" id="school-total">
+            <li>
+                <b><?=$school['books_cnt']?></b>
+                <span>图书</span>
+            </li>
+            <li>
+                <b><?=$school['user_cnt']?></b>
+                <span>成员</span>
+            </li>
+            <li>
+                <b><?=$school['discuss_cnt']?></b>
+                <span>讨论</span>
+            </li>
+        </ul>
+        <br style="clear: both"/>
+    </div>
+
+    <?php if($diaocha):?>
+    <a target="_blank" class="sui-msg msg-large msg-tips msg-block" href="<?=$diaocha['url']?>" style="margin-bottom: 5px;">
+        <div class="msg-con"><?=$diaocha['txt']?>  <!--<button type="button" data-dismiss="msgs" class="sui-close">×</button>-->  </div>
+        <s class="msg-icon"></s>
+    </a>
+    <?php endif; ?>
+
+    <?php if('西南林业大学'==$book_school['school'] ): ?>
+        <a target="_blank" class="sui-msg msg-large msg-tips msg-block" href="https://mp.weixin.qq.com/s?__biz=MzA3MDcwNTE2MQ==&mid=2649819643&idx=1&sn=f7921d262f35310ac7f61cd8b4d071dc&chksm=873d609db04ae98b7e0b9ef5c309252c4cb88d5d788842e0c3ca1e103db37f20170dc254d1f9&mpshare=1&scene=1&srcid=0428woOm4ejPeIulElnHnMe6#rd" style="margin-bottom: 5px;">
+            <div class="msg-con"> 读书show活动@你，是时候参加“好策”阅读争霸赛了！  <!--<button type="button" data-dismiss="msgs" class="sui-close">×</button>-->  </div>
+            <s class="msg-icon"></s>
+        </a>
+    <?php endif;?>
+
+
+
+    <div  class="sp"  >
+        <?php if('安徽建筑大学城市建设学院'==$book_school['school'] ): ?>
+        <div class="sp6">
+            <div class="dr-box-padding">
+                <div class="dr-box-content dr-box-ul" style="text-align: center">
+                    <a href="http://a.app.qq.com/o/simple.jsp?pkgname=app.haoce.com" target="_blank" style="display: inline-block;height: 160px; width: 160px;"> <img src="<?=$_cdn?>/res/img/app_code.jpg"></a>
+                </div>
+                <div style="text-align: left; font-size: 30px;line-height: 150%; text-indent: 60px;">
+                    同学们好！为配合我校“荫桐阅读”读书工程，请同学们下载好策APP使用阅读，以便记录同学们阅读过程，便于统计同学所得学分。具体使用流程请点击下载<a href="<?=$_cdn?>/res/file/help_v3.pdf" target="_blank" style="color: #00a0e9">《好策读书平台使用流程说明》</a>
+                </div>
+            </div>
+        </div>
+        <div class="sp3">
+            <?php include  tplFile("book/i_add.phtml"); ?>
+        </div>
+        <?php else:?>
+        <div class="sp6">
+            <?php
+            switch ($switch){
+                case 'teacherList':
+                    include  tplFile("book/op_index_teacher_list.phtml");
+                    break;
+                case 'collegeList':
+                    include  tplFile("book/op_index_college_list.phtml");
+                    break;
+                default:
+                    include  tplFile("book/op_index_default.phtml");
+            }
+
+            ?>
+        </div>
+        <div class="sp3">
+            <?php include  tplFile("book/i_index_right.phtml"); ?>
+        </div>
+        <?php endif; ?>
+    </div>
+
+</div>
+<script>
+    var ui={
+        d:false
+    }
+
+    $(function () {
+
+
+        $('.book-hover').hover( function () {
+            if(ui.d==false ){
+                ui.d = dialog({
+                    //align: 'right top',
+                    onremove:function () {
+                        ui.d= false ;
+                    }
+                   // ,quickClose:true
+                })
+            }
+            var that =$(this);
+            ui.d.content('<div class="book-tips-info">'+ that.data('content') +'</div>');
+            ui.d.title( that.data('title') );
+            ui.d.show( this );
+        } ,function () {
+            ui.d.close(  );
+        });
+
+        <?php
+       if( $is_show) {
+
+           $str = '<div style="max-width: 450px;">' . $_cu['name'] . '同学你好！欢迎来到好策读书！请注意页面右侧“选书通知”，务必于' . date('Y年m月d日 H:i', $term_config['s_end_time']) . '前选书
+        ，并于' . date('Y年m月d日 H:i', $term_config['end']) . '前完成相应学习任务。具体步骤如下：<ul class="dr-info">
+        <li>1.点击待选图书，查看图书详情。</li>
+        <li>2.点击图书页面中“加入”按钮，即可加入阅读。</li>
+        <li>3.加入后在出现的班级选框中输入并选择您的班级名称。</li>
+        <li>4.完成图书下方相应任务。</li>
+        <li>如遇问题，可通过页面右侧“反馈”中联系方式，联系我们！</li></ul></div>';
+           $title = '选书提示';
+       }elseif( $diaocha && !$is_pop ) {
+//           $click="ui.s_enter()"; //
+//           $str = '<div style="max-width: 450px; line-height: 30px;text-indent: 20px;">' . $diaocha['long'] . ' <a href="' . $diaocha['url'] . '"  onclick="'.$click.'" target="_blank"   >详情戳这里</a>';
+//           $str .='，而后<a target="_blank" href="https://www.haoce.com/taobao">领取支付宝红包</a>';//if($client!=1 )
+//           $str.='</div>';
+//           $title = '有奖调查问卷';// $diaocha['txt'];
+       }
+       if($title && $str ){
+        ?>
+        ui.s_enter=function () {
+            _czc.push(['_trackEvent','弹窗','enter_<?=$title?>' ]);
+        }
+        var dShow= dialog({
+            content:'<?=strtr($str,["'"=>'"',"\n"=>'',"\r"=>''])?>',
+            title:'<?=$title?>'
+            //align: 'right top',
+            //,quickClose:true
+        });
+        dShow.showModal();
+        _czc.push(['_trackEvent','弹窗','<?=$title?>' ]);
+        <?php }  ?>
+
+
+        
+    });
+</script>

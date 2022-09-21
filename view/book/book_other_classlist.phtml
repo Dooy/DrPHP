@@ -1,0 +1,57 @@
+<div class="dr-container">
+    <ul class="sui-breadcrumb">
+        <li><a href="/">首页</a></li>
+        <li><a href="<?=R('book/detail/'.$book['book_id'])?>"><?=$book['book']?></a></li>
+        <li class="active"><?=$site_title?></li>
+    </ul>
+
+    <h2><?=$site_title?></h2>
+
+
+    <div  class="sp-v2"  >
+        <?php if(!$classList):?>
+            <div class="dr-box-padding" >
+                <div style="text-align: center;padding: 30px 0;" class="sui-text-danger">您暂无任课班级，可联系学校管理员安排！</div>
+            </div>
+        <?php else:?>
+
+            <div class="dr-box-padding" >
+
+                <table class="sui-table ">
+                    <thead>
+                    <tr>
+                        <th>班群号</th>
+                        <th>名称</th>
+                        <th>任课老师</th>
+                        <th>选书人数</th>
+                        <th>讨论/回帖</th>
+                        <?php foreach ($tagName as $k=> $v): if($k<=0 ) continue; ?>
+                        <th><?=$v['n']?></th>
+                        <?php endforeach;?>
+
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($classList as $k=> $class):?>
+                        <tr>
+                            <td><?=$k<=0?'--':$k?></td>
+                            <td><?=$k<=0?'未加入班级':$className[$k]['class']?></td>
+                            <td>
+                                <?php foreach( $cls_role[$k] as $k3=> $v3): ?>
+                                    <?=$user[$v3['user_id']]['name']?><?php if($_cu['uid']==$v3['user_id']): ?><span class="sui-label label-warning">本人</span><?php endif;?><br>
+                                <?php endforeach; ?>
+                            </td>
+                            <td><?=$class['cnt']?></td>
+                            <td><?=$class['topic_cnt']?>/<?=$class['comment_cnt']?></td>
+                            <?php foreach ($tagName as $k=> $v): if($k<=0 ) continue; ?>
+                                <td><?=$class['tag_'.$k.'_cnt']?></td>
+                            <?php endforeach;?>
+                        </tr>
+                    <?php endforeach;?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif;?>
+
+    </div>
+</div>

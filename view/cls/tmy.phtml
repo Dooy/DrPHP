@@ -1,0 +1,44 @@
+<div class="sui-container">
+    <div class="sui-row-fluid">
+        <?php $kk=0;  foreach($tmy['list'] as $v ):$kk++; ?>
+            <?php if( $kk%2==1 && $kk>1): ?>
+                </div> <div class="sui-row-fluid">
+            <?php endif;?>
+        <div class="span6">
+            <table class="sui-table table-bordered-simple">
+                <thead>
+                <tr>
+                    <th colspan="4">
+                        <label class="checkbox">
+                            <input type="checkbox">
+                        </label><?=$v['class']?><span class="pull-right gray">创建: <?=date("Y-m-d",$v['ctime'])?></span>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td   class="center"  width="20%">班群号<br><h3><?=$v['class_id']?></h3></td>
+                        <td class="center" width="20%">学生数<br><h3><?=$v['stu_cnt']?></h3></td>
+                        <td class="center" width="20%">任务数<br><h3><?=$v['task_cnt']?></h3></td>
+                        <td class="center" width="20%">
+                            <ul class="unstyled">
+                                <?php if( $type=='-1'): ?>
+                                    <li><a href="<?=R('cls/operate/back?cid='.$v['class_id'])?>">还原</a></li>
+                                    <li><a href="<?=R('cls/operate/realdel?cid='.$v['class_id'])?>">彻底删除</a></li>
+                                <?php else: ?>
+                                <li><a href="#">查看任务</a></li>
+                                <li><a href="#">查看学生</a></li>
+                                <li><a href="#">邀请学生</a></li>
+                                <li><a href="<?=R('cls/modify/'.$v['class_id'])?>">修改</a></li>
+                                <li><a href="<?=R('cls/operate/del?cid='.$v['class_id'])?>">归档</a></li>
+                                <?php endif; ?>
+                            </ul>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <?php endforeach; ?>
+    </div>
+    <?=$tmy['page']?>
+</div>

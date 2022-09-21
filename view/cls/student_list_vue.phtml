@@ -1,0 +1,216 @@
+<style>
+    .v-hide input{ width: 30px; text-align: center }
+</style>
+<div class="dr-container">
+    
+
+    <div class="dr-box-padding"  id="school-banner"  >
+
+        <div class="pull-left" id="school-name">
+
+            <h3><?=$site_title?></h3>
+            <h4><?=$class['class']?></h4>
+        </div>
+        <ul class="pull-right total" id="school-total">
+            <li>
+                <b><?=$class['stu_cnt']?></b>
+                <span>人数</span>
+            </li>
+            <li>
+                <b><?=$class['class_id']?></b>
+                <span>班群号</span>
+            </li>
+            <!--
+            <li>
+                <b>10</b>
+                <span>任务</span>
+            </li>
+            <li>
+                <b>10</b>
+                <span>读书</span>
+            </li>
+            -->
+
+
+        </ul>
+        <br style="clear: both"/>
+    </div>
+
+    <div  class="sp-v2"  >
+        <div class="sp6" id="haoce_vue">
+            <template  v-for="(v5,k5) in arr_list" content="v5">
+
+            <div class="dr-box-padding"  >
+                <h3  v-if="k5>0">外加入</h3>
+                <form>
+                <table class="sui-table ">
+                    <thead v-if="k5==0">
+                    <tr>
+                        <th>#</th>
+                        <th>姓名<br><a href="<?=R($DR_SELF,['sort'=>'number','ds'=>$_GET['ds']=='asc'?'desc':'asc'])?>">学号<i class="sui-icon icon-tb-<?php if($_GET['ds']=='asc') echo 'un' ?>fold"></i></a></th>
+
+
+                            <th>选书/完成<br>(终分)<div class="v-hide"><button   class="sui-btn btn-small">设置权重</button></div></th>
+                            <th>发帖/回帖<br>(成绩)<div class="v-hide"><input type="text"  class="input-mini" name="d0" v-model="term.dafen[0]"></div></th>
+                            <template v-for="(v,k) in tags">
+                            <th v-if="k>0">{{v.n}}<br>(成绩)<div class="v-hide"><input type="text"  class="input-mini" :name="'d'+k"  v-model ="term.dafen[k]"></div></th>
+                            </template>
+                    </tr>
+                    </thead>
+
+                        <tbody>
+
+                        <template v-for="(v,k) in studentList">
+                            <template v-if="(!k5 && v.ct && v.ct.A) || (k5 && !(v.ct && v.ct.A)) || arr_list.length==1">
+                            <tr >
+                               <td v-html="(v.ct && v.ct.A)? v.ct.A :(k+1)"></td>
+
+                               <td>
+                                   <a  :href="'/book/user/'+v.user_id" target="_blank" v-html="v.name"></a>
+                                   <span class="sui-label label-warning" v-if="v.finish && v.finish.ctime &&  v.finish.ctime>term_config.s_end_time">补选</span>
+                                    <div v-html="v.number " @click="v.ctime= !v.ctime"></div>
+                               </td>
+
+                               <template v-if="v.tjrz && v.tjrz.book_cnt">
+                                   <td >
+                                       {{v.tjrz.book_cnt+'/'+(v.finish && v.finish.wc_cnt ? v.finish.wc_cnt:'-')}}
+                                       <span style="cursor: pointer;color: #0a6cd6"  @click="v.ctime= !v.ctime" v-if="v.finish && v.finish.detail&& v.finish.detail.length">详</span>
+                                       <br>{{(v.finish && v.finish.score &&v.finish.score.last?v.finish.score.last:'-') }}
+                                   </td>
+                                   <td>{{v.tjrz.topic_cnt}}/{{v.tjrz.comment_cnt}}<br>{{v.finish&&v.finish.score &&v.finish.score[0]?v.finish.score[0]:'-'}}</td>
+                                    <template v-for="(v2,k2) in tags">
+                                     <td   v-if="k2>0">{{v.tjrz['tag_'+k2+'_cnt']}} <br>{{v.finish && v.finish.score &&v.finish.score[k2]?v.finish.score[k2]:'-'}}</td>
+                                    </template>
+                                </template>
+                                <td colspan="6" style="color: #999"  v-else>未加入</td>
+
+                            </tr>
+                            <template v-if="!v.ctime && v.finish && v.finish.detail">
+
+                            <tr  v-for=" (v3,k3) in v.finish.detail">
+                                <td></td>
+                                <td colspan="1">
+                                    <div style="display: inline;max-width: 200px; overflow: hidden;height: 20px;float: left" :title="books[v3.book_id].book">
+                                        <span class="sui-label label-warning" v-if="v3.over=='1'">完成</span>{{books[v3.book_id].book}}
+                                        <span class="sui-label label-warning" v-if="v3.ctime && v3.ctime>term_config.s_end_time">补选</span>
+                                    </div>
+                                    <div style="clear: both"></div>
+                                </td>
+                                <td v-html="v3.score.last"></td>
+                                <td v-html="v3.score[0]?v3.score[0]:'-'"></td>
+                                <template v-for="(v2,k2) in tags">
+                                    <td   v-if="k2>0" v-html="books[v3.book_id]['tag_'+k2+'_config']=='0'?'未':(v3.score[k2]?v3.score[k2]:'-')"></td>
+                                </template>
+                            </tr>
+                            </template>
+
+                            </template>
+
+                        </template>
+                        </tbody>
+
+                </table>
+                </form>
+            </div>
+
+        </template>
+
+            <div class="flexbox">
+                <div class="dr-page flex"> </div>
+                <div>
+                    <div class="sui-btn-group">
+                        <a href="<?=R($DR_SELF,  ['export'=>1] )?>" class="sui-btn  btn-info">导出终分</a>
+                        <a href="<?=R($DR_SELF,  ['export'=>2] )?>" class="sui-btn  btn-bordered btn-info">导出全分</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end sp6-->
+        <div class="sp3">
+            <div class="dr-box-padding">
+                <div class="dr-box-title">创建人</div>
+                <a class="book-create" >
+                    <div class="head-large"><img src="<?=H($user[$class['user_id']]['head'])?>"></div>
+                    <div href=""><?=$user[$class['user_id']]['name']?></div>
+                </a>
+            </div>
+            <?php if($class_role):?>
+            <div class="dr-box-padding">
+                <div class="dr-box-title">任课教师</div>
+                <div class="dr-box-content book-admin">
+                    <?php   foreach( $class_role  as $bk ): ?>
+                        <a class="book-admin-item" >
+                            <div class="head"><img src="<?=H($user[$bk['user_id']]['head'])?>"></div>
+                            <?=$user[$bk['user_id']]['name']?>
+                        </a>
+                    <?php endforeach;?>
+                </div>
+            </div>
+            <?php endif;?>
+
+
+            <div class="dr-box-padding">
+                <div class="dr-box-title">白名单</div>
+                <div class="dr-box-content">
+                    <?php if( $class_teacher ):?>
+                        <h4>导入老师</h4>
+                    <div class="book-admin" style="padding-bottom: 30px; ">
+                        <?php   foreach( $class_teacher  as $bk ): ?>
+                            <a class="book-admin-item"  style="height: 90px; <?php if($bk['ct_id']==$_GET['ct_id'] ): ?> color: red;<?php endif; ?>  " href="<?=R('/cls/studentList/book/'.$class['class_id'].'?ct_id='.$bk['ct_id'] )?>">
+                                <div class="head"><img src="<?=H($user[$bk['user_id']]['head'])?>"></div>
+                                <div><?=$bk['cnt']?>人</div>
+                                <div><?=$user[$bk['user_id']]['name']?></div>
+                            </a>
+                        <?php endforeach;?>
+                    </div>
+                    <div style="clear: both"></div>
+                    <?php endif; ?>
+                    <div class="des2">说明：<br>1.导入表头必须为 序号/学号/姓名<br>2.学号对应，若同名不同号则未加入<br>3.一个学号同时有2个账号会任意取一个</div>
+                    <p><button   class="sui-btn btn-primary" id="upload">导入白名单</button> <a href="/res/class_teacher.xlsx">模板下载</a></p>
+
+                </div>
+            </div>
+
+            <div  class="dr-box-padding">
+                <div class="dr-box-title">终分（最终成绩）说明</div>
+                <div class="dr-box-content">
+                    <div class="des2">
+                        1.多本书先取完成的
+                        <br>2.多本书完成条件相同，取成绩高的！同时讨论、回帖等基本信息都是此本书
+                        <br>3.每本书都有自己的任务，权重仅考虑本书相关的任务
+                        <br>4.未:代表未要求
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+<script src="<?=$_cdn?><?=$WWW_RES?>/js/plupload/plupload.full.min.js"></script>
+<script src="<?=$_cdn?><?=$WWW_RES?>hcapp/html/vue.min.js"></script>
+<script>
+    var vm = new Vue({
+        el:'#haoce_vue',
+        data: {
+            term:<?=json_encode($term)?>
+            , tags:<?=json_encode($tags)?>
+            , studentList:<?=json_encode($studentList)?>
+            , books:<?=json_encode($books)?>
+            , term_config:<?=json_encode( $term_config )?>
+            ,arr_list:<?php if( $is_order_class_teacher):?>['','外加入']<?php else:?>['']<?php endif; ?>
+        },
+        methods:{
+        }
+    });
+    $(function () {
+        DR.uploadone( 'upload'
+            ,{
+                cb:function (rep) {  }
+                ,query:'class_id=<?=$class['class_id']?>'
+                ,url:'<?=R('cls/studentList/implode')?>'
+                ,ext:'xls,xlsx'
+            });
+
+    });
+</script>

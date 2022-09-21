@@ -1,0 +1,41 @@
+
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>广告测试</title>
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-4785236016322524",
+            enable_page_level_ads: true
+        });
+    </script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <?php include "bk_head.phtml";  ?>
+
+</head>
+<body>
+<haoce>
+<h1>god</h1>
+<a href="https://www.baidu.com">去外网！</a>
+<button @tap="open_local()" >打开本地</button>
+</haoce>
+</body>
+<script type="text/javascript">
+    mui.init();
+    var vm = new Vue({
+        el:'haoce',
+        data:{
+
+        }
+        ,methods:{
+            open_local:function () {
+                var nw=plus.webview.create('_www/html/head_img.html');// _www/html/me-head.html
+                nw.show();
+            }
+        }
+    });
+ </script>
+</html>

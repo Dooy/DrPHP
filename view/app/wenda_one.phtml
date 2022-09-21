@@ -1,0 +1,411 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>主题详情</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <?php include "bk_head.phtml";?>
+    <link rel="stylesheet" type="text/css" href="<?=$hc_app?>/css/icons-haoce.css" />
+    <style>
+        .slide-fade-enter-active {  transition: all .3s ease;   }
+        .slide-fade-leave-active { transition: all .3s cubic-bezier(1.0, 0.5, 0.8, 1.0);  }
+        .slide-fade-enter, .slide-fade-leave-to{  transform: translateY(-150px); opacity: 0; }
+        .xx_select{ color: #f0ad4e;}
+        .dr_ying { line-height: 150%;text-align: justify ; background-color: #c6c6c6;     padding: 8px; border-radius: 4px;  font-size: small; margin-bottom: 10px;  }
+
+    </style>
+</head>
+<body style="margin: 0 auto">
+<haoce>
+<div class="mui-content"  id="book_topic" style="max-width: 780px;margin: 0 auto">
+    <div class="banner book_banner" >
+        <div class="banner-img" ><img :src="novel.cdn_img"></div>
+        <h1 class="title mui-ellipsis-2" style="font-size: 20px; line-height: 140%"  v-if="detail.cat_id==6">概要写作</h1>
+        <h1 class="title mui-ellipsis-2" style="font-size: 20px; line-height: 140%"  v-else-if="detail.cat_id==4">摘抄随想</h1>
+        <h1 class="title mui-ellipsis-2" style="font-size: 20px; line-height: 140%"  v-else-if="detail.cat_id==5">朗读</h1>
+        <h1 class="title mui-ellipsis-2" style="font-size: 20px; line-height: 140%" v-html="wenda.text.title" v-else></h1>
+        <h2 class="title2 mui-ellipsis" v-html="'《'+novel.novel+'》'" style="top:auto;bottom: 5px;right: 65px; text-align: right" v-if="novel.novel!=''"></h2>
+    </div>
+    <div class="book_info">
+        <div class="logo"style="z-index:100;" v-if="novel.cdn_img!=''"><img :src="novel.cdn_img"></div>
+    </div>
+    <div style="margin-top: -20px;" v-if="wenda.text||detail.type=='cat'">
+        <ul class="mui-table-view"  v-if="detail.type!='cat'">
+            <li class="mui-table-view-cell mui-media">
+                <a href="javascript:;">
+                    <img class="mui-media-object mui-pull-left" :src="user[wenda.user_id].head" style="width: 42px;">
+                    <div class="mui-media-body">
+                        <div v-html="user[wenda.user_id].name"></div>
+                        <div  style="color: #8f8f94; font-size: 14px;" class="flexbox">
+                            <div class="flex" v-html="'发表于：'+ HC.dateUtils.format_time(wenda.ctime)"></div>
+                            <span v-html="wenda.word+'字'"></span>
+                            <span style="text-align: center;width: 20px;">|</span>
+                            <span  v-html="'查看('+wenda.view+')'"></span>
+                        </div>
+                    </div>
+                </a>
+            </li>
+            <li class="mui-table-view-cell">
+                <div style="line-height: 150%;text-align: justify; min-height: 80px;" v-html="wenda.text.text.nl2br()"></div>
+                <div  style="color: #8f8f94; font-size: 14px;" class="flexbox">
+                    <div class="flex"> </div>
+                    <span  v-html="'回复('+wenda.cnt+')'" @tap="showRe()"></span>
+                    <span style="text-align: center;width: 20px;">|</span>
+                    <span @tap="HC.good('wenda',wenda.wenda_id,wenda )"><i class="mui-icon icon-tb-appreciatefill" style="font-size: 16px;"></i>赞({{wenda.good_cnt}})</span>
+                </div>
+            </li>
+        </ul>
+        <ul  class="mui-table-view" v-else>
+            <li class="mui-table-view-cell mui-media">
+                <a href="javascript:;">
+                    <img class="mui-media-object mui-pull-left" src="https://cdn.haoce.com//res/head/person/24.jpg" style="width: 42px;">
+                    <div class="mui-media-body">
+                        <div>任务要求</div>
+                        <div  style="color: #8f8f94; font-size: 14px;" class="flexbox">小策</div>
+                    </div>
+                </a>
+            </li>
+            <li class="mui-table-view-cell">
+                <div style="line-height: 150%;text-align: justify; min-height: 80px;" v-html="blockName.opt.info[detail.cat_id]"></div>
+            </li>
+        </ul>
+
+        <ul class="mui-table-view" style="margin-top: 10px;" v-if="relist.length">
+            <template  v-for="(v,k) in relist">
+            <li class="mui-table-view-cell mui-media"  v-if="v.text">
+                <div>
+                    <img class="mui-media-object mui-pull-left" :src="user[v.user_id].head" style="width: 42px;border-radius: 50%;" onerror="this.src='https://cdn.haoce.com/res/img/none_user.jpg'">
+                    <div class="mui-media-body">
+                        <div  style="color: #8f8f94; font-size: 14px;" class="flexbox">
+                            <div class="flex" v-html="user[v.user_id].name +'发表于：'+ HC.dateUtils.format_time(v.ctime)" v-if="detail.type=='cat'"></div>
+                            <div class="flex" v-html="user[v.user_id].name +'回复于：'+ HC.dateUtils.format_time(v.ctime)" v-else></div>
+                            <span v-html="v.word+'字'"></span>
+                            <span style="text-align: center;width: 20px;">|</span>
+                            <span v-html="(k+1)+'楼'"></span>
+                        </div>
+                        <template v-if="v.cat_id==5" >
+                            <div class="pg-msg-content"  style="width: 30%;" @tap="playV3(v)">
+                                <i  class="mui-icon icon-tb-notification" style="font-size: 16px;"></i>
+                                <span v-if="v.wenda_id==st.play_id" v-html="st.play_pos">试听</span>
+                                <span v-else>试听</span>
+                            </div>
+                            <div v-html="v.text.text_arr.time+'\''" style="padding-top: 8px;"></div>
+                            <div style="clear: both"></div>
+                            <div :class="{'mui-ellipsis-2': v.text.text_arr.name}" @tap="v.text.text_arr.name= v.text.text_arr.name?false:true " style="line-height: 150%;text-align: justify; "
+                                 v-html="v.text.text.nl2br() " ></div>
+                        </template>
+                        <div style="line-height: 150%;text-align: justify; " v-html="v.text.text.nl2br()" v-else></div>
+
+                        <div v-if="v.cat_id==4 && v.text.text_arr && v.text.text_arr.ying" v-html="v.text.text_arr.ying.nl2br()" class="dr_ying"></div>
+
+                        <div class="flexbox">
+                            <div v-if="st.dafen!=''">
+                                <template  v-for="fv in fen.arr">
+                                    <span class="mui-icon icon-tb-favorfill xx_select" v-if="is_selected(v,fv)"
+                                      style=" font-size: 20px; cursor: pointer " :title="fv+'分'" @tap="dafen(v,fv)"></span>
+                                    <span  class="mui-icon icon-tb-favor"  style=" font-size: 20px; cursor: pointer " :title="fv+'分'" @tap="dafen(v,fv)" v-else></span>
+                                </template>
+                            </div>
+                            <div  style="color: #8f8f94; font-size: 14px;text-align: right"  class="flex" >
+                                <span  @tap="del(v,k)" style="margin-right: 10px;" v-if="u.uid==v.user_id"><i class="mui-icon mui-icon-trash" style="font-size: 16px;"></i>删除</span>
+                                <span  @tap="HC.good('wenda',v.wenda_id,v )"><i class="mui-icon icon-tb-appreciatefill" style="font-size: 16px;"></i>赞({{v.good_cnt}})</span>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                </div>
+            </li>
+            </template>
+        </ul>
+        <div v-else-if="detail.cat_id==4" style="padding-top: 50px;text-align: center;color: #999" >正待您完成！<p style="padding-top: 20px">请到阅读页面，长按段落进行随想！</p></div>
+        <!-- <button v-else-if="wenda.cat_id>1 && wenda.cat_id<100" type="button" class="mui-btn mui-btn-primary" @tap="showRe()">正待您完成</button>-->
+        <div v-else-if="wenda.cat_id>1 && wenda.cat_id<100" style="padding-top: 50px;text-align: center;color: #999" @tap="showRe()"><button type="button" class="mui-btn mui-btn-primary">正待您完成</button></div>
+    </div>
+    <div v-else  style="padding-top: 50px;text-align: center;color: #999">正在载入！</div>
+</div>
+
+<div style="position: fixed; z-index: 101; top: 0; right: 0; left: 0; ">
+        <transition name="slide-fade">
+            <form class="mui-input-group mui-table-view"    v-if="st.re">
+                <li class="mui-input-row" style="height: auto">
+                    <textarea id="textarea" :rows="(detail.type=='cat' && detail.cat_id==5)?20:5" placeholder="请输入内容"  v-model="f.text" @keyup="f.word= HC.wordCount(  f.text )"  ></textarea>
+
+                    <div  style="padding: 11px;">
+                        <span id="stat" v-if="f.word>0" style="color: #999">已经输入{{f.word}}字</span>
+                        <button type="button" class="mui-btn mui-btn-primary"   @hold="hc_recorder.hold()" @release="hc_recorder.release()"   v-if="detail.type=='cat' && detail.cat_id==5" style="width: 120px">长按录音</button>
+                        <button type="button" class="mui-btn mui-btn-primary" @tap="createWenda( )" v-else-if="detail.type=='cat'">完成</button>
+                        <button type="button" class="mui-btn mui-btn-primary" @tap="addComment( )" v-else>回复</button>
+                        <a  style="float: right;color: #666; margin:7px 10px 0 0; " @tap="st.re=false" >关闭</a>
+                        <div style="clear: both;"></div>
+                    </div>
+                </li>
+            </form>
+        </transition>
+    </div>
+    <div class="dr_sound" v-if="record.is_doing">
+        <div id='sound-alert' class="rprogress"  >
+            <div class="rschedule"></div>
+            <div class="r-sigh">!</div>
+            <div id="audio_tips" class="rsalert" v-html="record.tips">手指上滑，取消发送</div>
+        </div>
+    </div>
+</haoce>
+
+</body>
+<script>
+    mui.init({
+        swipeBack: true //启用右滑关闭功能
+        ,gestureConfig: {
+            tap: true, //默认为true
+            doubletap: true, //默认为false
+            longtap: true, //默认为false
+            swipe: true, //默认为true
+            drag: true, //默认为true
+            hold: true, //默认为false，不监听
+            release: true //默认为false，不监听
+        }
+    });
+
+    var vm =  new Vue({
+        el:'haoce',
+        data:{
+            wenda:{ text:{title:'',text:''},cat_id:2}
+            ,relist:[]
+            ,detail:{novel_id: 1, wenda_id:1001,type:'pid',cat_id:0 }
+            ,user:{}
+            ,st:{re:false ,dafen:'<?=$_GET['dafen']?>',player:null,play_id:0,play_pos:'...' }
+            ,f:{ text:'',word:0 }
+            ,blockName:{opt:{ info:{"1": "","2": "","4": "","5": "","6": ""}}}
+            ,u:{}
+
+            ,record:{is_doing: false ,tips:'手指上滑，取消' },hc_recorder:{}
+            ,fen:{arr:[1,2,3,4,5]}
+            ,novel:{    "novel_id": "1",    "site_id": "60956",    "novel": "",    "site": "8848",    "ctime": "1510845833",    "cat": "gerneral",    "is_yin": "1",    "is_shuan": "2",    "view": "0",    "img": "3e98d82e6362d338a351c024ad691f36.jpg",    "is_show": "1",    "user_id": "0",    "cdn_img": ""}
+        }
+        ,created:function () {
+            mui.plusReady(  this.plusReady );
+        }
+        ,methods:{
+            plusReady:function(){
+                this.initRecorder();
+                this.initPlay();
+            },
+            initPlay:function () {
+
+            },
+            initRecorder :function(){
+                var that = this;
+                //console.error('good new45789 ');
+                this.hc_recorder= new HC.recorder( this.record,this.submitYin, {holdBefore:function () {
+                        if( that.f.text==''){
+                            HC.msg("录音之前请先填您读的内容！"); return false ;
+                        }
+                        return true;
+                    }
+                });
+               // console.log( 'god news' );
+            },
+            submitYin:function( obj ){
+                console.log( JSON.stringify(obj) );
+                if( obj.time<3 ){
+                    HC.msg('朗读时间，请大于3秒');
+                    return ;
+                }
+                HC.showWaiting( "发布中...");
+                var that = this;
+                for(var p in this.f ) obj[p]=  this.f[p];
+                obj.cat_id= this.detail.cat_id;
+                obj.novel_id= this.detail.novel_id;
+                HC.upload( '/wenda/one/post' , obj.path,{data:obj , success:function (rep) {
+                    HC.closeWaiting();
+                    HC.msg("发布成功！");
+                    that.relist=[];
+                    that.loadComment();
+                    that.st.re = false;
+                    HC.msg("完成！");
+                    that.f={text:'',word:0,title:'' }
+                }});
+
+            },
+            dr_load:function ( e ) {
+                this.init();
+                console.log("Detail:"+ JSON.stringify(e.detail) );
+                if(  !e.detail.novel_id  ){
+                    HC.msg('参数错误');return ;
+                }
+                if( typeof e.detail.type =='undefined')   e.detail.type='pid';
+                //HC.msg(  e.detail.type );
+                this.detail= e.detail; //!e.detail.wenda_id ||
+                this.loadWenda();
+                //this.finish();
+            },
+            is_selected:function (v,fv ) {
+                var u= this.u ;
+                return (v.haoce_dafen>0 ? (v.haoce_dafen>=fv ) : ( v.haoce_log&&v.haoce_log[10]&&v.haoce_log[10][u.uid]&&v.haoce_log[10][u.uid][0].opt_value>=fv ));
+            },
+            init:function () {
+                this.relist=[];
+                this.f ={ text:'',word:0 }
+                this.wenda ={ text:false,cat_id:2}
+                this.book ={book_img:'',book:'-'  }
+            },
+            del:function (v,k) {
+                var doDel=function () {
+                    HC.ajax( '/wenda/one/del/'+ v.wenda_id ,{ success:function () {
+                        vm.relist.splice(k,1);
+                    }});
+                }
+                if(!plus){
+                    doDel(); return;
+                }
+                var btnArray = ['再考虑一下', '确认'];
+                var _self = this ;
+                mui.confirm('是否删除，确认'  , '是否删除？', btnArray, function(e) {
+                    if (e.index == 1){
+                        doDel();
+                    }
+                });
+            },
+            loadWenda:function () {
+                this.loadComment();
+                this.loadNovel();
+                if( this.detail.type!='cat') this.loadWendaOne();
+                else this.wenda.text= {title:'',text:'123'} ;
+                //HC.msg('god ok2?'+ this.wenda.text); return ;
+            }
+            ,loadWendaOne:function () {
+                var that = this;
+                HC.ajax( 'wenda/one/get/'+  this.detail.wenda_id   ,{success:function (rep ) {
+                    //vm.u= rep._cu ;
+                    that.wenda= rep.wenda;
+                    HC.marge( vm.user, rep.user );
+                    //vm.loadComment();
+                }});
+            }
+            ,loadNovel:function () {
+                var that = this;
+                HC.ajax( 'book/novel/one/'+  this.detail.novel_id +'?check=block'  ,{success:function (rep ) {
+                     that.u= rep._cu ;
+                     that.novel= rep.novel;
+                     if(  rep.blockName ) that.blockName = rep.blockName ;
+                }});
+            }
+            ,createWenda5:function () {
+                HC.msg('朗读');
+            }
+            ,playV3:function (v) {
+                console.log('v2', v.text.text_arr.file  );
+                var that = this;
+                this.st.play_id = v.wenda_id ;
+                if(  this.st.player )this.st.player.stop();
+                this.st.player = new HC.player( v.text.text_arr.file ,{
+                    'type':'amr'
+                    ,getPos:function (p) {
+                        console.log('p:'+ p );
+                        that.st.play_pos = that.st.player.format(p);
+                    }
+                });
+                this.st.player.start();
+            }
+            ,loadComment:function () {
+
+                switch( this.detail.type){
+                    case 'cat':
+                        var url=  'wenda/list/cat/'+  this.detail.cat_id +'/'+   this.detail.novel_id+'?dafen='+ this.st.dafen;
+                        break;
+                    default:
+                        var url=  'wenda/list/pid/'+  this.detail.wenda_id +'/'+   this.detail.novel_id+'?dafen='+ this.st.dafen;
+                        break;
+                }
+                var that = this;
+                HC.ajax(url ,{success:function (rep ) {
+                    for( var pk in rep.list.list ) rep.list.list[ pk].haoce_dafen = 0;
+                    vm.relist = vm.relist.concat( rep.list.list );
+                    console.log('list',  vm.relist);
+                    HC.marge( vm.user, rep.user );
+                    if( that.detail.type=='cat'){
+                        //alert('ddd');
+                        that.wenda.text.title= rep.cat_name.n ;
+                    }
+                }})
+            }
+            ,showRe:function () {
+                this.st.re=  !this.st.re ;
+            }
+            ,addComment:function () {
+                if(vm.f.text==''){ HC.msg('请输入内容'); return ;}
+                var dt= vm.f;
+                dt.novel_id= this.detail.novel_id;
+                dt.pid= this.detail.wenda_id;
+                HC.ajax( 'wenda/one/re'    ,{data:dt,success:function (rep ) {
+                    vm.relist = [rep.wenda].concat( vm.relist );
+                    HC.marge( vm.user, rep.user );
+                    vm.st.re= false;
+                    vm.finish();
+                }});
+            }
+            ,createWenda:function ( ) {
+
+
+                if( this.f.word<8) { HC.msg('正文内容能多写几个字么？'); return ;}
+                var data= this.f;
+                data.cat_id= this.detail.cat_id;
+                data.novel_id= this.detail.novel_id;
+                var that = this;
+                //console.log('createWenda',  data );
+                //return ;
+                HC.ajax( 'wenda/one/post' ,{data: data , success:function (rep ) {
+                    that.loadComment();
+                    that.st.re = false;
+                    HC.msg("完成！");
+                    that.f={text:'',word:0,title:'' }
+                }});
+            }
+            ,topRight:function () {
+                //HC.msg('待处理');
+                if( this.detail.type=='cat'){
+                    this.st.re =   !this.st.re ;
+                    return ;
+                }
+                if( ! this.st.re) this.st.re = true;
+                else this.addComment();
+            }
+            ,finish:function ( ) {
+                var wb =plus.webview.getWebviewById('wenda');
+                mui.fire( wb,'dr_finish',  {wenda_id:this.detail.wenda_id });
+            }
+            ,dafen:function ( v,fen) {
+                HC.ajax( '/wenda/one/dafen/'+v.wenda_id,{data:{fen:fen},success:function (rep) {
+                    HC.msg("打分成功!");
+                    v.haoce_dafen= fen;
+                }});
+            }
+        }
+    });
+    mui.plusReady(function(){
+        if( HC.getWinExtras().detail.novel_id ){ //&&  HC.getWinExtras().detail.wenda_id
+            vm.dr_load( HC.getWinExtras() );
+        }
+    });
+
+    <?php if($_GET['web_debug']):?> vm.loadWenda();
+    <?php elseif($_GET['novel_id']>0 && $_GET['wenda_id']>0):?>
+    vm.detail.novel_id= <?=intval($_GET['novel_id'])?>;
+    vm.detail.wenda_id= <?=intval($_GET['wenda_id'])?>;
+    vm.loadWenda();
+    <?php elseif($_GET['novel_id']>0 && $_GET['cat_id']>0):?>
+    vm.detail.novel_id= <?=intval($_GET['novel_id'])?>;
+    vm.detail.cat_id= <?=intval($_GET['cat_id'])?>;
+    vm.detail.type='cat';
+    //vm.wenda.text ={title:'1','text':'good'};
+    vm.loadWenda();
+    <?php else:?>
+    HC.cacheBack({cb:function () {  }});
+    <?php endif?>
+    document.addEventListener('dr_load', vm.dr_load );
+    document.addEventListener('topRight', vm.topRight );
+    //console.log('local',window.location );
+</script>
+</html>

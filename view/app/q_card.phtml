@@ -1,0 +1,174 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>HI PAY</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <?php include "bk_head.phtml";?>
+    <style>
+        .title{
+            margin: 20px 15px 7px;
+            color: #6d6d72;
+            font-size: 15px;
+        }
+        .fade-enter-active, .fade-leave-active {
+            transition: opacity .5s;
+        }
+        .fade-enter, .fade-leave-to  {
+            opacity: 0;
+        }
+        .q_warng{  margin: 10px 15px 7px;  color: #ff7300; font-size: 15px;  }
+
+        .q_time{position: absolute; right: 83px; top: 11px;}
+        .q_btn{ position: absolute; right: 10px;top: 13px; }
+        .mui-popup-input input{ height: 40px; font-size: 20px;  font-weight:bolder; }
+    </style>
+</head>
+<body>
+<bobo>
+    <header class="mui-bar mui-bar-nav">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+        <h1 class="mui-title">收款卡</h1>
+        <button class="mui-btn mui-btn-blue mui-btn-link mui-pull-right" @tap="add_init()">添加</button>
+    </header>
+
+    <div class="mui-content" v-if="st.tab=='add' || st.tab=='modify'" id="addFrom">
+        <div class="title">新增收款卡 </div>
+        <form class="mui-input-group">
+            <div class="mui-input-row">
+                <label>收款人</label>
+                <input type="text" placeholder="收款人姓名" v-model="f.c_name">
+            </div>
+            <div class="mui-input-row">
+                <label>卡号</label>
+                <input type="text" placeholder="数字" v-model="f.c_id">
+            </div>
+            <div class="mui-input-row">
+                <label>银行</label>
+                <input type="text" placeholder="银行名称 如:中国银行" v-model="f.c_bank">
+            </div>
+            <div class="mui-input-row">
+                <label>开户行</label>
+                <input type="text" placeholder="南京分行" v-model="f.c_add">
+            </div>
+            <div class="mui-input-row">
+                <label>谷歌验证码</label>
+                <input type="text" placeholder="6位动态码" v-model="f.google">
+            </div>
+            <div class="mui-button-row">
+                <button type="button" class="mui-btn mui-btn-primary" @click="add()" v-html=" st.tab=='modify'?'修改':'添加'">确认</button>
+
+                <button type="button" class="mui-btn " @click="st.tab=''">取消</button>
+            </div>
+
+        </form>
+    </div>
+    <div v-else class="mui-content">
+
+        <ul class="mui-table-view mui-table-view-striped mui-table-view-condensed" v-if="card.list.length>0">
+            <li class="mui-table-view-cell" v-for="v in card.list">
+                <a class="mui-table"  href="#picture" @tap="setPic(v)">
+                    <div class="mui-table-cell mui-col-xs-10">
+                        <h4 class="mui-ellipsis" v-html="'卡号 '+v.c_id"></h4>
+                        <h5>收款人:<span v-html="v.c_name"></span>，银行:<span v-html="v.c_bank"></span></h5>
+                        <p class="mui-h6 mui-ellipsis" v-html="'开户行:'+v.c_add"></p>
+                    </div>
+                    <div class="mui-table-cell mui-col-xs-2 mui-text-right">
+                        <span class="mui-h5">23万</span>
+                    </div>
+                    <span class="mui-badge mui-badge-danger" style="position: absolute;right: 0px; top: 60px;" v-if="sv.bank.c_id==v.c_id">已启用</span>
+                </a>
+            </li>
+        </ul>
+        <div v-else style="text-align: center;padding: 30px;">
+            <a href="javascript:;" @tap="add_init()">请先添加收款卡</a>
+        </div>
+    </div>
+
+    <div id="picture" class="mui-popover mui-popover-action mui-popover-bottom">
+        <ul class="mui-table-view">
+            <li class="mui-table-view-cell">
+                <a href="javascript:;" @click="open()">启用</a>
+            </li>
+            <!--
+            <li class="mui-table-view-cell">
+                <a href="#">删除</a>
+            </li>
+            -->
+        </ul>
+        <ul class="mui-table-view">
+            <li class="mui-table-view-cell">
+                <a href="#picture"><b>取消</b></a>
+            </li>
+        </ul>
+    </div>
+
+</bobo>
+</body>
+<script>
+new Vue({
+    el: 'bobo',
+    data: {
+        st:{tab:'',pic:{id:0}},
+        f:{c_name:'',c_id:'',c_bank:'',c_add:'',google:''}
+        ,card:{ list:[]}
+        ,sv:{}
+
+    }
+    ,
+    created: function () {
+        this.initF();
+        this.load();
+    },
+    mounted: function () {
+    },
+    methods: {
+        setPic:function(v){
+            this.st.pic=v;
+            //console.log('setPic', v );
+        }
+        ,open:function () {
+            //console.log('open', this.st.pic , this.sv );
+            var that = this;
+            mui('#picture' ).popover('toggle');
+            HC.ajax('/fw/card/set/'+ this.st.pic.id ,{  success:function (rep) {
+                //location.reload();
+                    that.sv.bank.c_id= that.st.pic.c_id;
+                } } );
+
+        }
+        ,add_init:function () {
+            this.st.tab='add';
+        }
+        ,initF:function () {
+            this.f= {c_name:'',c_id:'',c_bank:'',c_add:'',google:''};
+        }
+        ,add:function () {
+            if( this.f.c_bank=='' || this.f.c_id=='' || this.f.c_name==''){
+                HC.msg("收款人、卡号、银行不能为空！");
+                return;
+            }
+
+            var that = this;
+            var url='/fw/card/add';
+            HC.ajax(url,{data:this.f, success:function (rep) {
+                    that.st.tab='list';
+                    //if( that.st.tab!='modify') that.st.now_page=0;
+                    //that.load();
+                    location.reload();
+                } } );
+
+        }
+        ,load:function () {
+            var that = this;
+            HC.ajax('/fw/card/list',{  success:function (rep) {
+                    console.log('list', rep );
+                    that.card= rep.card;
+                    that.sv = rep.sv ;
+
+                } } );
+        }
+    }
+ });
+</script>
+</html>

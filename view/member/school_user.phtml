@@ -1,0 +1,41 @@
+<div class="dr-container">
+<form id="form-msg" class="sui-form form-horizontal " novalidate="novalidate" action="<?=R($_c.'/setting/info')?>">
+
+    <div class="sui-form form-horizontal"><div class="control-group">
+            <label   class="control-label"></label>
+            <div class="controls"><h1>绑定信息</h1></div>
+        </div></div>
+
+    <div class="control-group ct-tel "  >
+        <label  class="control-label "  >学号：</label>
+        <div class="controls">
+            <input type="text" value="<?=$me['user']['number']?>"  name="number" placeholder="真实学号" data-rules="required"  data-empty-msg="请填写学号">
+        </div>
+    </div>
+    <div class="control-group ct-tel "  >
+        <label  class="control-label "  >姓名：</label>
+        <div class="controls">
+            <input type="text" value="<?=$me['user']['name']?>"  name="name" placeholder="真实姓名" data-rules="required"  data-empty-msg="请填写姓名">
+        </div>
+    </div>
+    <div class="control-group ct-tel "  >
+        <label  class="control-label "  > </label>
+        <div class="controls">
+            <button type="submit" class="sui-btn btn-primary">绑定</button>
+        </div>
+    </div>
+</form>
+    <ul class="dr-info">
+        说明：
+        <li>1.学号必须跟姓名匹配才能绑定成功！</li>
+        <li>2.请勿重复绑定：一个学号只能被一个绑定一账号；再次绑定会提示已绑定的信息</li>
+        <li>3.未绑定成功，无法选书</li>
+        <li>4.若你的学号跟姓名不存在等其他原因无法成功绑定，请联系你的老师或者客服人员！</li>
+    </ul>
+</div>
+
+<script>
+    $(function () {
+        DR.ajaxAndValidate( 'form-msg')
+    });
+</script>

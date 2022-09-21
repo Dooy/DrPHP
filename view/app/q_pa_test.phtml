@@ -1,0 +1,331 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>HI PAY</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <?php include "bk_head.phtml";?>
+    <script src="<?=$hc_app?>/js/qf.icomet.js<?=$local_version?>"></script>
+    <style>
+        .title{
+            margin: 20px 15px 7px;
+            color: #6d6d72;
+            font-size: 15px;
+        }
+        .fade-enter-active, .fade-leave-active {
+            transition: opacity .5s;
+        }
+        .fade-enter, .fade-leave-to  {
+            opacity: 0;
+        }
+        .q_warng{  margin: 10px 15px 7px;  color: #ff7300; font-size: 15px;  }
+
+        .q_time{position: absolute; right: 83px; top: 11px;}
+        .q_btn{ position: absolute; right: 10px;top: 13px; }
+        .mui-popup-input input{ height: 40px; font-size: 20px;  font-weight:bolder; }
+    </style>
+</head>
+<body>
+<bobo>
+    <header class="mui-bar mui-bar-nav">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" @click="closeWin()"></a>
+        <h1 class="mui-title">平安银行</h1>
+    </header>
+    <div class="mui-content">
+        <div class="mui-input-group" style="margin-top: 5px; ">
+            <!--
+            <div class="mui-input-row">
+
+                <input type="text" placeholder="店铺登录号" v-model="f.mobile">
+            </div>
+            -->
+            <div class="mui-button-row">
+                <button type="button" class="mui-btn mui-btn-primary" @click="openLogin()">开始监听</button>
+                <button type="button" class="mui-btn " @click="clear()">清空</button>
+
+                <button type="button" class="mui-btn " @click="openPingan( )" v-if="!st.isOpen">平安</button>
+                <button type="button" class="mui-btn " @click="hideWin( )" v-else>关闭</button>
+
+                <button type="button" class="mui-btn " @click="pingBill( )">Test</button>
+                <!--
+
+                <button type="button" class="mui-btn " @click="logout()">登出</button>
+                <button type="button" class="mui-btn " @click="getAll('today')">当日</button>
+                <button type="button" class="mui-btn " @click="getAll('yesterday')">昨日</button>
+                -->
+            </div>
+        </div>
+
+        <div class="title">状态:
+            <span v-if="st.isStartIComet">监听</span><span v-else style="color: red">未开启</span>
+            ，账号:<span v-html="u.clientName" v-if="st.isLogin"></span><span v-else style="color: red">未登录</span>
+            <template v-if="card.bankCardMask!=''">，卡号：<span v-html="card.bankCardMask"></span></template>
+            <!--<span v-if="f.code">已登录</span>-->
+        </div>
+
+        <ul class="mui-table-view">
+
+            <li class="mui-table-view-cell mui-media" v-for="v in list">
+                <a href="javascript:;" @click="post(v)">
+                    <div class="mui-media-body">
+                        <span v-html="(v.transType=='C'?'+':'-')+v.transAmount+'元'" ></span>
+                        <p class='mui-ellipsis' v-html="v.mernamec+ '  '+ v.transNo"> </p>
+                        <span v-html="v.compsiteTime" style="position: absolute;right: 10px; font-size: 13px; top: 8px; color: #999999"></span>
+                    </div>
+                </a>
+            </li>
+
+        </ul>
+
+
+    </div>
+</bobo>
+</body>
+
+<script>
+    new Vue({
+        el: 'bobo',
+        data: {
+            st:{ bekeerSMS:null ,isListening: false , isLogin:false, isOpen:false,isStartIComet:false,win:null,time:0 ,timeCnt:0 }
+            ,f:{mobile:'test',cnt:0,code:''}
+            ,card:{bankCardMask:'', bankCardSign:'' }
+            ,u:{"uflag":"111","clientName":"***","uflag4":"0","nickName":"","patternId":"","mid":"","bflag4":"0","telNo":"","responseCode":"000000","loginName":"","bflag":"111","responseMsg":"成功","certificateType":""}
+            ,list:[{"cardMask":"6230***********4853","cardNo":"","cardType":"01","compsiteTime":"2019-09-29 16:49:05","mercode":"001980099990002","mernamec":"银联扫码转账","searialNo":"2810351909291469606029","source":"3","transAmount":"0.01","transCcy":"RMB","transNo":"9693011909291649047226","transResult":"0","transType":"C","vouchernum":"40190929604496029462"}] //
+        }
+        ,
+        created: function () {
+        },
+        mounted: function () {
+            setInterval( this.clientTime, 10*1000);
+            this.init();
+        },
+        methods: {
+            init:function () {
+
+                setTimeout(function(){
+                    api.setKeepScreenOn({
+                        keepOn: true
+                    });
+                },10000);
+                this.st.time= this.getTimeNow();
+                setInterval( this.queryBill, 10*1000);
+            }
+            ,queryBill:function ( ) {
+                this.st.timeCnt++;
+                var dt= this.getTimeNow()-  this.st.time;
+                if( dt<90 ) this.pingBill();
+                else if( dt<180 && this.st.timeCnt%2==0) this.pingBill();
+                else if( dt<360 && this.st.timeCnt%3==0) this.pingBill();
+                else if( dt<600 && this.st.timeCnt%4==0) this.pingBill();
+                else if( this.st.timeCnt %6==0) this.pingBill();
+            }
+            ,getTimeNow:function () {
+                return Math.round(new Date() / 1000);
+            }
+            ,startIcomet:function ( channel) {
+                var that = this;
+                if(  that.st.isStartIComet ) return ;
+                config = {
+                    channel:  channel,
+                    signUrl: '/icomet/sign',
+                    subUrl:  '/icomet/sub',
+                    callback: that.icommetDo
+                };
+                new iComet( config );
+                that.st.isStartIComet = true;
+            }
+            ,icommetDo:function ( content) {
+                //
+                try{
+                    this.st.time= this.getTimeNow();
+                    var d= JSON.parse( content );
+                    if(d.cmd='qr' ) this.createQr( d.data );
+                }catch (e) {
+                }
+            }
+            ,pingBill:function () {
+                var that = this;
+                if(  this.card.bankCardSign=='' ) {
+                    return ;
+                }
+                var ctime = Math.round(new Date() / 1000);
+                var start= HC.dateUtils.date_format( ctime-3600*24*7,'yyyy-MM-dd HH:mm:ss' );
+                var end= HC.dateUtils.date_format( ctime ,'yyyy-MM-dd HH:mm:ss' );
+                //alert( start );
+                var opt={
+                    pageIndex: 1
+                    ,pageSize: 50
+                    ,startDate: start
+                    ,endDate: end
+                    ,cardSign:''
+                    ,transType:''
+                    ,isPaBank:''
+                    ,accountFlag:''
+                };
+                var that = this;
+                this.ajax('https://rmb.pingan.com.cn/brop/tpp/pay/paymanager/qryTransRecords.do',function (rep) {
+                    that.list = rep.transRecordsList;
+                    var pst={cls:'com.pingan.bill',data: JSON.stringify(rep) };
+                    that.postSave( pst );
+                    //alert( JSON.stringify(rep ));
+                },{data: opt });
+            }
+            ,createQr:function (data) {
+                var that = this;
+
+                var pd={
+                    isAA: '0'
+                    ,bankCardSign: that.card.bankCardSign
+                    ,txnAmt: data.money
+                    ,txnAmtSum: data.money
+                };
+                //alert( JSON.stringify(pd ) );
+                this.ajax('https://rmb.pingan.com.cn/brop/tpp/pay/qrcode/aaIncomeInput.do',function (rep) {
+                    //alert( JSON.stringify(rep ) );
+                    var dd={cls:'com.pingan.qr',arg:JSON.stringify(data),'data': JSON.stringify(rep) };
+                    that.postSave(dd );
+                },{
+                    data:pd
+                    ,referer:'https://b.pingan.com.cn/pay/cashier/receivables.html'
+                });
+            }
+            ,postSave:function (data) {
+                var that = this;
+                if(  that.card.bankCardSign=='' ) {
+                    HC.msg('请先开启监听');
+                    return ;
+                }
+                data.pingAnID =  that.card.bankCardSign;
+                HC.ajax('/client/payLogV3PingAn/'+that.card.bankCardSign, {data:data });
+            }
+            ,clientTime:function () {
+                if(  this.card.bankCardSign=='') return ;
+                var f= this.card;
+                f.clientName= this.u.clientName;
+                f.telNo= this.u.telNo;
+                HC.ajax('/client/timePingAn/'+ this.card.bankCardSign ,{data: f } );
+            }
+            ,openLogin:function(){
+                //this.closeTaobao();
+                var that = this;
+                var url= 'https://rsb.pingan.com.cn/bron/coss/cust/info/queryNewMyUserInfo' ;
+                this.ajax( url, function (rep) {
+                    if( parseInt( rep.responseCode )===0 ){ // parseInt( rep.responseCode )>0
+                        that.u= rep.data.userInfo;
+                        that.st.isLogin= true;
+                        that.queryCard();
+                        if( that.st.win==null ){
+                            that.openPingan();
+                            setTimeout( that.hideWin, 3000 );
+                        }
+                        else {
+                            that.hideWin();
+                        }
+
+                    }else{
+                        that.openPingan();
+                    }
+                }); //,{data: {isOverseas:'0',sceneType:'03'} }
+    
+            }
+            ,queryCard:function () {
+                var that = this;
+                this.ajax( 'https://rmb.pingan.com.cn/brop/tpp/pay/qrcode/cust/qryCardListForPay.do', function (rep) {
+                    that.card= rep.bankCardList[0];
+                    if(that.card.bankCardSign!='')   that.startIcomet( 'P'+that.card.bankCardSign );
+
+                },{data: {isOverseas:'0',sceneType:'03'} }); //
+            }
+            ,openPingan:function () {
+                this.st.isOpen = true ;
+                api.openFrame({
+                    name: 'pingan',
+                    //url: 'https://bank.pingan.com.cn/m/main/index.html'
+                    url: 'https://b.pingan.com.cn/pay/cashier/receivables.html'
+                    //,headers:{'User-Agent':'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.75 Safari/537.36'}
+                    ,bounces: true,
+                    rect: { // 推荐使用Margin布局，用于适配屏幕的动态变化
+                        marginTop: 120, // main页面距离win顶部的高度
+                        marginBottom: 0, // main页面距离win底部的高度
+                        w: 'auto' // main页面的宽度 自适应屏幕宽度
+                    }
+                });
+                this.st.win= true;
+            }
+            ,closeWin:function () {
+                api.closeFrame({
+                    name: 'pingan'
+                });
+            }
+            ,hideWin:function () {
+                this.st.isOpen = false ;
+                api.setFrameAttr({
+                    name: 'pingan'
+                    ,rect:{
+                        marginTop: 900, // main页面距离win顶部的高度
+                        marginBottom: 0, // main页面距离win底部的高度
+                        w: 'auto'
+                    }
+                });
+            }
+            ,logout:function () {
+                this.ajax( 'https://bank.pingan.com.cn/ibp/ibp4pc/work/logout.do', function (rep) {
+                    alert( JSON.stringify( rep ) );
+
+                },{data:{ channelType:'d', responseDataType:'JSON'}});
+            }
+            ,ajax:function (url,success) {
+                var conf={
+                    data:null
+                    ,referer:'https://bank.pingan.com.cn/m/member/ibank/index.html'
+                };
+                if( arguments.length>2) mui.extend( conf,arguments[2], false );
+                //alert( JSON.stringify( conf.data) );
+                if( api ) {
+                    var opt={
+                        url: url,
+                        method:  'get'
+                        ,headers:{ 'referer': conf.referer }
+                        //,dataType:'text'
+                    };
+                    if(  conf.data){
+                        opt.data={values: conf.data };
+                        opt.method='POST';
+                    };
+                    api.ajax(opt, function (ret, err) {
+                        if (ret) {
+                            //alert('成功'+JSON.stringify(ret)  );
+                            success(ret );
+                            //var str = ret.body;//that.cut(ret.body,'window._data =','};');
+                        } else {
+                            HC.msg('失败！'+JSON.stringify(err)  );
+                            var str = err.body;//that.cut(err.body,'window._data =','};');
+                        }
+
+                        //success(str);
+                    });
+                }else{
+
+                    var opt={
+                        dataType:'json',//服务器返回json格式数据
+                        type:'get',//HTTP请求类型
+                        timeout:10000,//超时时间设置为10秒；
+                        //headers:{'Content-Type':'application/json'},
+                        success: success,
+                        error:function(xhr,type,errorThrown){
+                            alert('失败！'+type );
+                            //异常处理；
+                            console.log(type);
+                        }
+                    };
+                    if( opt.data!=null ){
+                        opt.data = conf.data;
+                        opt.type='post';
+                    }
+                    mui.ajax( url,opt);
+                }
+            }
+        }
+    });
+</script>
+</html>

@@ -1,0 +1,41 @@
+.dr-index-head{ height: 100px;margin: 0 auto; width: 1000px;}
+.dr-index-logo{ padding-top: 10px; }
+.dr-index-main{width: 100%; position: relative; height: 378px; background-color: #f7f7f7}
+.dr-index-banner {  display: none; height: 378px;    position: relative;    width: 100%;    min-width: 960px;  background: url('../img/banner01.jpg') repeat-x 50% 50%;}
+
+.dr-index-bt{position:absolute; width: 100%; text-align: center; bottom: 20px; }
+.dr-index-bt a{display: inline-block; height: 12px; width: 12px;  background-color: rgba(0,0,0,0.2);    font-size: 0px;    line-height: 0px; border-radius: 10px; }
+.dr-index-bt .select{ background-color:  rgba(241,155,2,0.8); width: 30px;  }
+
+.dr-index-from-w{margin: 0 auto; width: 960px; position: relative; }
+.dr-index-from-op{ position: absolute; width: 297px; height: 330px; background-color: rgba(0,0,0,0.2); z-index: 15; top: -350px; right: 0; }
+.dr-index-from{ position: absolute;  z-index: 16;  top: -320px; right: 0; width: 330px; height: 330px; }
+.dr-index-from .control-label, .dr-index-from h1{color: #fff;}
+.dr-index-banner-txt{width: 960px; margin: 0 auto; position: relative; height:100%; overflow: hidden; }
+.dr-hc-slogin{font-size: 30px; line-height: 36px; color:#fff; }
+.blink a{color: #fff; }
+.slogin-1{ padding-top: 60px; }
+.slogin-2{ padding-top: 20px; padding-left: 60px;}
+.slogin-3{ padding-top: 20px; padding-left: 150px;}
+
+#form-msg .control-group{position: relative;}
+#form-msg .control-group .sui-msg{position: absolute; right: 0px; bottom: -15px;right: 0px; }
+
+.app_download{ padding: 10px; background-color: #fff ; display: none; }
+.app_download:hover{ text-decoration : none }
+.app_download .app_img{ width: 80px; height: 80px; margin-right: 10px;  }
+
+.app_code{ position: absolute; right:360px; width: 160px; height: 190px; bottom: 100px; font-size: 16px; text-align: center;background-color: #fff; color:#333; line-height: 150%;  }
+
+@media screen and (max-width: 540px) {
+    .dr-index-from-op ,.dr-index-main{ display: none;}
+    .dr-index-from-w,.dr-index-head{ width: 100%; }
+    .dr-index-logo .pull-left{ float: none;display: block;padding-left: 20px; }
+    #logo-txt{display: none; }
+    .dr-index-head{margin-bottom: -50px; }
+    .dr-index-from-w,.dr-index-from{position: static; }
+    .dr-index-from .control-label, .dr-index-from h1{color: #333;}
+    .app_download{display: flex;}
+}
+
+

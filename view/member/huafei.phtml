@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>话费账号上线</title>
+
+    <!--标准mui.css-->
+    <link rel="stylesheet" href="/res/mui/css/mui.min.css">
+    <script src="/res/js/mui.min.js"></script>
+    <script src="/res/js/vue.min.js"></script>
+    <script src="/res/js/hc_v2.js?d=20180722"></script>
+
+    <style>
+        .pay-btn-group-sb{   background-color:#4cb9fc ; border: 1px solid #4cb9fc; color: #fff;text-decoration:none;
+            display: inline-block; box-sizing: border-box; margin-bottom: 0;    font-size: 12px;            line-height: 12px;
+            text-align: center;    vertical-align: middle;    cursor: pointer;  float: right ;
+            user-select: none; margin: 0; }
+
+        .toast-container {     line-height: 17px;  position: fixed; z-index: 9999; bottom: 0px;
+            left: 50%;   -webkit-transition:  .3s;   transition: .3s;  -webkit-transform: translate(-50%,0);   transform: translate(-50%,0);
+            max-width: 300px; opacity:0;
+        }
+        .toast-message{  font-size: 14px;padding: 10px 25px;  text-align: center; color: #fff; border-radius: 6px; background-color: #323232;}
+        .toast-active{ opacity:0.9; bottom: 50px; }
+        .title{
+            margin: 20px 15px 7px;
+            color: #6d6d72;
+            font-size: 15px;
+        }
+
+    </style>
+</head>
+
+<body>
+<bobo>
+        <header class="mui-bar mui-bar-nav">
+
+            <h1 class="mui-title">账号上线:<span v-html="sv.acc.zhifu_account"></span></h1>
+        </header>
+    <div class="mui-content">
+
+            <div class="title">
+                获取短信随机码->填入验证码->登录获取凭证
+            </div>
+
+            <form class="mui-input-group">
+                <div class="mui-input-row">
+                    <label>验证码</label>
+                    <input type="text" class="mui-input-clear" placeholder="请先获取短信随机码" v-model="st.yzm">
+                </div>
+                <div class="mui-button-row">
+                    <button type="button" class="mui-btn mui-btn-primary"  @click="login()">登录获取凭证</button>
+                    <button type="button" class="mui-btn" @click="online()" v-if="sv.cookie">直接启用</button>
+                </div>
+            </form>
+
+        <div v-html="st.cookie"></div>
+
+
+        <div style="position: absolute;bottom: 0; right: 0; left: 0; height: 300px;">
+            <iframe style="height: 300px; width: 100%;" src="https://login.10086.cn/html/login/touch.html?channelID=12014&backUrl=https%3A%2F%2Ftouch.10086.cn%2Fi%2Fmobile%2Frechargecredit.html"></iframe>
+        </div>
+    </div>
+
+
+</bobo>
+</body>
+<script>
+    new Vue({
+        el: 'bobo',
+        data: {
+            sv:<?=json_encode($sv)?>
+            ,st:{cookie:'',yzm:''}
+        }
+        ,
+        created: function () {
+        },
+        mounted: function () {
+        },
+        methods: {
+            login:function () {
+                var that = this;
+                if( that.st.yzm==''){
+                    HC.msg("请填写验证码！");
+                    return;
+                }
+                // HC.ajax('/member/wxqr/update',{data:v  });
+                HC.ajax('/mclient/10086/login/'+ that.sv.acc.zhifu_account+'/'+ that.st.yzm ,{success:function (rep) {
+                        //alert('good news');
+                        console.log(rep );
+                        that.st.cookie= that.sv.cookie  =rep.cookie;
+                        that.saveCookie();
+                        that.online();
+                    } });
+            }
+            ,saveCookie:function () {
+                if(this.st.cookie=='') {
+                    HC.msg('请先获取登录凭证');
+                    return;
+                }
+                var that= this;
+                HC.ajax('/console/tool/saveCookie/'+ that.sv.acc.account_id,{data:{ cookie: that.st.cookie }} )
+            }
+            ,online:function () {
+                var that= this;
+                HC.ajax('/mclient/10086/online' ,{data: { cookie:that.sv.cookie, acc:that.sv.acc}} );
+            }
+        }
+    });
+</script>
+</html>

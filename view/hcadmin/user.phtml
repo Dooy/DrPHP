@@ -1,0 +1,162 @@
+<link href="<?=$WWW_RES?>/css/msui.css" rel="stylesheet">
+
+<div class="dr-min pull-left" >
+    <a href="<?=$reback?>"> <i class="sui-icon icon-pc-enter"></i>返回</a>
+    <?php include "op_user.phtml"; ?>
+
+    <hr>
+
+    <form class="sui-form form-inline"  id="form-psw" action="<?=R('hcadmin/user/edit_psw/'. $me['user']['user_id'])?>">
+        <div class="input-append">
+            <input id="passwd" name="passwd" placeholder="新密码" type="text" class="span2">
+            <input id="google" name="code" placeholder="6位动态码" type="number" style="width: 80px" class="span2">
+            <button type="button" class="sui-btn" id="psw-btn">修改密码</button>
+        </div>
+    </form>
+
+    <hr>
+
+    <table class="sui-table table-bordered table-sideheader">
+        <thead>
+        <tr>
+            <th width="100">类型</th>
+            <th>账号</th>
+            <th>绑定时间</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ( $me['oauth'] as $k=>$v ): ?>
+        <?php foreach ($v as $k2=>$v2 ): ?>
+        <tr>
+            <td><?=$from_type[$k]?></td>
+            <td><?=$v2['openid']?></td>
+            <td><?=date("Y-m-d",$v2['ctime'])?></td>
+            <td>[<a href="javascript:;" data-url="<?=R($_c.'/user/openid_del/'. $v2['id'])?>" class="ajax-url">删除</a>]</td>
+        </tr>
+        <?php endforeach; ?>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+    <form class="sui-form form-inline"  id="form-bind" action="<?=R('hcadmin/user/bind/'. $me['user']['user_id'])?>">
+        <div class="input-append">
+            <input id="openid" name="openid" placeholder="手机或者邮箱" type="text" class="span2">
+            <button type="button" class="sui-btn" id="bindOpenId">绑定账号</button>
+        </div>
+    </form>
+
+    <hr>
+    <form  class="sui-form form-horizontal" novalidate="novalidate" >
+            <h4>权限</h4>
+            <?php foreach ( $pre_type as $k=> $v ): ?>
+                <label class="checkbox-pretty inline <?=( isset($me['attr'][$k]) ?'checked':'')?>">
+                    <input type="checkbox" <?=( isset($me['attr'][$k]) ?'checked="checked"':'')?> value="1" name="<?=$k?>" class="attr_checkbox" data-url="<?=R('hcadmin/user/op/'. $me['user']['user_id'])?>"><span><?=$v['n']?></span>
+                </label>
+            <?php endforeach;?>
+    </form>
+    <hr>
+    <div  class="sui-form form-horizontal" novalidate="novalidate" >
+        <h4>其他备注（仅供后台人员查阅）</h4>
+        <div class="sui-msg msg-tips ">
+            <div class="msg-con">直接Enter 就修改了,每行单独修改。如果想删除直接留空然后Enter</div>
+            <s class="msg-icon"></s>
+        </div>
+        <div class="control-group">
+            <label for="inputNick" class="control-label ">职位：</label>
+            <div class="controls">
+                <input type="text" class="cl-attr"  name="zw" value="<?=$me['attr']['zw'][0]['value']?>"  placeholder=" 教研室主任"  />
+                <div class="sui-msg msg-tips msg-naked">
+                    <div class="msg-con">重要领导 比如：院长 教研室主任！</div>
+                    <s class="msg-icon"></s>
+                </div>
+            </div>
+        </div>
+        <div class="control-group">
+            <label for="inputNick" class="control-label v-top ">职级：</label>
+            <div class="controls">
+                <input type="text" class="cl-attr"  name="zj" value="<?=$me['attr']['zj'][0]['value']?>"  placeholder=" 厅长"  />
+                <div class="sui-msg msg-tips msg-naked">
+                    <div class="msg-con">比如：正部、副部、正厅、副厅、正处、副处、正科、副科</div>
+                    <s class="msg-icon"></s>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label for="inputNick" class="control-label ">语种：</label>
+            <div class="controls">
+                <input type="text" class="cl-attr"  name="yz" value="<?=$me['attr']['yz'][0]['value']?>"  placeholder="德语"  />
+                <div class="sui-msg msg-tips msg-naked">
+                    <div class="msg-con">比如：德语 英语 法语</div>
+                    <s class="msg-icon"></s>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="control-group">
+            <label for="inputNick" class="control-label ">邮箱：</label>
+            <div class="controls">
+                <input type="text" class="cl-attr"  name="mail" value="<?=$me['attr']['mail'][0]['value']?>"  placeholder="仅记录非账号"  />
+                <div class="sui-msg msg-tips msg-naked">
+                    <div class="msg-con">仅记录非账号</div>
+                    <s class="msg-icon"></s>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="control-group">
+            <label for="inputNick" class="control-label ">学院：</label>
+            <div class="controls">
+                <input type="text" class="cl-attr"  name="coll" value="<?=$me['attr']['coll'][0]['value']?>"  placeholder="所在学院"  />
+            </div>
+        </div>
+
+        <!--
+        <div  >
+            <b  >备注：</b><br>
+            <textarea rows="3" style="width: 100%;" placeholder="这里放一些沟通记录" name="bz"  class="cl-attr"></textarea>
+        </div>
+        -->
+
+    </div>
+
+</div>
+
+<div class="pull-left dr-min" style="width: 400px; background-color: #eeeeee">
+    <?php include "op_gt.phtml" ?>
+</div>
+
+<div style="clear: both"></div>
+<script>
+    $(function () {
+        $('.attr_checkbox').change(function () {
+            //alert(this.value );
+            var that = $(this);
+            var attr= { };
+            attr[ that.attr('name') ]=  that.val();
+            DR.ajax( that.data('url'),{'data':{'attr':attr } })
+        });
+        DR.ajaxAndValidate( 'form-user');
+        DR.ajaxAndValidate( 'form-gt');
+        $('#psw-btn').click(function () {
+            DR.ajaxForm( 'form-psw' );
+        });
+        $('#bindOpenId').click(function () {
+            DR.ajaxForm( 'form-bind' );
+        });
+        $('.ajax-url').click( DR.ajaxUrl    );
+
+        $('.cl-attr').keyup(function (e) {
+            //DR.log('keyCode:',  e.keyCode );
+            if(13== e.keyCode ){
+                var url='<?=R($_c.'/user/attr/'.$me['user']['user_id'])?>';
+                var that = $(this);
+                var attr= { };
+                attr[ that.attr('name') ]=  that.val();
+                DR.ajax( url ,{'data':{'attr':attr } })
+            }
+        })
+    });
+</script>

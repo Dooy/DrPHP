@@ -1,0 +1,275 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>京东支付</title>
+    <link rel="icon" href="//static.360buyimg.com/finance/payment/receivable/1.2.0/css/i/ico.ico" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="//sp.jd.com/payment/2.0.0/css/main.css">
+    <link rel="stylesheet" type="text/css" href="//sp.jd.com/payment/1.2.0/css/bankList.css">
+    <script type="text/javascript" src="//sp.jd.com/payment/2.0.0/js/lib/jquery-1.6.4-min.js"></script>
+    <script type="text/javascript" src="//sp.jd.com/payment/2.0.0/js/common.js"></script>
+    <script>
+        var globalVar = {
+            jimiConfig: {
+                openState: false,
+                complainURL: "//ur.jr.jd.com/survey/show?id=163&u=http://www.jd.com?orderId=5096257"
+            }
+        };
+    </script>
+
+</head>
+<body>
+<!-- shortcut -->
+<div class="shortcut">
+    <div class="w">
+        <a class="s-logo" href="//www.jd.com" target="_blank">
+            <img width="170" height="28" alt="京东 收银台" src="//storage.360buyimg.com/payment-assets/logo/2.0.0/jd-logo.png">
+        </a>
+        <ul class="s-right">
+            <li class="s-item fore1" id="loginbar"></li>
+            <li class="s-div">|</li>
+            <li class="s-item fore2">
+                <a class="op-i-ext" target="_blank" href="//order.jd.com/center/list.action" >我的订单</a>
+            </li>
+            <li class="s-div">|</li>
+            <li class="s-item fore2">
+                <a href="">使用帮助</a>
+            </li>
+        </ul>
+        <span class="clr"></span>
+    </div>
+</div>
+
+<!-- shortcut end -->
+
+
+<div class="main">
+    <div class="w">
+
+        <!-- order 订单信息 无二维码 新增-->
+        <div class="order order-noQrcode clearfix">
+            <!-- 订单信息 -->
+            <div class="o-left">
+                <h3 class="o-title">订单提交成功，请尽快付款！</h3>
+                <h3 class="o-title">订单号：5096257</h3>
+                <p class="o-tips">
+                    该订单<span class="font-red">24小时</span>内未支付将自动取消
+                </p>
+            </div>
+            <!-- 订单信息 end -->
+            <!-- 订单金额 -->
+            <div class="o-right">
+                <div class="o-price">
+                    <em>应付金额</em><strong>20</strong><em>元</em>
+                </div>
+            </div>
+            <!-- 订单金额 end -->
+        </div>
+        <!-- order 订单信息 end -->
+
+        <!-- payment 支付方式选择 -->
+        <div class="payment payment-third">
+
+
+            <!-- paybox 银行卡 -->
+            <div class="p-wrap clearfix">
+                <!-- 银行卡 区域 -->
+                <div class="bank-area clearfix">
+                    <!-- bank-wrap 银行卡选择数据录入区域 -->
+                    <div class="bank-wrap">
+                        <div class="ui-tab mb20">
+                            <div class="ui-tab-items">
+                                <ul class="clearfix">
+                                    <li class="ui-tab-item bw-tab-wangyin curr">
+                                        <a href="javascript:;">储蓄卡</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="ui-tab-content">
+                            <!-- 储蓄卡支付 -->
+                            <div class="bw-tab-content">
+                                <!-- 支付银行列表 -->
+                                <div class="payment-list">
+                                    <ul class="pl-wrap clearfix">
+                                        <li class="pl-item" onclick="gatewayBankConfirm('3de722ee76ad1a6afa6d1541b8725240b10dad55eb4adb64ea1139c9e24507444cf03e3da07b67597ac91dc438e2fdec6a83781911b869751ac2545d2e1d6472a5a78de93f94253f5d444602b72fe27191aa90c0c1610621436c09319ad29b9665e1ec0392ad039fe263e145069ff9ac','1')">
+                                            <span id="bank-abc" class="bank-logo">农业银行</span>
+                                        </li>
+                                        <li class="pl-item" onclick="gatewayBankConfirm('3de722ee76ad1a6afa6d1541b8725240b10dad55eb4adb64ea1139c9e24507444cf03e3da07b67597ac91dc438e2fdec6a83781911b869751ac2545d2e1d6472a5a78de93f94253f5d444602b72fe27191aa90c0c1610621436c09319ad29b9650238acd4a7e4406cb07768dcb750b14','1')">
+                                            <span id="bank-njcb" class="bank-logo">南京银行</span>
+                                        </li>
+                                        <li class="pl-item" onclick="gatewayBankConfirm('3de722ee76ad1a6afa6d1541b8725240b10dad55eb4adb64ea1139c9e24507444cf03e3da07b67597ac91dc438e2fdec6a83781911b869751ac2545d2e1d6472a5a78de93f94253f5d444602b72fe27191aa90c0c1610621436c09319ad29b96b163ad364bb0ed0aee9ae209dc3b721d','1')">
+                                            <span id="bank-icbc" class="bank-logo">工商银行</span>
+                                        </li>
+                                        <li class="pl-item" onclick="gatewayBankConfirm('3de722ee76ad1a6afa6d1541b8725240b10dad55eb4adb64ea1139c9e24507444cf03e3da07b67597ac91dc438e2fdec6a83781911b869751ac2545d2e1d6472a5a78de93f94253f5d444602b72fe27191aa90c0c1610621436c09319ad29b9619c1d4b6ef5728e3d2b8d24bd2d25dec','1')">
+                                            <span id="bank-ceb" class="bank-logo">中国光大银行</span>
+                                        </li>
+                                        <li class="pl-item" onclick="gatewayBankConfirm('3de722ee76ad1a6afa6d1541b8725240b10dad55eb4adb64ea1139c9e24507444cf03e3da07b67597ac91dc438e2fdec6a83781911b869751ac2545d2e1d6472a5a78de93f94253f5d444602b72fe27191aa90c0c1610621436c09319ad29b96b250da143e76ba176be344f811bebcda','1')">
+                                            <span id="bank-cmbc" class="bank-logo">中国民生银行</span>
+                                        </li>
+                                        <li class="pl-item" onclick="gatewayBankConfirm('3de722ee76ad1a6afa6d1541b8725240b10dad55eb4adb64ea1139c9e24507444cf03e3da07b67597ac91dc438e2fdec6a83781911b869751ac2545d2e1d6472a5a78de93f94253f5d444602b72fe27191aa90c0c1610621436c09319ad29b96ac1c5d6e73b8d6ee1bf8c80b34e18e08','1')">
+                                            <span id="bank-bob" class="bank-logo">北京银行</span>
+                                        </li>
+                                        <li class="pl-item" onclick="gatewayBankConfirm('3de722ee76ad1a6afa6d1541b8725240b10dad55eb4adb64ea1139c9e24507444cf03e3da07b67597ac91dc438e2fdec6a83781911b869751ac2545d2e1d6472a5a78de93f94253f5d444602b72fe27191aa90c0c1610621436c09319ad29b966797a5b6e199c7e49f4a49f527f19968','1')">
+                                            <span id="bank-ccb" class="bank-logo">建设银行</span>
+                                        </li>
+                                        <li class="pl-item" onclick="gatewayBankConfirm('3de722ee76ad1a6afa6d1541b8725240b10dad55eb4adb64ea1139c9e24507444cf03e3da07b67597ac91dc438e2fdec6a83781911b869751ac2545d2e1d6472a5a78de93f94253f5d444602b72fe27191aa90c0c1610621436c09319ad29b96f4657bccae3de123bfb0c9375c8275e1','1')">
+                                            <span id="bank-cmb" class="bank-logo">招商银行</span>
+                                        </li>
+                                        <li class="pl-item" onclick="gatewayBankConfirm('3de722ee76ad1a6afa6d1541b8725240b10dad55eb4adb64ea1139c9e24507444cf03e3da07b67597ac91dc438e2fdec6a83781911b869751ac2545d2e1d6472a5a78de93f94253f5d444602b72fe27191aa90c0c1610621436c09319ad29b96bce7e5a05eeba08fc8c89cdfde26a391','1')">
+                                            <span id="bank-pab" class="bank-logo">平安银行</span>
+                                        </li>
+                                        <li class="pl-item" onclick="gatewayBankConfirm('3de722ee76ad1a6afa6d1541b8725240b10dad55eb4adb64ea1139c9e24507444cf03e3da07b67597ac91dc438e2fdec6a83781911b869751ac2545d2e1d6472a5a78de93f94253f5d444602b72fe27191aa90c0c1610621436c09319ad29b96bc915878e4997e79f6c32871c9aab0c9','1')">
+                                            <span id="bank-spdb" class="bank-logo">浦发银行</span>
+                                        </li>
+                                        <li class="pl-item" onclick="gatewayBankConfirm('3de722ee76ad1a6afa6d1541b8725240b10dad55eb4adb64ea1139c9e24507444cf03e3da07b67597ac91dc438e2fdec6a83781911b869751ac2545d2e1d6472a5a78de93f94253f5d444602b72fe27191aa90c0c1610621436c09319ad29b968d0235ae94ae2e70720f472dbd998a75','1')">
+                                            <span id="bank-bcom" class="bank-logo">交通银行</span>
+                                        </li>
+                                        <li class="pl-item" onclick="gatewayBankConfirm('3de722ee76ad1a6afa6d1541b8725240b10dad55eb4adb64ea1139c9e24507444cf03e3da07b67597ac91dc438e2fdec6a83781911b869751ac2545d2e1d6472a5a78de93f94253f5d444602b72fe27191aa90c0c1610621436c09319ad29b9689477d4296c525e5d2f9fc051da5a5f5','1')">
+                                            <span id="bank-citic" class="bank-logo">中信银行</span>
+                                        </li>
+                                        <li class="pl-item" onclick="gatewayBankConfirm('3de722ee76ad1a6afa6d1541b8725240b10dad55eb4adb64ea1139c9e24507444cf03e3da07b67597ac91dc438e2fdec6a83781911b869751ac2545d2e1d6472a5a78de93f94253f5d444602b72fe27191aa90c0c1610621436c09319ad29b96030a83ee239ea1db8be5968a87ee29ff','1')">
+                                            <span id="bank-qdccb" class="bank-logo">青岛银行</span>
+                                        </li>
+                                        <li class="pl-item" onclick="gatewayBankConfirm('3de722ee76ad1a6afa6d1541b8725240b10dad55eb4adb64ea1139c9e24507444cf03e3da07b67597ac91dc438e2fdec6a83781911b869751ac2545d2e1d6472a5a78de93f94253f5d444602b72fe27191aa90c0c1610621436c09319ad29b96be640b4a1444e2d10abcce0f9bd98717','1')">
+                                            <span id="bank-gdb" class="bank-logo">广发银行</span>
+                                        </li>
+                                        <li class="pl-item" onclick="gatewayBankConfirm('3de722ee76ad1a6afa6d1541b8725240b10dad55eb4adb64ea1139c9e24507444cf03e3da07b67597ac91dc438e2fdec6a83781911b869751ac2545d2e1d6472a5a78de93f94253f5d444602b72fe27191aa90c0c1610621436c09319ad29b965df7ea7b6d9ba1edefdbe350f95fae03','1')">
+                                            <span id="bank-bocd" class="bank-logo">成都银行</span>
+                                        </li>
+                                        <li class="pl-item" onclick="gatewayBankConfirm('3de722ee76ad1a6afa6d1541b8725240b10dad55eb4adb64ea1139c9e24507444cf03e3da07b67597ac91dc438e2fdec6a83781911b869751ac2545d2e1d6472a5a78de93f94253f5d444602b72fe27191aa90c0c1610621436c09319ad29b96f63ffb8727208f88879e0c5b5895f484','1')">
+                                            <span id="bank-boc" class="bank-logo">中国银行</span>
+                                        </li>
+                                        <li class="pl-item" onclick="gatewayBankConfirm('3de722ee76ad1a6afa6d1541b8725240b10dad55eb4adb64ea1139c9e24507444cf03e3da07b67597ac91dc438e2fdec6a83781911b869751ac2545d2e1d6472a5a78de93f94253f5d444602b72fe27191aa90c0c1610621436c09319ad29b96979651c430bffabd19f56d878772a755','1')">
+                                            <span id="bank-hxb" class="bank-logo">华夏银行</span>
+                                        </li>
+                                        <li class="pl-item" onclick="gatewayBankConfirm('3de722ee76ad1a6afa6d1541b8725240b10dad55eb4adb64ea1139c9e24507444cf03e3da07b67597ac91dc438e2fdec6a83781911b869751ac2545d2e1d6472a5a78de93f94253f5d444602b72fe27191aa90c0c1610621436c09319ad29b96b38492bc50d78843e32a660c57b52cd0','1')">
+                                            <span id="bank-post" class="bank-logo">邮政储蓄</span>
+                                        </li>
+                                        <li class="pl-item" onclick="gatewayBankConfirm('3de722ee76ad1a6afa6d1541b8725240b10dad55eb4adb64ea1139c9e24507444cf03e3da07b67597ac91dc438e2fdec6a83781911b869751ac2545d2e1d6472a5a78de93f94253f5d444602b72fe27191aa90c0c1610621436c09319ad29b96c46c7ffa02f5ea9d474f552eae02c976','1')">
+                                            <span id="bank-hzb" class="bank-logo">杭州银行</span>
+                                        </li>
+                                        <li class="pl-item" onclick="gatewayBankConfirm('3de722ee76ad1a6afa6d1541b8725240b10dad55eb4adb64ea1139c9e24507444cf03e3da07b67597ac91dc438e2fdec6a83781911b869751ac2545d2e1d6472a5a78de93f94253f5d444602b72fe27191aa90c0c1610621436c09319ad29b962a93c3c4e715b103e767ffa971d10027','1')">
+                                            <span id="bank-srcb" class="bank-logo">上海农商行</span>
+                                        </li>
+                                        <li class="pl-item" onclick="gatewayBankConfirm('3de722ee76ad1a6afa6d1541b8725240b10dad55eb4adb64ea1139c9e24507444cf03e3da07b67597ac91dc438e2fdec6a83781911b869751ac2545d2e1d6472a5a78de93f94253f5d444602b72fe27191aa90c0c1610621436c09319ad29b9625047a3c6a8c99efdcbdee1e1a814924','1')">
+                                            <span id="bank-nbcb" class="bank-logo">宁波银行</span>
+                                        </li>
+                                        <li class="pl-item" onclick="gatewayBankConfirm('3de722ee76ad1a6afa6d1541b8725240b10dad55eb4adb64ea1139c9e24507444cf03e3da07b67597ac91dc438e2fdec6a83781911b869751ac2545d2e1d6472a5a78de93f94253f5d444602b72fe27191aa90c0c1610621436c09319ad29b96ad10a065f2e0474ac0c3609b9fe3397a','1')">
+                                            <span id="bank-shb" class="bank-logo">上海银行</span>
+                                        </li>
+                                        <li class="pl-item" onclick="gatewayBankConfirm('3de722ee76ad1a6afa6d1541b8725240b10dad55eb4adb64ea1139c9e24507444cf03e3da07b67597ac91dc438e2fdec6a83781911b869751ac2545d2e1d6472a5a78de93f94253f5d444602b72fe27191aa90c0c1610621436c09319ad29b9632e769e3ef893391fde71c29f4d4d8e8','1')">
+                                            <span id="bank-bjrcb" class="bank-logo">北京农商银行</span>
+                                        </li>
+                                        <li class="pl-item" onclick="gatewayBankConfirm('3de722ee76ad1a6afa6d1541b8725240b10dad55eb4adb64ea1139c9e24507444cf03e3da07b67597ac91dc438e2fdec6a83781911b869751ac2545d2e1d6472a5a78de93f94253f5d444602b72fe27191aa90c0c1610621436c09319ad29b9664f75a54ecc78296f17896ebd1607d56','1')">
+                                            <span id="bank-cib" class="bank-logo">兴业银行</span>
+                                        </li>
+
+                                    </ul>
+                                </div>
+                                <!-- 支付银行列表 end -->
+                            </div>
+                            <!-- 储蓄卡支付 end -->
+                            <!-- 信用卡网银 -->
+                            <div class="bw-tab-content" style="display:none;">
+                                <!-- 支付银行列表 -->
+                                <div class="payment-list">
+                                    <ul class="pl-wrap clearfix">
+                                    </ul>
+                                </div>
+                                <!-- 支付银行列表 end -->
+                            </div>
+                            <!-- 信用卡网银 end -->
+                        </div>
+
+                    </div>
+                </div>
+                <!-- 银行卡 区域 end -->
+            </div>
+            <!-- pay-verify 支付验证提交 -->
+        </div>
+    </div>
+</div>
+
+<form action="/gatewayCashier/bankConfirm" name="paymentConfirm" id="paymentConfirm" method="post" target="_blank" style="display:none">
+    <input type="hidden" name="orderId" id="orderId" value="5096257" autocomplete="off"/>
+    <input type="hidden" name="paySign" id="paySign" value="3de722ee76ad1a6afa6d1541b8725240d65d75e4685e3b7457efff9b79e3e50c7449776a39ac231b4f847c8a7dd6024d14986fe9d1f082ad29f1032b6eb79b4c741debeafedba17189b73a35edbaab78043141b744c2f5981bc7f98979b90626e0e4e127abf315f7852bafe49b4ea129a242a6b659228133b28c6bb00781457458cc187b1178710eb685322f8e8d91f9" autocomplete="off"/>
+    <input type="hidden" name="riskPageReq" id="riskPageReq" value="" autocomplete="off">
+    <input type="hidden" name="channelSign" id="channelSign" value="" autocomplete="off"/>
+    <input type="hidden" name="cardType" id="cardType" value="" autocomplete="off"/>
+    <input type="hidden" name="cashierId" id="cashierId" value="" autocomplete="off"/>
+</form>
+
+<script>
+    function gatewayBankConfirm(channelSign,cardType){
+        $("#riskPageReq").val(JSON.stringify(globalVar.riskInfo));
+        $("#channelSign").val(channelSign);
+        $("#cardType").val(cardType);
+
+        $("#paymentConfirm").submit();
+    }
+
+</script>
+
+<!-- 收银台 footer -->
+<div class="p-footer">
+    <div class="pf-wrap w">
+        <div class="pf-line">
+      <span class="pf-l-copyright"
+      >Copyright &copy; 2004-2020 京东JD.com 版权所有</span
+      >
+            <img
+                width="185"
+                height="20"
+                src="//sp.jd.com/payment/2.0.0/css/i/footer-auth.png"
+            />
+        </div>
+    </div>
+</div>
+<script src="//payrisk.jd.com/js/tdpay.js"></script>
+
+<script language="javaScript">
+    try {
+        globalVar.riskInfo = {};
+        getJdEid(function (eid, fp, risk) {
+            console.log(eid,fp,risk );
+            if (eid && eid.length > 91) {
+                eid = '';
+            }
+            globalVar.riskInfo.deviceId = eid;
+            globalVar.riskInfo.fingerprint = fp;
+            globalVar.riskInfo.jsContent = risk.jsContent;
+        });
+    } catch (e) {
+
+    }
+</script>
+<script type="text/javascript" src="//sp.jd.com/payment/2.0.0/js/common.js"></script>
+
+<script>
+
+    // 绑定页面中tab切换 快捷网银等
+    $('.ui-tab-item').bind('click', function(){
+        var index = $(this).index();
+        $(this).addClass('curr').siblings().removeClass('curr');
+        $('.bw-tab-content').eq(index).show().siblings().hide();
+    });
+
+</script>
+<script>
+    // 奇点埋点
+    var _qd = _qd || {};
+    _qd['module'] = '9320009';
+    setTimeout(function () {
+        (function () {
+            var qd = document.createElement("script");
+            qd.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'jrclick.jd.com/qidian.js';
+            qd.async = 1;
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(qd, s);
+        })();
+    }, 5000)
+
+</script></body>
+</html>

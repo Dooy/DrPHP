@@ -1,0 +1,114 @@
+<script src="https://img.hcharts.cn/highcharts/highcharts.js"></script>
+<bobo>
+    <div style="padding-top: 8px">
+        <div class="sui-btn-group">
+            <button  class="sui-btn btn-primary btn-bordered" @click="Img('today','cnt','今日笔数比例' )">今日笔数</button>
+            <button  class="sui-btn btn-primary btn-bordered" @click="Img('today','total','今日资金比例' )">今日资金</button>
+            <button  class="sui-btn btn-primary btn-bordered" @click="Img('yesterday','cnt','昨日笔数比例' )">昨日笔数</button>
+            <button  class="sui-btn btn-primary btn-bordered" @click="Img('yesterday','total','昨日资金比例' )">昨日资金</button>
+        </div>
+    </div>
+    <div id="container" style="min-width:360px;height:400px"></div>
+    <table class="sui-table table-bordered"  >
+        <thead>
+        <tr>
+            <th>档位</th>
+            <th>今日</th>
+            <th>昨日</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(v,k) in yesterday">
+            <td v-html="k"></td>
+            <td v-if="today[k]"><span v-html="today[k].cnt"></span>笔/<span v-html="today[k].total"></span></td>
+            <td v-else>-</td>
+            <td  ><span v-html="v.cnt"></span>笔/<span v-html="v.total"></span></td>
+        </tr>
+        </tbody>
+
+    </table>
+</bobo>
+
+<script>
+    new Vue({
+        el: 'bobo',
+        data: {
+            yesterday:<?=json_encode($trade)?>
+            ,today:{}
+        }
+        ,
+        created: function () {
+            this.loadToday();
+        },
+        mounted: function () {
+            this.Img('yesterday','cnt','昨日笔数比例' );
+        },
+        methods: {
+            loadToday:function () {
+                var that = this;
+                DR.ajax('/bi/trade/today',{},{success:function (rep) {
+                    that.today= rep.data.trade;
+                    }});
+            }
+            ,Img:function (lab,ks,title) {
+                var data=[];
+                var that = this;
+                for(var p in that[lab]){
+                    var item={name:p+'档',y:that[lab][p][ks] };
+                    data.push(item);
+                }
+                //console.log('data',data );
+
+                Highcharts.chart('container', {
+                    chart: {
+                        plotBackgroundColor: null,
+                        plotBorderWidth: null,
+                        plotShadow: false,
+                        type: 'pie'
+                    },
+                    credits:{
+                        href:'#',
+                        text:''
+                    },
+                    title: {
+                        text:  title
+                    },
+
+                    tooltip: {
+                        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                    },
+                    /*
+                    plotOptions: {
+                        pie: {
+                            allowPointSelect: true,
+                            cursor: 'pointer',
+                            dataLabels: {
+                                enabled: false
+                            },
+                            showInLegend: true
+                        }
+                    },
+                    */
+                    plotOptions: {
+                        pie: {
+                            allowPointSelect: true,
+                            cursor: 'pointer',
+                            dataLabels: {
+                                enabled: true,
+                                format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                                style: {
+                                    color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                                }
+                            }
+                        }
+                    },
+                    series: [{
+                        name: '比率',
+                        colorByPoint: true,
+                        data:  data
+                    }]
+                });
+            }
+        }
+    });
+</script>

@@ -1,0 +1,129 @@
+<div class="flexbox" style="padding: 8px 0px 0 0px; ">
+    <div class="flex">
+        <form id="user-search" action="<?=R($_c.'/bookList/s')?>"  class="sui-form">
+            <select name="type">
+                <?php foreach ($sq as $k=>$v):?>
+                <option value="<?=$k?>" <?php if($k==$get['type']):?>selected<?php endif;?> ><?=$v?></option>
+                <?php endforeach; ?>
+            </select>
+            <input type="text" placeholder="搜索内容..." class="input-medium" name="q" value="<?=($get['school']?$get['school']:$get['q'])?>">
+            <button type="submit" class="sui-btn ">查找</button>
+        </form>
+    </div>
+    <div>
+        <?php if($_c=='hcadmin'):?><a class="sui-btn <?=($p[0]=='pdf' )?'btn-primary':'btn-bordered'?> " href="<?=R($_c.'/bookList/pdf' )?>">无电子书</a><?php endif;?>
+
+        <div class="sui-btn-group">
+        <?php foreach ($bookType as $k2=>$v2): ?><a class="sui-btn <?=($p[0]=='type'&& $p[1]==$k2)?'btn-primary':'btn-bordered'?> " href="<?=R($_c.'/bookList/type/'. $k2)?>"><?=$v2['n']?></a>
+        <?php endforeach; ?>
+        </div>
+    </div>
+    <div style="padding: 0 5px;">
+          <span class="sui-dropdown dropdown-bordered select"><span class="dropdown-inner"><a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle"><span class="dropdown-value"><?=($termList[$term_key]['term'])? $termList[$term_key]['term'] :'全部'?></span> <i class="caret"></i></a>
+            <ul id="menu1" role="menu" aria-labelledby="drop1" class="sui-dropdown-menu">
+                <?php if($term_key): ?>  <li role="presentation" ><a role="menuitem" tabindex="-1" href="<?=R($_c.'/bookList' )?>">全部</a></li><?php endif;  ?>
+                <?php foreach ($termList as $k2=>$v2): ?>
+                    <li role="presentation" ><a role="menuitem" tabindex="-1" href="<?=R($DR_SELF,['term'=>$k2 ])?>"><?php if($k2==$term_now): ?>(当前)<?php endif; ?> <?=$v2['term']?></a></li>
+                <?php  endforeach; ?>
+            </ul></span>
+          </span>
+    </div>
+    <div style="margin-left: 10px; "> <a class="sui-btn btn-primary " href="<?=R('book/s/hc')?>" target="_blank">书库引用新增</a> <a class="sui-btn" href="<?=R($_c.'/book?isiframe=1')?>"  >新增</a>
+    </div>
+</div>
+<?php if( $list['list']): ?>
+    <table class="sui-table table-bordered">
+        <thead>
+        <tr>
+            <th width="30px;">封面</th>
+            <th>书名 <?php if( $_c=='hcadmin'): ?> <br>学校 <?php endif; ?><br>学期</th>
+            <th>作者<br>字数/页数<?php if( $_c=='hcadmin'): ?><br>ISBN<?php endif; ?></th>
+            <th>成员/主题/评论<br>朗读/期中/期末</th>
+            <th>创建</th>
+            <th>指导教师</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ( $list['list'] as $v ) : ?>
+            <tr>
+                <td><a href="<?=R('/book/detail/'.$v['book_id'] )?>" target="_blank"><img src="<?=$v['book_img']?>" style="width: 30px;height:50px; border: 0;"></a> </td>
+                <td><?=$v['book']?>  <?php if( $_c=='hcadmin'): ?> <br><?=$v['school']?> <?php endif; ?>
+                    <?php if( !trim($v['book_pdf']) && $_c=='hcadmin'   ):?>
+                        <?php if($bookIsbn[ $v['book_isbn']]['book_pdf']):?>
+                            <span class="sui-label">电子书在isbn下</span>
+                        <?php else: ?><span class="sui-label label-danger">无电子书</span>
+                        <?php endif; ?>
+                    <?php endif;?>
+
+                    <br><span class="sui-dropdown"><span class="dropdown-inner"><a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle"><span class="dropdown-value"><?=$termList[$v['term_key']]['term']?></span> <i class="caret"></i></a>
+                        <ul id="menu1" role="menu" aria-labelledby="drop1" class="sui-dropdown-menu">
+                            <?php foreach ($termList as $k2=>$v2): ?>
+                                <li role="presentation" class="booktype" data-url="<?=R($_c.'/book/edit_term/'.$v['book_id'].'/'.$k2)?>"><a role="menuitem" tabindex="-1" href="javascript:;"><?=$v2['term']?></a></li>
+                            <?php  endforeach; ?>
+                        </ul></span>
+                     </span>
+                </td>
+                <td>
+                    <?=$v['book_writer']?><br><?=$v['book_word_cnt']?>/<?=$v['book_page']?>
+                    <?php if( $_c=='hcadmin'): ?><br><?=$v['book_isbn']?><?php endif; ?>
+                </td>
+
+                <td><?=$v['user_cnt']?>/<?=$v['topic_cnt']?>/<?=$v['comment_cnt']?><br><?=$v['tag_3_cnt']?>/<?=$v['tag_4_cnt']?>/<?=$v['tag_4_cnt']?></td>
+                <td><a href="<?=R($_c.'/bookList/uid/'.$v['user_id'] )?>" title="本人布置的书单"><?=$user[$v['user_id']]['name']?></a><br><?=date("Y-m-d", $v['ctime'])?></td>
+                <td>
+                    <?php foreach ($v['bookAdmin'] as $bv): ?>
+                        <?=$user[$bv['user_id']]['name']?><br>
+                    <?php endforeach; ?>
+                </td>
+
+                <td>
+                    [<a href="<?=R($_c.'/book/edit/'. $v['book_id'].'?isiframe=1')?>">编辑</a>]
+                    [<span class="sui-dropdown"><span class="dropdown-inner"><a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle"><span class="dropdown-value"><?=$bookType[$v['type']]['n']?></span> <i class="caret"></i></a>
+                        <ul id="menu1" role="menu" aria-labelledby="drop1" class="sui-dropdown-menu">
+                            <?php foreach ($bookType as $k2=>$v2): ?>
+                                <li role="presentation" class="booktype" data-url="<?=R($_c.'/book/edit_type/'.$v['book_id'].'/'.$k2)?>"><a role="menuitem" tabindex="-1" href="javascript:;"><?=$v2['n']?></a></li>
+                            <?php  endforeach; ?>
+                        </ul></span>
+                    </span>]
+                    <br>
+                    [<a href="javascript:;" data-url="<?=R($_c.'/book/admin/'. $v['book_id'])?>" class="dr-iframe">指导教师</a>]
+                    <?php if( $_c=='hcadmin' && $bookIsbn[ $v['book_isbn']]): ?>
+                        [<a href="<?=R($_c.'/novel?isbn='.$v['book_isbn'] )?>"><?=$bookIsbn[ $v['book_isbn']]['novel_id']?'已绑定':'绑定'?></a>]
+                        <br>[<a href="<?=R($_c.'/snt?isbn='.$v['book_isbn'] )?>">翻译</a>]
+                    <?php endif;?>
+                </td>
+            </tr>
+        <?php endforeach;?>
+        </tbody>
+    </table>
+    <div class="flexbox">
+        <div class="dr-page flex"><?=$list['page']?></div>
+        <!--<div>  <a class="sui-btn  btn-bordered" href="/<?=$_c?>/<?=$_a?>?export=1">导出</a></div> -->
+        <div>  <a class="sui-btn  btn-bordered" href="<?=R( $DR_SELF,['export'=>1])?>">导出</a></div>
+    </div>
+<?php else: ?>
+    <div class="sui-msg msg-large msg-block msg-error">
+        <div class="msg-con">该条件下 无匹配结果 <a href="<?=R($_c.'/bookList')?>">查看全部</a> <button type="button" data-dismiss="msgs" class="sui-close">×</button> </div>
+        <s class="msg-icon"></s>
+    </div>
+<?php endif;?>
+<ul class="dr-info">
+    说明：
+    <li>默认情况已将“下架”隐藏，如需查看“下架” 请在右上角按分类查看</li>
+</ul>
+<script>
+    $(function () {
+        var ui={
+
+        }
+        $('.booktype').click(function () {
+            var that = $(this);
+            var p= that.parents('.dropdown-inner');
+            //alert( that.data('url') );
+            DR.ajax( that.data('url') );
+            p.find('.dropdown-value').html( that.text()  );
+        });
+        $('.dr-iframe').click( DR.iframe_fun );
+    });
+</script>

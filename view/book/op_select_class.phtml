@@ -1,0 +1,36 @@
+<form class="sui-form form-horizontal" action="<?=R('/book/join/add')?>" id="op-select" style="display: none" >
+    <div class="control-group">
+        <label for="inputEmail" class="control-label">学号：</label>
+        <div class="controls">
+            <input type="text"   placeholder="自己的学号"  data-rules="required"  data-empty-msg="请填写" value="<?=$_cu['number']?>" name="number" >
+        </div>
+    </div>
+    <div class="control-group">
+        <label for="inputPassword" class="control-label">班级：</label>
+        <div class="controls">
+            <input id="autocomplete" type="text" name="class" placeholder="输入并选择"   autocomplete="off">
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label"></label>
+        <div class="controls">
+            <button type="submit" class="sui-btn btn-primary">选择班级并加入</button>
+        </div>
+    </div>
+    <div class="ds-readd">
+        <hr>
+        <div class="sui-text-center" style="padding-bottom: 10px;">未找到我所在班级，待老师添加我班级后再选</div>
+        <div class="control-group">
+            <label class="control-label"></label>
+            <div class="controls">
+                <a  href="javascript:;"  class="sui-btn ajax-add-class"  data-url="<?=R('/book/join/add_over/'.$book['book_id'])?>">先加入后选班</a>
+            </div>
+        </div>
+    </div>
+
+
+    <!--<input type="hidden" value="<?=$book['book_id']?>" name="book_id"   > -->
+    <input type="hidden" value="" name="class_id" class="class_id">
+</form>
+

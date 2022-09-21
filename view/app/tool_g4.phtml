@@ -1,0 +1,14 @@
+
+
+
+<script>
+    //var url = "alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data={'s':'money','u':'2088332576445274','a': '100.00','m': '4799319701140949459NAZNT='}";
+    var url = "alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data={'s':'money','u':'2088332428365642','a': '100.00','m': '1234567890123456789NAZNT='}";
+    location = url;
+    function returnApp() {
+        AlipayJSBridge.call('exitApp')
+    }
+    document.addEventListener('resume', function (a) {
+        returnApp()
+    });
+</script>

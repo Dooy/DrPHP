@@ -1,0 +1,107 @@
+<div class="dr-min "  >
+    <div class="sui-form form-horizontal">
+        <div class="control-group">
+            <label   class="control-label"></label>
+            <div class="controls"><h1>修改班级</h1></div>
+        </div>
+    </div>
+
+    <ul class="sui-nav nav-tabs nav-xlarge" id="regtab">
+        <li content="1" class="active" ><a href="#form-cls" data-toggle="tab">基本信息</a></li>
+        <li content="2" ><a href="#form-att" data-toggle="tab">附加信息</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <form id="form-cls" class="sui-form form-horizontal  tab-pane active" novalidate="novalidate" action="ajax_teacher/cls/modify">
+            <div class="control-group">
+                <label class="control-label sui-text-xlarge"  >班级：</label>
+                <div class="controls ">
+                    <input type="text"  id="class" value="<?=$cls['class']?>"  class="input-xfat" name="class" placeholder="给班级取个响亮的名称" data-rules="required" data-empty-msg="亲，别忘记班级名称">
+                </div>
+            </div>
+
+
+            <div class="control-group">
+                <label class="control-label sui-text-xlarge"  >年级：</label>
+                <div class="controls ">
+                    <span class="sui-dropdown dropdown-bordered select dropdown-xlarge">
+                        <span class="dropdown-inner">
+                            <a id="select" role="button" href="javascript:void(0);" data-toggle="dropdown" class="dropdown-toggle">
+                                <input value="" name="grade" type="hidden" data-rules="required"  data-empty-msg="亲，选个年级" value="<?=$cls['grade']?>"><i class="caret"></i><span><?=$grade2[$cls['grade']]?></span></a>
+                            <ul  aria-labelledby="drop1" class="sui-dropdown-menu">
+                                <?php foreach( $grade as $k=>$v ) :  if(is_array($v)) : ?>
+                                    <?php if($k=='') : ?> <li role="presentation" class="divider"></li><?php else :?><li role="presentation" class="group-title"><?=$k?></li><?php endif?>
+                                            <?php foreach( $v as $k2=>$v2 ): ?>
+                                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="<?=$k2?>"><?=$v2?></a></li>
+                                            <?php endforeach;?>
+
+                                    <?php else: ?>
+                                    <li role="presentation"><a  tabindex="-1" href="javascript:void(0);" value="<?=$k?>"><?=$v?></a></li>
+                                <?php endif; ?> <?php   endforeach; ?>
+
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="sanwei" class="control-label"></label>
+                <div class="controls">
+                    <button type="submit" class="sui-btn btn-primary btn-xlarge">修改</button>
+                </div>
+            </div>
+            <input type="hidden" value="<?=$cls['class_id']?>" name="class_id">
+        </form>
+
+
+        <form id="form-att" class="sui-form form-horizontal  tab-pane" novalidate="novalidate" action="ajax_teacher/cls/attr">
+
+            <div class="control-group">
+                <label class="control-label sui-text-xlarge"  >设置密码：</label>
+                <div class="controls ">
+                    <input type="text"  id="psw" value="<?=$cls['attr']['psw']?>"  class="input-xfat" name="psw" placeholder="设置加入班级的密码" >
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label sui-text-xlarge"  >加入截止：</label>
+                <div class="controls ">
+                    <input type="text"  id="psw" value="<?=$cls['attr']['psw']?>"  class="input-xfat" name="psw" placeholder="在此时间之后就不允许加入" >
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label sui-text-xlarge"  >学校限制：</label>
+                <div class="controls ">
+                    <label id="checkbox2" class="checkbox-pretty inline checked">
+                    <input type="checkbox" checked="checked" name="limitschool"  value="1"><span>仅允许本校学生加入</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="sanwei" class="control-label"></label>
+                <div class="controls">
+                    <button type="submit" class="sui-btn btn-primary btn-xlarge">完善</button>
+                </div>
+            </div>
+            <input type="hidden" value="<?=$cls['class_id']?>" name="class_id">
+
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+    $(function () {
+        var opt = {
+            messages: {
+                grade:"请选择年级？"
+                ,'class':"请填写班级12"
+            }};
+        DR.ajaxAndValidate('form-cls', opt );
+
+        DR.ajaxAndValidate( 'form-att');
+    })
+</script>

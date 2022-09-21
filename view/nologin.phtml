@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <title><?=($site_title?$site_title.'-':'')?>好策</title>
+    <?php
+    include "header.phtml";
+    ?>
+
+</head>
+<body>
+
+<div class="sui-navbar  navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="sui-container">
+            <a href="<?=WWW_ROOT?>" class="sui-brand">好策</a>
+
+            <ul class="sui-nav" style="float:right" id="_haoce_user"> </ul>
+        </div>
+
+    </div>
+
+
+
+</div>
+<div style="height: 60px"> </div>
+<?php
+include $tpl_file;
+?>
+</body>
+<?php
+include "drtip.phtml";
+?>
+</html>
+
+
+

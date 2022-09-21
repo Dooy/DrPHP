@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>支付宝</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <style>
+
+    </style>
+</head>
+<body>
+<ul>
+    <?php foreach ($arr as $v ): ?>
+        <li style="height: 50px"><a href="alipays://platformapi/startapp?appId=20000067&__open_alipay__=YES&url=<?=urlencode($url2.$v['id'] .'/'. $v['name'])?>">支付给<?=$v['name']?></a></li>
+    <?php endforeach;?>
+</ul>
+<div id="debug" style="padding: 50px 0;text-align: center; "  >
+    Loading...
+
+</div>
+</body>
+<script>
+    var debug= document.getElementById('debug');
+    //location.href='<?=$url?>';
+    function open() {
+        //location.href='<?=$url?>';
+    }
+</script>
+</html>

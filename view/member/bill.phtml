@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>详情</title>
+
+    <!--标准mui.css-->
+    <link rel="stylesheet" href="/res/mui/css/mui.min.css">
+    <script src="<?=$_cdn?>/res/js/mui.min.js"></script>
+    <script src="<?=$_cdn?>/res/js/vue.min.js"></script>
+    <script src="<?=$_cdn?>/res/js/hc_v2.js?d=20180722"></script>
+    <?php if( in_array( $server['ma']['c_user_id'], [4,356] )):?>
+        <link rel="stylesheet" href="<?=$_cdn?>/res/wo/wo.css?d=2019110102">
+    <?php endif;?>
+
+    <style>
+        .pay-btn-group-sb{   background-color:#4cb9fc ; border: 1px solid #4cb9fc; color: #fff;text-decoration:none;
+            display: inline-block; box-sizing: border-box; margin-bottom: 0;    font-size: 12px;            line-height: 12px;
+            text-align: center;    vertical-align: middle;    cursor: pointer;  float: right ;
+            user-select: none; margin: 0; }
+
+        .toast-container {     line-height: 17px;  position: fixed; z-index: 9999; bottom: 0px;
+            left: 50%;   -webkit-transition:  .3s;   transition: .3s;  -webkit-transform: translate(-50%,0);   transform: translate(-50%,0);
+            max-width: 300px; opacity:0;
+        }
+        .toast-message{  font-size: 14px;padding: 10px 25px;  text-align: center; color: #fff; border-radius: 6px; background-color: #323232;}
+        .toast-active{ opacity:0.9; bottom: 50px; }
+
+    </style>
+</head>
+
+<body>
+<bobo>
+    <div class="toast-container" id="toast" :class="{'toast-active': st.msgShow}" ><div class="toast-message" id="toast-txt" v-html="st.msg"></div></div>
+    <?php if($_GET['head']): ?>
+        <header class="mui-bar mui-bar-nav">
+            <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+            <h1 class="mui-title">账单详情</h1>
+        </header>
+    <?php endif;?>
+    <div class="mui-content">
+        <div>
+            <ul class="mui-table-view ">
+                <li class="mui-table-view-cell mui-media">
+                    <div style="text-align: center"><h3 v-html="sv.ma.realname"></h3></div>
+                </li>
+
+                <li class="mui-table-view-cell">
+                    类型：<b v-html="sv.billType[sv.bill.type].n"    ></b>
+                </li>
+                <li class="mui-table-view-cell">
+                    单号：<span v-html="sv.bill.mb_id"></span>
+                </li>
+                <li class="mui-table-view-cell">
+                    备注：<span v-html="sv.bill.beizhu"></span>
+                </li>
+
+                <li class="mui-table-view-cell" v-if="(45==sv.bill.type || 47==sv.bill.type) && sv.txFee>0">
+                    实到金额：<span v-html="sdao()"></span>元
+                    <button class="pay-btn-group-sb"   :data-clipboard-text="sdao()" data-toast="复制金额成功" >复制</button>
+                </li>
+
+                <li class="mui-table-view-cell" v-else>
+                    金额：<span v-html="sv.bill.price/100"></span>元
+                    <button class="pay-btn-group-sb"   :data-clipboard-text="sv.bill.price/100" data-toast="复制金额成功" >复制</button>
+                </li>
+
+                <li class="mui-table-view-cell">
+                    变动金额：<span v-if="sv.bill.realprice>0" style="color: #ff6700">+</span><span v-html="sv.bill.realprice/100" style="color: #ff6700"></span>元
+                </li>
+
+                <li class="mui-table-view-cell">
+                    当前余额：<span v-html="sv.bill.amount/100"></span>元
+                </li>
+
+                <li class="mui-table-view-cell">
+                    创建时间：<span v-html="HC.dateUtils.date_format(sv.bill.ctime,'MM/dd HH:mm:ss')"></span>
+                </li>
+
+
+            </ul>
+        </div>
+
+
+        <div class="mui-content-padded" v-if="sv.billType[sv.bill.type].can && cu.uid==sv.bill.c_user_id" >
+            <template  v-for="(v,k) in sv.billType[sv.bill.type].can">
+            <button v-if="46==v" @click="doJob(sv.bill,v)" type="button"  class="mui-btn mui-btn-block mui-btn-danger" style="padding: 10px 0" v-html="sv.billType[v].n">通过</button>
+            <button v-else-if="47==v" @click="doJob(sv.bill,v)" type="button"  class="mui-btn mui-btn-block mui-btn-success" style="padding: 10px 0" v-html="sv.billType[v].n">通过</button>
+            <button v-else @click="doJob(sv.bill,v)" type="button" :class="{'mui-btn-primary':k==0 }" class="mui-btn  mui-btn-block" style="padding: 10px 0" v-html="sv.billType[v].n">通过</button>
+            </template>
+        </div>
+
+
+        <div v-if="sv.bill.opt_value && sv.bill.opt_value.bank">
+            <div style="padding: 20px 20px 10px 15px;color: #666666;font-size:15px">汇款信息</div>
+            <ul class="mui-table-view " >
+                <li class="mui-table-view-cell" >
+                    银行：<span v-html="sv.bill.opt_value.bank.c_bank"></span>
+                </li>
+                <li class="mui-table-view-cell" >
+                    收款人：<span v-html="sv.bill.opt_value.bank.c_name"></span>
+                </li>
+                <li class="mui-table-view-cell" >
+                    收款卡：<span v-html="sv.bill.opt_value.bank.c_id"></span>
+                </li>
+                <li class="mui-table-view-cell" >
+                    开户行：<span v-html="sv.bill.opt_value.bank.c_add"></span>
+                </li>
+                <li class="mui-table-view-cell" >
+                    汇款金额：<span v-html="sv.bill.opt_value.price"></span>
+                </li>
+                <li class="mui-table-view-cell" >
+                    汇款人姓名：<span v-html="sv.bill.opt_value.beizhu"></span>
+                </li>
+                <li class="mui-table-view-cell" >
+                    汇款凭证：
+                    <template  v-if="sv.bill.opt_value.img"><br>
+                    <a :href="HC.alioss+sv.bill.opt_value.img" target="_blank"> <img :src="HC.alioss+sv.bill.opt_value.img" style="max-width: 90%;"></a>
+                    </template>
+                    <span v-else>凭证未上传</span>
+                </li>
+            </ul>
+        </div>
+
+
+        <div v-if="sv.bill.opt_value && sv.bill.opt_value.ma">
+            <div style="padding: 20px 20px 10px 15px;color: #666666;font-size:15px">汇款出信息</div>
+            <ul class="mui-table-view " >
+                <li class="mui-table-view-cell" >
+                    银行：<span v-html="sv.bill.opt_value.ma.card_bank" id="cp_yh"></span>
+                    <button class="pay-btn-group-sb"   :data-clipboard-text="sv.bill.opt_value.ma.card_bank" data-toast="复制银行成功" >复制</button>
+                </li>
+                <li class="mui-table-view-cell" >
+                    卡号：<span v-html="sv.bill.opt_value.ma.card_id" id="cp_card"></span>
+                    <button class="pay-btn-group-sb"   :data-clipboard-text="sv.bill.opt_value.ma.card_id" data-toast="复制卡号成功" >复制</button>
+                </li>
+                <li class="mui-table-view-cell" >
+                    收款人：<span v-html="sv.bill.opt_value.ma.realname" id="cp_realname"></span>
+                    <button class="pay-btn-group-sb"   :data-clipboard-text="sv.bill.opt_value.ma.realname" data-toast="复制收款人成功" >复制</button>
+                </li>
+                <li class="mui-table-view-cell" >
+                    开户行：<span v-html="sv.bill.opt_value.ma.card_address" id="card_address"></span>
+                    <button class="pay-btn-group-sb"   :data-clipboard-text="sv.bill.opt_value.ma.card_address" data-toast="复制开户行成功" >复制</button>
+                </li>
+
+            </ul>
+        </div>
+
+        <div  v-if="sv.bill.opt_value && sv.bill.opt_value.fname"  >
+            <div style="padding: 20px 20px 10px 15px;color: #666666;font-size:15px">转账信息</div>
+            <ul class="mui-table-view " >
+                <li class="mui-table-view-cell" >
+                    汇出：<span v-html="sv.bill.opt_value.fname"></span>
+                </li>
+                <li class="mui-table-view-cell" >
+                    转入：<span v-html="sv.bill.opt_value.tname"></span>
+                </li>
+
+
+            </ul>
+        </div>
+
+    </div>
+</bobo>
+</body>
+<script src="/res/js/clipboard.min.js"></script>
+<script>
+    new Vue({
+        el: 'bobo',
+        data: {
+            sv:<?=json_encode($server )?>
+            ,cu:<?=json_encode($_cu )?>
+            ,st:{msg:'', msgShow:false }
+        }
+        ,
+        created: function () {
+        },
+        mounted: function () {
+            var that = this;
+            that.initCopy();
+            setTimeout(function () {
+
+            },2000 );
+
+        },
+        methods: {
+            doJob:function (obj,type) {
+                console.log(obj,type );
+                if( 41==type){
+
+                    console.log("qD");
+                    var btnArray = ['关闭', '确认收款'];
+                    var that = this;
+                    var v= obj;
+
+                    var html='<b style="color: red">'+ v.beizhu +"</b> 确认收到<b style=\"color: red\"> "+  v.price/100 +'元</b>？' ;
+
+                    //html += '<br>建单时间：<b  >'+HC.dateUtils.date_format(v.ctime,'HH:mm:ss')+'</b>' ;
+                    html += '<br><span style="color: #666666">注：“确认收款”会增加相应保证金</span>' ;
+
+                    var that = this;
+
+                    mui.prompt( html , '请输入到账金额 '  , '收款确认', btnArray, function(e) {
+                        if (e.index == 1) {
+                            if( e.value!= ( v.price/100) ){
+                                HC.msg("金额输入错误！！");
+                                return false;
+                            }
+                            console.log("god", e.value );
+                            HC.ajax('/console/ma2cw/doJob/'+ obj.mb_id+'/'+ type);
+                        }
+                    });
+
+                }else
+                {
+                    HC.ajax('/console/ma2cw/doJob/'+ obj.mb_id+'/'+ type);
+                }
+
+            }
+            ,initCopy:function ( ) {
+                var clipboard = new ClipboardJS('.pay-btn-group-sb');
+                //clipboard = new ClipboardJS('#pay_sb');
+                var that = this;
+                clipboard.on('success', function(e) {
+                    console.info('Action:', e.action ,e);
+                    console.info('Text:', e.text);
+                    console.info('Trigger:', e.trigger);
+                    e.clearSelection();
+                    that.toast(  e.trigger.getAttribute('data-toast') );
+                });
+                
+            }
+            ,toast: function ( str ) {
+                this.st.msg= str ;
+                this.st.msgShow=true;
+                var that = this;
+                setTimeout(function () {
+                    that.st.msgShow= false;
+                },3000)
+                /*
+                st.toastTxt.innerHTML= str;
+                st.toast.classList.add('toast-active');
+                setTimeout(function () {
+                    st.toast.classList.remove('toast-active');
+                },3000);
+                */
+            }
+            ,sdao:function () {
+                var price = this.sv.bill.price/100;
+                var f = parseInt( parseInt( price *100) * this.sv.txFee/10000 )/100;
+                return parseInt((price-f)*100)/100 ;
+            }
+        }
+    });
+</script>
+</html>

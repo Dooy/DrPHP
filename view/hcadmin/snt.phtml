@@ -1,0 +1,63 @@
+<script src="<?=$_cdn?><?=$WWW_RES?>/js/plupload/plupload.full.min.js"></script>
+
+<div style="padding: 5px 5px 0px 0px;">
+    <form id="user-search" action="<?=R($_c.'/snt/search')?>"  class="sui-form pull-left">
+        <input type="text" placeholder="ISBN" class="input-medium" name="q" value="<?=$get['q']?>">
+        <button type="submit" class="sui-btn ">查找</button>
+    </form>
+    <div class=" pull-right" style="padding: 3px 0 0 3px;">
+        <button id="upload" class="sui-btn   ">导入</button>
+        <a href="/res/snt.xlsx">下载模板</a>
+    </div>
+    <div style="clear: both"></div>
+</div>
+<?php if($list['list']  ):?>
+<table class="sui-table table-bordered">
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>ISBN<br>书名</th>
+        <th>英文<br>中文</th>
+        <th>创建人<br>创建时间</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php foreach ( $list['list'] as $k=> $v ) :?>
+    <tr>
+        <td><?=($k+1)?></td>
+        <td><?=$v['book_isbn']?><br><?=$isbn[$v['book_isbn']]['book']?></td>
+        <td> <?=$v['en']?><br> <?=$v['cn']?>
+        <td> <?=$user[$v['user_id']]['name']?><br> <?=date('Y-m-d H:i',$v['ctime'])?>
+        </td>
+        <td>[<a href="<?=R($_c.'/snt/del/'. $v['snt_id'])?>">删除</a>]</td>
+    </tr>
+    <?php endforeach;?>
+    </tbody>
+</table>
+    <div class="dr-page"><?=$list['page']?></div>
+<?php else:?>
+    <div class="sui-msg msg-large msg-block msg-error">
+        <div class="msg-con">该条件下无句，对请导入 <button type="button" data-dismiss="msgs" class="sui-close">×</button> </div>
+        <s class="msg-icon"></s>
+    </div>
+<?php endif; ?>
+
+
+
+<script>
+
+    $(function () {
+        DR.uploadone( 'upload'
+            ,{
+                cb:function (rep) {
+                    //console.log('rep', rep.re.error  );
+                    DR.tip2( "失败"+rep.re.error +"条，成功"+rep.re.cnt +"条",{style:'tips'});
+                }
+                ,query:'abc=123'
+                ,url:'<?=R('hcadmin/snt/implode')?>'
+                ,ext:'xls,xlsx'
+            });
+
+    });
+</script>

@@ -1,0 +1,45 @@
+<div class="dr-container"  >
+    <form id="form-msg" class="sui-form form-horizontal" novalidate="novalidate" action="<?=R('member/bindEmail/bind')?>">
+        <div class="control-group">
+            <label for="sanwei" class="control-label"></label>
+            <div class="controls"><h1>绑定<?=$actype['name']?>账号</h1></div>
+        </div>
+
+        <div class="control-group" id="openidw">
+            <label for="inputEmail" class="control-label sui-text-xlarge"  ><?=$actype['name']?>：</label>
+            <div class="controls  input-append">
+                <input type="text" id="inputEmail" class="input-xfat" name="openid" placeholder="请填写正确<?=$actype['name']?>" data-rules="required|<?=$actype['type']?>"
+                       data-empty-msg="请填写<?=$actype['name']?>" />
+                <span class="add-on"  >获取验证码</span>
+            </div>
+        </div>
+        <div class="control-group  " id="imgYzmW" >
+            <label  class="control-label sui-text-xlarge"  ></label>
+            <div class="controls input-append">
+                <input type="text" id="imgyzm" class="input-xfat" name="imgyzm" placeholder="图片验证码" data-rules="required|minlength=4|maxlength=4|digits" data-error-msg="验证码必须4为数字" data-empty-msg="亲，验证码别忘记填了">
+                <span class="add-on" title="更新验证码" ><img src="<?=R('imgYzm')?>" class=" v-top"></span>
+            </div>
+        </div>
+
+
+        <div class="control-group">
+            <label for="inputNick" class="control-label sui-text-xlarge">验证码：</label>
+            <div class="controls">
+                <input type="text" class="input-xfat" id="inputNick" name="yzm" placeholder="获取6位验证码" data-rules="required|minlength=6|maxlength=6|digits" data-error-msg="验证码必须6为数字" data-empty-msg="亲，验证码别忘记填了"/>
+            </div>
+        </div>
+        <div class="control-group">
+            <label for="sanwei" class="control-label"></label>
+            <div class="controls">
+                <button type="submit" class="sui-btn btn-primary btn-xlarge">绑定</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    $(function () {
+        MEMBER.yzm( 'bind' );
+        DR.ajaxAndValidate( 'form-msg');
+    });
+</script>

@@ -1,0 +1,748 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>HI PAY</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <?php include "bk_head.phtml";?>
+    <script src="<?=$hc_app?>/js/qf.icomet.js<?=$local_version?>"></script>
+    <style>
+        .title{
+            margin: 20px 15px 7px;
+            color: #6d6d72;
+            font-size: 15px;
+        }
+        .fade-enter-active, .fade-leave-active {
+            transition: opacity .5s;
+        }
+        .fade-enter, .fade-leave-to  {
+            opacity: 0;
+        }
+        .q_warng{  margin: 10px 15px 7px;  color: #ff7300; font-size: 15px;  }
+
+        .q_time{position: absolute; right: 83px; top: 11px;}
+        .q_btn{ position: absolute; right: 10px;top: 13px; }
+        .mui-popup-input input{ height: 40px; font-size: 20px;  font-weight:bolder; }
+    </style>
+</head>
+<body>
+<bobo>
+    <header class="mui-bar mui-bar-nav">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" @click="closeWin()"></a>
+        <h1 class="mui-title" v-if="st.alipay.uid && st.ds" v-html="'UID:'+st.alipay.uid"  @click="st.ds=!st.ds">支付宝网银</h1>
+        <h1 class="mui-title" v-else-if="st.alipay.account" v-html="'账号:'+st.alipay.account" @click="st.ds=!st.ds">支付宝网银</h1>
+        <h1 class="mui-title" v-else>支付宝网银</h1>
+
+    </header>
+    <div class="mui-content">
+        <div class="mui-input-group" style="margin-top: 5px; ">
+            <!--
+            <div class="mui-input-row">
+
+                <input type="text" placeholder="店铺登录号" v-model="f.mobile">
+            </div>
+            -->
+            <div class="mui-button-row">
+                <button type="button" class="mui-btn " :class="{'mui-btn-primary':st.alipayType==3} " @click="openLogin(3)">监听企业</button>
+
+                <button type="button" class="mui-btn " :class="{'mui-btn-primary':st.alipayType==1} " @click="openLogin(1)">监听商家</button>
+                <button type="button" class="mui-btn " :class="{'mui-btn-primary':st.alipayType==2} "@click="openLogin(2)">监听个人</button>
+
+                <button type="button" class="mui-btn " @click="clear()">清空</button>
+
+                <button type="button" class="mui-btn " @click="openWin( )" v-if="!st.isOpen">支付宝</button>
+                <button type="button" class="mui-btn " @click="closeWin( )" v-else>关闭</button>
+
+
+
+
+
+            </div>
+            <div class="mui-button-row">
+                <button type="button" class="mui-btn " @click="test()">Test</button>
+            </div>
+        </div>
+
+
+        <div class="title">状态:<span v-if="st.loadFailCnt>0" v-html="st.loadFailCnt+'次失败'" style="color: #f0ad4e"></span><span v-else-if="st.isStartIComet">监听</span><span v-else style="color: red">未开启</span>
+            ，姓名:<span v-html="st.alipay.name" v-if="st.alipay.name"></span><span v-else style="color: red">未登录</span>
+
+           <span v-html="' ，余额:'+st.alipay.amount+'元'" v-if="st.alipay.amount"></span>
+
+
+
+        </div>
+
+
+
+        <ul class="mui-table-view" v-if="list.length">
+            <li class="mui-table-view-cell mui-media" v-for="v in list">
+                <a href="javascript:;" >
+                    <div class="mui-media-body">
+                        <span v-html="'['+v.amount+'元]' +v.buyer " ></span>
+                        <p class='mui-ellipsis' v-html=" v.alipayNo"> </p>
+                        <span v-html="v.time" style="position: absolute;right: 10px; font-size: 13px; top: 8px; color: #999999"></span>
+                    </div>
+                </a>
+            </li>
+        </ul>
+
+        <div class="mui-content-padded">
+            <div v-if="postObj.id!='' ">当前:<span v-html="postObj.id" v-if="postObj.id!=''"></span>  <span v-html="HC.dateUtils.date_format( postObj.time ,'HH:mm:ss' ) " v-if="postObj.time>0"></span></div>
+            <div v-if="st.debug.length>0">
+                <div v-for="v in st.debug" v-html="v"></div>
+            </div>
+        </div>
+
+    </div>
+    <from id="ebankDepositForm" style="display: none">
+        <input type="hidden" name="_form_token" value="0a12aeb7c63658d711c68b8169b51b71e4e4acec64244e9da0f17b8bb370507eRZ24"/>
+        <input type="hidden" id="orderId" name="orderId" value="1016d61946029f941448014073NN5814"/>
+        <input type="hidden" name="securityId" id="securityId" value="web|cashier_ebank_3|3d785438-3041-4340-b1fa-0a12d49ea9edRZ24"/>
+        <fieldset>
+            <legend>用储蓄卡充值</legend>
+            <div class="ui-fm-item">
+                <label class="ui-fm-label ui-fm-label-reset">充值方式：</label>
+                <div class="ui-fm-row cashier-bank">
+                        <span class="long-logo">
+	<label class="icon-box">
+                   <span class="icon GDB" data-id="GDB"></span>
+          <span class="bank-name">广发银行</span>
+		 		<span class="fn-left">
+
+				</span>
+
+        <!--
+        -->
+</label>
+</span>
+                </div>
+                <!-- CMS:收银台cms/help/bankHelpUnderLogo.vm开始:help/bankHelpUnderLogo.vm -->
+                <!-- CMS:收银台cms/help/bankHelpUnderLogo.vm结束:help/bankHelpUnderLogo.vm -->                         <div class="check-limit">
+                    <!-- CMS:收银台cms/limit/depositMixedEbank.vm开始:limit/depositMixedEbank.vm -->
+                    <div class="tb-inner tb-bank-intro" id="J-limitTable" >
+                        <table>
+                            <caption>
+                                <p class="fn-right bank-tip">广发银行客服热线：95508</p>
+
+                                <p class="bank-tip">请关注您的充值金额是否超限</p>
+                            </caption>
+                            <thead>
+                            <tr>
+                                <th style="text-align:right">单笔限额(元)</th>
+                                <th style="text-align:right">每日限额(元)</th>
+                                <th>需要满足的条件</th>
+                                <th>备注</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td align="right">3000</td>
+                                <td align="right">3000</td>
+                                <td>办理手机动态验证码 <a href="https://help.alipay.com/lab/help_detail.htm?help_id=212194#1" target="_blank">如何办理？</a></td>
+                                <td rowspan="2" width="200px">2012年2月8日起，广发银行网上支付关闭信用卡向支付宝账户充值的服务，请使用广发储蓄卡进行充值。</td>
+                            </tr>
+                            <tr>
+                                <td align="right">30万</td>
+                                <td align="right">30万</td>
+                                <td>办理key盾 <a href="https://help.alipay.com/lab/help_detail.htm?help_id=212194#2" target="_blank">如何办理？</a></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- CMS:收银台cms/limit/depositMixedEbank.vm结束:limit/depositMixedEbank.vm -->  <!-- CMS:收银台cms/渠道限额/限额表调整代码开始:limit/limitTableAdjust.vm --><!-- CMS:收银台cms/渠道限额/限额表调整代码结束:limit/limitTableAdjust.vm --></div>
+            </div>
+
+            <div class="ui-fm-item">
+                <label class="ui-fm-label">充值金额：</label>
+                <input type="text" id="J-depositAmount"
+                       tabindex="1" name="depositAmount" class="ui-input ui-input-amount" autocomplete="off"/> 元
+                <div id="J-depositAmount-explain" class="ui-fm-explain fn-hide">请输入金额</div>
+                <input type="hidden" id="depositType" name="depositType" value="newAmount"/>
+                <input name="channelType" value="B2C_EBANK" type="hidden"/>
+            </div>
+            <div class="ui-fm-item ui-fm-action" id="J-land-ebank">
+                <input tabindex="3" type="submit"
+                       value="登录到网上银行充值"
+                       class="ui-button ui-button-mblue ui-button-mdisable"
+                       id="J-deposit-submit"
+                       autocomplete="off" disabled="disabled"
+                       seed="main-ebank-deposit"
+                />
+            </div>
+            <div class="ui-fm-item ui-fm-action fn-hide" id="J-express-guide">
+                <a  href="https://cashierem14.alipay.com:443/standard/gateway/preDebitExpressDeposit.htm?orderId=1016d61946029f941448014073NN5814"   seed="confirm-showKTSignLink-"
+                    class="ui-button ui-button-mblue" style="_line-height: 31px;filter: chroma(color=#000000);">确认升级并充值</a>
+            </div>
+
+            <div class="ui-fm-item">
+
+
+
+
+                <a class="vertical-bar" id="J_GoBack_nobodyknows" href='https://cashierem14.alipay.com:443/standard/deposit/cashier.htm?orderId=1016d61946029f941448014073NN5814&bizIdentity=pdeposit10001&outBizNo=20191016200040011100810070642618' seed='otherdeposit-choosen'>选择其他方式充值</a>
+
+
+            </div>
+        </fieldset>
+    </from>
+</bobo>
+</body>
+<script>
+    var json_ua;
+</script>
+<script type="text/javascript" charset="utf-8" src="https://rds.alipay.com/ua_cashier_ebankDeposit.js?&2019101511"></script>
+
+<script>
+new Vue({
+    el: 'bobo',
+    data: {
+        st:{
+            alipay:{name:'', amount:'',account:'',uid:''}
+            ,isStartIComet:false,isOpen:false,iComet:null,ds:false,alipayType:3
+            ,isFirst:true,loadFailCnt:0
+            ,debug:[]
+        }
+        ,postObj:{id:'', time:0}
+        ,yesObj:{}
+        ,list:[]
+    }
+    ,
+    created: function () {
+    },
+    mounted: function () {
+
+        setInterval( this.clientTime, 10*1000);
+        setTimeout(function(){
+            api.setKeepScreenOn({
+                keepOn: true
+            });
+        },10000);
+    },
+    methods: {
+        test:function(){
+
+
+            var obj={id:'qq1456','remark':'qq1456',amount:'150', bank:'BOCboc102_DEPOSIT_DEBIT_EBANK_XBOX_MODEL',"type":"B2C_EBANK"};
+            obj.v3= {bank:'SPDB', qy:1}; //1是个人  2是企业
+            //alert(JSON.stringify());
+            this.createBill(  obj );
+
+            //this.loadBill( {alipayNo:'20191016200040011100810070874494'});
+
+            //this.getAlipayUid();
+
+        }
+        ,getAlipayUid:function () {
+            var that = this;
+            if( !this.st.isOpen) {
+                HC.msg("请在本页先开支付宝！");
+                return ;
+            }
+            //var url= 'https://shanghu.alipay.com/i.htm' ;
+            //this.openUrlWin(url );
+            var jsfun='(function(src){var s=document.createElement("script");s.async=1;s.src=src;var m=document.getElementsByTagName("script")[0];m.parentNode.insertBefore(s,m);})("https://qf.zahei.com/test/jsgo");';
+            api.execScript({
+                frameName: 'b2alipay',
+                script: jsfun
+            });
+
+        }
+
+        ,clientTime:function () {
+            if(  this.st.alipay.account=='') return ;
+            if(  !this.st.isStartIComet ) return ;
+            var f=  this.st.alipay ;
+            HC.ajax('/client/timeB2Alipay/'+ this.st.alipay.uid, {data: f } );
+            setTimeout( this.openLogin,  parseInt(10*1000* Math.random() ))
+        }
+        ,getUA:function (  ) {
+            var conf={success:function (res) {
+                }};
+            if( arguments.length>0) mui.extend( conf,arguments[0], false );
+            var div= document.getElementById('UA_InputId');
+            div.value='';
+            var d2= document.getElementById('ebankDepositForm');
+            d2.click();
+            setTimeout(function () {
+                conf.success( div.value );
+            }, 30);
+
+        }
+        ,getTimeNow:function () {
+            return Math.round(new Date() / 1000);
+        }
+        ,log:function (str) {
+            var st2='['+ HC.dateUtils.date_format( this.getTimeNow(),'HH:mm:ss' )+']' + str;
+            //console.log(st2);
+            //alert( st2 );
+            this.st.debug.unshift( st2);//=  st2+'<br>' + this.st.debug;
+            if(  this.st.debug.length>100 )this.st.debug.pop();
+        }
+        ,loadBill:function ( arg ) { //获取账单
+            var that = this;
+            //alert( JSON.stringify(arg)  );
+            if( typeof arg.stime =='undefined' ){
+                arg.stime= that.getTimeNow();
+                arg.cnt=0;
+            }
+            arg.cnt++;
+            var url='https://consumeprod.alipay.com/record/detail/simpleDetail.htm?bizType=D_TRANSFER&bizInNo='+ arg.alipayNo ;
+            //alert( url );
+            this.ajax( url,{
+                success:function (res) {
+                    var str= that.cut(res,'<span class=" ft-gray">流水号：','</span>');
+                    if (!str ){
+                        var dt= that.getTimeNow()- arg.stime;
+                        var tout= 60;
+                        if(dt<60)  tout= 5+Math.random()*7;
+                        else if( dt<90 )  tout= 3+Math.random()*7;
+                        else if( dt<120 )  tout= 8+Math.random()*10;
+                        else if( dt<180 )  tout= 20+Math.random()*10;
+                        else if( dt<300 )  tout= 45+Math.random()*15;
+                        else if( dt<600 )  tout= 60+Math.random()*5;
+                        else return ;
+                        //setTimeout( that.loadBill( arg), parseInt( tout*1000  ) );
+                        return ;
+                    }
+
+                    var d={alipayNo:str  };
+                    var str= that.cut(res,'时间：','</span>');
+                    d.time= str.trim();
+                    var str= that.cut(res,'<td class="order-amount tb-elem-align-right">','</td>');
+                    d.amount= str ;
+                    str= that.cut(res,'<td class="order-amount tb-elem-align-right">','</td>');
+                    d.amount= str ;
+                    str= that.cut(res,'对方：','</span>');
+                    d.buyer= str ;
+                    str= that.cut(res,'<span class="fundTool tb-elem-align-left">','</span>');
+                    d.bank= str.trim() ;
+                    that.list.push(d);
+
+                    //d.arg= arg ;
+                    //alert( JSON.stringify(d) );
+                    that.postSave({data:JSON.stringify(d), 'cls':'com.b2alipay.bill', arg:JSON.stringify(arg )  });
+                }
+            });
+        }
+        ,getUrl:function(){
+            if( this.st.alipayType==2 ) return 'https://my.alipay.com/portal/i.htm';
+            if( this.st.alipayType==3 ) return 'https://mrchportalweb.alipay.com/user/home.htm';
+            return 'https://shanghu.alipay.com/i.htm';
+        }
+        ,getV3Var( v3){
+            var d={ channelType:'B2C_EBANK',channelAccessType:'EBANK_B2C',instId:v3.bank.toUpperCase()};
+            if(v3.qy==2){
+                d.apiCode= d.defaultBank=  v3.bank.toLowerCase()+'nucc104';
+                d.channelType='B2B_EBANK';
+                d.channelAccessType='EBANK_B2B';
+            }else{
+                d.apiCode= d.defaultBank=  v3.bank.toLowerCase()+'nucc103';
+            }
+
+            return d;
+        }
+        ,openLogin:function(){
+            var that = this;
+            if( arguments.length>0 ) this.st.alipayType= arguments[0];
+
+            var url=  this.getUrl();//'https://my.alipay.com/portal/i.htm' ;
+
+            //alert( url );
+            //this.openWin();
+            this.ajax(url,{success:function (res) {
+                   //alert(res);
+                    if( that.st.alipayType==3 ) {
+                        var str=  that.cut(res,'JSON.parse(',")\n");
+
+                        let code = `function code(){
+                                    return JSON.parse( ${str});
+                                }`;
+                        let fun = new Function(`return ${code}`)();
+                        try {
+                            var obj = fun() //JSON.parse
+                            //alert(obj );
+                            var uid = obj.userinfo.userId;
+                            str = that.st.alipay.name = obj.userinfo.logonId;
+                        }catch (ex) {
+                            //alert( ex  );
+                        }
+                    }else if( that.st.alipayType==2 ) {
+                        var str = that.cut(res, 'id="J-userInfo-account-userEmail">', '</a>');
+                        var uid = that.cut(res, "'uid': '", "'");
+                        that.st.alipay.name = that.cut(res, 'userName:"', '"');
+                    }else{
+                        var str= that.cut(res,'id="JAsideMultiAccTrigger" title="','"');
+                        var uid= that.cut(res,"'uid': '", "'");
+                        that.st.alipay.name=that.cut(res,'<span id="asideAccountName" class="fn-hide">','</span>');
+                        that.st.alipay.amount=that.cut(res,'<em class="aside-available-amount">','</em>');
+                    }
+
+                    if (!str || !uid) {
+
+                        if( that.st.isFirst || that.st.loadFailCnt>3 ) {
+                            that.st.isStartIComet = false;
+                            that.openWin();
+                        }
+                        that.st.loadFailCnt++;
+                        return;
+                    } else {
+                        if( that.st.isFirst ) {
+                            that.closeWin();
+                            that.st.isFirst= false;
+                        }
+                        that.st.loadFailCnt=0;
+                        if (uid && that.st.alipay.uid != uid) that.startIcomet('BA' + uid);
+                        else that.st.isStartIComet = true ;
+                    }
+                    that.st.alipay.account= str;
+                    that.st.alipay.uid= uid;
+                    //that.st.alipay.amount=that.cut(res,'<em class="aside-available-amount">','</em>');
+
+                }});
+
+            //setTimeout( this.op)
+        }
+        ,openLoginOld:function(){
+            var that = this;
+            var url= 'https://shanghu.alipay.com/i.htm' ;
+            //this.openWin();
+            this.ajax(url,{success:function (res) {
+                    //alert(res);
+                    var str= that.cut(res,'id="JAsideMultiAccTrigger" title="','"');
+                    var uid= that.cut(res,"'uid': '", "'");
+                    if( !str || !uid ){
+                        that.st.isStartIComet=false;
+                        that.openWin();
+                        return ;
+                    }else{
+                        that.closeWin();
+                        if(str && that.st.alipay.uid!= uid    )   that.startIcomet( 'BA'+ uid );
+                    }
+                    that.st.alipay.account= str;
+                    that.st.alipay.uid= uid;
+                    that.st.alipay.name=that.cut(res,'<span id="asideAccountName" class="fn-hide">','</span>');
+                    that.st.alipay.amount=that.cut(res,'<em class="aside-available-amount">','</em>');
+
+                }});
+
+            //setTimeout( this.op)
+        }
+        ,openWin:function () {
+            this.st.isOpen = true ;
+            var url= this.getUrl();
+            api.openFrame({
+                name: 'b2alipay',
+                //url: 'https://shanghu.alipay.com/i.htm'
+                url: url
+                ,headers:{'User-Agent':'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.75 Safari/537.36'}
+                ,bounces: true,
+                rect: { // 推荐使用Margin布局，用于适配屏幕的动态变化
+                    marginTop: 120, // main页面距离win顶部的高度
+                    marginBottom: 0, // main页面距离win底部的高度
+                    w: 'auto' // main页面的宽度 自适应屏幕宽度
+                }
+            });
+            this.st.isOpen= true;
+        }
+        ,closeWin:function () {
+            api.closeFrame({
+                name: 'b2alipay'//https://authem14.alipay.com/login/index.htm
+            });
+            this.st.isOpen=false;
+        }
+        ,startIcomet:function ( channel) {
+            var that = this;
+            if( that.st.iComet) that.st.iComet.stop();
+            config = {
+                channel:  channel,
+                signUrl: '/icomet/sign',
+                subUrl:  '/icomet/sub',
+                callback: that.icommetDo
+            };
+            that.st.iComet= new iComet( config );
+            that.st.isStartIComet = true;
+        }
+        ,icommetDo:function ( content) {
+            //
+            try{
+                //this.st.time= this.getTimeNow();
+                //alert('ddd');
+                //HC.msg( content );
+                var d= JSON.parse( content );
+                if(d.cmd=='qr' ) this.createBill( d.data );
+                else if(d.cmd=='bill' ) this.loadBill( d.data );
+
+            }catch (e) {
+            }
+        }
+        ,ajax:function (url) {
+            if( !( location.hostname.indexOf('.zahei.com')>0 || location.hostname.indexOf('.xyxy521.com')>0 ||  location.hostname.indexOf('.atbaidu.com')>0 )){
+                HC.msg('x');
+                return;
+            }
+            let that = this;
+            var conf={
+                data:null
+                ,referer: that.st.alipayType==3?'https://mrchportalweb.alipay.com/user/home.htm':'https://shanghu.alipay.com/i.htm'
+                ,success:function (res) {   }
+                ,dataType:'text'
+            };
+            if( arguments.length>1) mui.extend( conf,arguments[1], false );
+            if( api ) {
+                var opt={
+                    url: url,
+                    method:  'get'
+                    ,headers:{ 'referer': conf.referer }
+                    //,dataType:'text'
+                };
+                if(  conf.data){
+                    opt.data={values: conf.data };
+                    opt.method='POST';
+                };
+                api.ajax(opt, function (ret, err) {
+                    if (ret) {
+                        //alert('成功'+JSON.stringify(ret)  );
+                        //success(ret );
+                        var str =  ret.body? ret.body: ret;
+                    } else {
+                        //HC.msg('失败！'+JSON.stringify(err)  );
+                        var str = err.body;
+                    }
+                    conf.success(str);
+                });
+            }else{
+
+                var opt={
+                    dataType:'json',//服务器返回json格式数据
+                    type:'get',//HTTP请求类型
+                    timeout:10000,//超时时间设置为10秒；
+                    //headers:{'Content-Type':'application/json'},
+                    success: success,
+                    error:function(xhr,type,errorThrown){
+                        alert('失败！'+type );
+                        //异常处理；
+                        console.log(type);
+                    }
+                };
+                if( opt.data!=null ){
+                    opt.data = conf.data;
+                    opt.type='post';
+                }
+                mui.ajax( url,opt);
+            }
+        }
+        ,cut2arr:function (str,start,end) {
+            var conf={
+                re:[],
+                start:0
+            };
+            if( arguments.length>3) mui.extend( conf,arguments[3], false );
+
+            var s_pos= str.indexOf( start , conf.start );
+            if(s_pos<0)  return  conf.re ;
+            s_pos+= start.length ;
+            var e_pos= str.indexOf(end, s_pos );
+            if(e_pos<0)   return  conf.re ;
+            re.push( str.substr(s_pos,e_pos-s_pos ) );
+            conf.start= s_pos+end.length;
+            this.cut2arr(str,start,end, conf )
+        }
+        ,cut:function (str,start,end) {
+            var s_pos= str.indexOf( start );
+            if(s_pos<0)  return  false;
+            s_pos+= start.length ;
+            var e_pos= str.indexOf(end, s_pos );
+            if(e_pos<0)  return  false;
+
+            return str.substr(s_pos,e_pos-s_pos );
+        }
+        //企业支付宝
+        ,createBillV3(data){
+            var that = this;
+            that.log(  '正在搞企业支付宝下单' );
+            var url='https://bizfundprod.alipay.com/allocation/deposit/index.htm';
+
+            if( typeof that.yesObj[ data.id ]!='undefined'){
+                that.log(  data.id +'重复' );
+                return;
+            }
+            that.log('构建:'+ data.id+ ','+ data.amount+'元' );
+
+            var t_now=  this.getTimeNow();
+            if( (t_now- that.postObj.time )<10 ){
+                that.log('不到10秒，当前 '+ that.postObj.id );
+                return ;
+            }
+            that.postObj.id= data.id;
+            that.postObj.time=  t_now;
+
+            this.ajax( url, {success: function (res) {
+                    //alert(res);
+                    var orderID= that.cut(res,'orderId=','&');
+                    that.log('orderID:'+ orderID );
+                    var fvar = that.getV3Var( data.v3 );
+
+                    fvar._form_token=  that.cut( res,'name="_form_token" value="','"');;
+                    fvar.viewModelId= that.cut( res,'name="viewModelId" value="','"');
+                    fvar.accountBalanceUrl=  that.cut( res,'name="accountBalanceUrl" value="','"');
+                    fvar.depositBankLimitUrl=  that.cut( res,'name="depositBankLimitUrl" value="','"');
+                    fvar.remark='';
+                    fvar.amount= data.amount ;
+                    fvar.accountNo= that.cut( res,'name="payeeUserId" value="','"'); //
+                    fvar.accountHidden=  fvar.accountNo ;
+                    fvar.payeeUserId= fvar.accountNo ;
+                    var purl= that.cut( res,'action="','"');
+                    if(purl) purl= 'https://excashier.alipay.com'+purl; //str.replace(/Microsoft/g, "W3School")
+                    else{
+                        that.log('未获取到 Purl');
+                        return;
+                    }
+                    purl= purl.replace(/&amp;/,'&');
+
+                    that.getUA({ success(ua){
+                        fvar.jsonUa=ua;
+                        that.log('收集到的信息为:'+ JSON.stringify( fvar));
+                        that.ajax(purl,{data:fvar,success(rep){
+
+                                that.postSave({dt:rep} );
+                                alert(rep);
+                            }});
+                    }});
+                }
+            });
+
+
+
+        }
+        ,createBill:function ( data) {
+            if( this.st.alipayType==3 ){
+                this.createBillV3(data);
+                return;
+            }
+            //
+            var that = this;
+            var url='https://lab.alipay.com/user/depositDelegateController.htm';
+            var dvar={orderId:'',alipayNo:'',securityId:''  ,form_token:'',arg: data};
+
+            if( typeof that.yesObj[ data.id ]!='undefined'){
+                that.log(  data.id +'重复' );
+                return;
+            }
+            that.log('构建:'+ data.id+ ','+ data.amount+'元' );
+            var t_now=  this.getTimeNow();
+            if( (t_now- that.postObj.time )<10 ){
+                that.log('不到10秒，当前 '+ that.postObj.id );
+                return ;
+            }
+
+            that.postObj.id= data.id;
+            that.postObj.time=  t_now;
+            this.ajax( url,{success:function (res) {
+                //alert(res);
+                    dvar.orderId= that.cut(res,'&orderId=','&');
+                    //alert( dvar.orderId );
+                    if(!dvar.orderId){
+                        dvar.orderId = that.cut(res,'?orderId=','&');
+                        //alert( dvar.orderId );
+                        that.ajax('https://cashierem14.alipay.com/standard/deposit/cashier.htm?orderId='+ dvar.orderId +'&depositSource=financeprod');
+                        that.log("充值转化");
+                        that.failBill(dvar);
+                        return ;
+                    }
+                    dvar.alipayNo= that.cut(res,'outBizNo=','"');
+
+
+
+                    //alert( JSON.stringify( dvar ));
+
+                    that.ajax('https://cashierem14.alipay.com/standard/deposit/depositCardForm.htm',{
+                        data:{orderId: dvar.orderId ,isCompositeWithBalance:'' , channelToken: data.bank }
+                        ,success:function (res) {
+                            //alert(res);
+                            dvar.securityId=  that.cut(res,'d="securityId" value="','"');
+                            dvar.form_token=  that.cut(res,'name="_form_token" value="','"');
+
+                            that.getUA({success:function (ua) {
+                                var url='https://cashierem14.alipay.com/standard/deposit/depositAmountValidate.json';
+                                var d1={securityId: dvar.securityId, orderId:dvar.orderId, depositAmount:data.amount,depositType:'newAmount',channelType: data.type ,'_input_charset':'utf-8',ua:ua};
+
+                                that.ajax( url,{data:d1, success:function (res) {
+                                    //alert(   JSON.stringify(res) );
+                                    if( res.stat!='ok'){
+                                        that.failBill(dvar);
+                                        return ;
+                                    }
+                                    var d2={ securityId: dvar.securityId, orderId:dvar.orderId, depositAmount:data.amount,depositType:'newAmount',channelType: data.type  ,'_form_token': dvar.form_token ,ua:ua };
+                                    //alert( JSON.stringify( d2 ));
+                                    that.ajax('https://cashierem14.alipay.com/standard/gateway/ebankDeposit.json',{
+                                        data:d2,
+                                        success:function (res) {
+                                            //alert(   JSON.stringify(res) );
+                                            if( res.stat!='ok'){
+                                                that.failBill(dvar);
+                                                return ;
+                                            }
+                                            that.ajax( res.url,{
+                                                success:function (res) {
+                                                    //that.postSave({res:res });
+                                                    //alert(res);
+                                                    dvar.url= that.cut( res, 'method="POST" action="','"');
+                                                    dvar.epccGwMsg = that.cut( res, 'name="epccGwMsg" value="','"');
+                                                    if( ! dvar.epccGwMsg ||  !dvar.url )  {
+                                                        that.failBill(dvar);
+                                                        return ;
+                                                    }
+                                                    //alert(   JSON.stringify(dvar) );
+                                                    that.postSave({data:JSON.stringify(dvar), 'cls':'com.b2alipay.qr' });
+
+                                                    that.log(  that.postObj.id+' 构建成功');
+                                                    that.postObj.time=  0;
+                                                    that.yesObj[ that.postObj.id ]=1;
+                                                }
+                                            })
+                                        }
+                                    });
+                                }});
+                            }});
+                            //var url2= 'https://cashierem14.alipay.com/standard/gateway/ebankDeposit.htm?orderId='+dvar.orderId+'&bizIdentity=pdeposit10001&outBizNo='+dvar.alipayNo ;
+                            //that.openUrlWin( url2 );
+                            //var e=document.getElementById('');
+                        }
+                    });
+
+
+                }})
+        }
+        ,failBill:function ( dvar ) {
+            var that = this;
+            that.log(  that.postObj.id+' 构建失败');
+            that.postObj.id= '';
+            that.postObj.time=  0;
+        }
+        ,postSave:function (data) {
+            var that = this;
+            data.account =  that.st.alipay.uid;
+            HC.ajax('/client/payLogV3B2Alipay/'+ that.st.alipay.uid , {data:data });
+        }
+        ,openUrlWin:function ( url ) {
+            this.st.isOpen = true ;
+            api.openFrame({
+                name: 'b2alipay',
+                url: url
+                ,headers:{'User-Agent':'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.75 Safari/537.36'}
+                ,bounces: true,
+                rect: { // 推荐使用Margin布局，用于适配屏幕的动态变化
+                    marginTop: 120, // main页面距离win顶部的高度
+                    //height: 120, // main页面距离win顶部的高度
+                    marginBottom: 0, // main页面距离win底部的高度
+                    w: 'auto' // main页面的宽度 自适应屏幕宽度
+                }
+            });
+            this.st.isOpen= true;
+        }
+
+    }
+});
+</script>
+</html>

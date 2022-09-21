@@ -1,0 +1,117 @@
+<div class="dr-min "  >
+    <form id="form-msg" class="sui-form form-horizontal" novalidate="novalidate" action="<?=R('forgot?sep=1')?>">
+        <div class="control-group">
+            <label for="sanwei" class="control-label"></label>
+            <div class="controls"><h1>重置密码</h1></div>
+        </div>
+
+        <div class="control-group" id="openidw">
+            <label for="inputEmail" class="control-label sui-text-xlarge"  >账号：</label>
+            <div class="controls  input-append">
+                <input type="text" id="inputEmail" class="input-xfat" name="openid" placeholder="邮箱或手机号码" data-rules="required"
+                       data-empty-msg="请填写账号" />
+                <span class="add-on"  >获取验证码</span>
+            </div>
+        </div>
+        <div class="control-group  " id="imgYzmW" >
+            <label  class="control-label sui-text-xlarge"  ></label>
+            <div class="controls input-append">
+                <input type="text" id="imgyzm" class="input-xfat" name="imgyzm" placeholder="图片验证码" data-rules="required|minlength=4|maxlength=4|digits" data-error-msg="验证码必须4为数字" data-empty-msg="亲，验证码别忘记填了">
+                <span class="add-on" title="更新验证码" ><img src="<?=R('imgYzm')?>" class=" v-top"></span>
+            </div>
+        </div>
+
+
+        <div class="control-group">
+            <label for="inputNick" class="control-label sui-text-xlarge">验证码：</label>
+            <div class="controls">
+                <input type="text" class="input-xfat" id="inputNick" name="yzm" placeholder="邮箱或手机获取6位验证码" data-rules="required|minlength=6|maxlength=6|digits" data-error-msg="验证码必须6为数字" data-empty-msg="亲，验证码别忘记填了"/>
+            </div>
+        </div>
+
+
+        <div class="control-group">
+            <label for="sanwei" class="control-label"></label>
+            <div class="controls">
+                <button type="submit" class="sui-btn btn-primary btn-xlarge">下一步</button>
+            </div>
+        </div>
+    </form>
+
+
+    <form id="form-msg2" class="sui-form form-horizontal" novalidate="novalidate" style="display: none" action="<?=R('forgot?sep=2')?>" >
+        <div class="control-group">
+            <label for="sanwei" class="control-label"></label>
+            <div class="controls"><h1>重置密码</h1></div>
+        </div>
+        <div class="control-group">
+        <label for="inputPassword" class="control-label sui-text-xlarge">新密码：</label>
+        <div class="controls">
+            <input type="password"class="input-xfat" id="inputPassword" name="password"  placeholder="新密码"   data-rules="required|minlength=6|maxlength=12">
+        </div>
+        </div>
+        <div class="control-group">
+            <label for="repassword" class="control-label sui-text-xlarge">重复密码：</label>
+            <div class="controls">
+                <input type="password" class="input-xfat" id="repassword" placeholder="与新密码一致" data-rules="required|match=password" name="repassword">
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label for="sanwei" class="control-label"></label>
+            <div class="controls">
+                <button type="submit" class="sui-btn btn-primary btn-xlarge">重置密码</button>
+            </div>
+        </div>
+    </form>
+
+
+</div>
+<script>
+
+    var ui={
+        f1: $("#form-msg"),
+        f2:$("#form-msg2")
+    }
+    /*
+    ui.f1.validate({
+    messages: {
+    email: ["亲，你还没填邮箱呢", "邮箱不要瞎填哦"],
+    password: "亲，密码必须是6-12位哦",
+    repassword:["亲，密码别忘记了","必须与新密码一致"]
+    ,ts:"身份很总要哟"
+    }
+    , success: function() {
+        //$.alert("恭喜，没有问题了。");
+            ui.f1.hide();
+            ui.f2.show();
+        return false;
+    }
+    });
+
+
+ui.f2.validate({
+    messages: {
+        password: "亲，密码必须是6-12位哦",
+        repassword:["亲，密码别忘记了","必须与新密码一致"]
+    }
+    , success: function() {
+        $.alert("恭喜，没有问题了。");
+
+        return false;
+    }
+});*/
+    var config={
+        time:0
+    }
+$(function () {
+    DR.ajaxAndValidate( 'form-msg',{},{'success':function () {
+        ui.f1.hide();
+        ui.f2.show();
+        return false ;
+    }});
+    DR.ajaxAndValidate( 'form-msg2');
+    MEMBER.yzm( 'passwd' );
+
+});
+</script>

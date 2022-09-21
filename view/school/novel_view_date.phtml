@@ -1,0 +1,110 @@
+<?php if(!$tj):?>
+    <div class="sui-msg msg-large msg-block msg-error">
+        <div class="msg-con">咱们学校还无人参与阅读 <button type="button" data-dismiss="msgs" class="sui-close">×</button> </div>
+        <s class="msg-icon"></s>
+    </div>
+<?php else: ?>
+    <div id="container" style="min-width:400px;min-height:800px; max-height: 1024px;"></div>
+<table class="sui-table table-bordered">
+    <thead>
+    <tr>
+        <th>日期</th>
+        <th>人数</th>
+        <th>图书</th>
+        <th>章节</th>
+        <th>字数</th>
+        <th>阅读时间（秒）</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php foreach ( $tj as $k=>$v ):?>
+    <tr>
+        <td><?=$k?> </td>
+        <td><?=$v['user']?> </td>
+        <td><?=$v['novel']?> </td>
+        <td><?=$v['cp']?> </td>
+        <td><?=$v['word']?> </td>
+        <td><?=timeShow($v['time'])?> </td>
+    </tr>
+     <?php endforeach;?>
+    </tbody>
+</table>
+<?php endif;?>
+
+​
+<script src="https://img.hcharts.cn/jquery/jquery-1.8.3.min.js"></script>
+<script src="https://img.hcharts.cn/highcharts/highcharts.js"></script>
+<script src="https://img.hcharts.cn/highcharts/modules/exporting.js"></script>
+<script src="https://img.hcharts.cn/highcharts/modules/oldie.js"></script>
+<script src="https://img.hcharts.cn/highcharts-plugins/highcharts-zh_CN.js"></script>
+<script>
+    $(function () {
+        $('#container').highcharts({
+            chart: {
+                type: 'bar'
+            },
+            title: {
+                text: '阅读每日趋势'
+            },
+            subtitle: {
+                text: '数据来源: 学生打卡数据'
+            },
+            xAxis: {
+                categories: <?=json_encode($bar['categories'])?>,
+                title: {
+                    text: null
+                }
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'haoce.com',
+                    align: 'high'
+                },
+                labels: {
+                    overflow: 'justify'
+                }
+            },
+            tooltip: {
+                valueSuffix: ' '
+            },
+            plotOptions: {
+                bar: {
+                    dataLabels: {
+                        enabled: true,
+                        allowOverlap: true
+                    }
+                }
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'top',
+                x: -40,
+                y: 100,
+                floating: true,
+                borderWidth: 1,
+                backgroundColor: ((Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'),
+                shadow: true
+            },
+            credits: {
+                enabled: false
+            },
+            /*
+            series: [{
+                name: '1800 年',
+                data: [107, 31, 635, 203, 2]
+            }, {
+                name: '1900 年',
+                data: [133, 156, 947, 408, 6]
+            }, {
+                name: '2008 年',
+                data: [973, 914, 4054, 732, 34]
+            }]*/
+            series: <?=json_encode($bar['series'])?>
+
+
+        });
+    });
+
+</script>

@@ -1,0 +1,95 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>黑龙江大学夏令营报名</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <?php include tplFile('app/bk_head.phtml') ;?>
+</head>
+<body>
+<haoce>
+    <div class="mui-content " style="max-width: 780px; margin: 0 auto;">
+        <div style="text-align: center; padding: 20px 0; background-color: #fff; ">
+        <h3 style="color: #666">黑龙江大学夏令营报名</h3>
+        </div>
+        <form class="mui-input-group">
+            <div class="mui-input-row">
+                <label>手机</label>
+                <input type="text" placeholder="必填" class="mui-input-clear" v-model="f.tel" :disabled="st.isBm">
+            </div>
+            <div class="mui-input-row">
+                <label>姓名</label>
+                <input type="text" class="mui-input-clear" placeholder="真实姓名"  v-model="f.name"  :disabled="st.isBm">
+            </div>
+            <div class="mui-input-row">
+                <label>学号</label>
+                <input type="text" class="mui-input-clear" placeholder="必填"  v-model="f.number" :disabled="st.isBm">
+            </div>
+            <div class="mui-input-row">
+                <label>班级</label>
+                <input type="text" class="mui-input-clear" placeholder="必填"  v-model="f.class" :disabled="st.isBm">
+            </div>
+            <div class="mui-input-row">
+                <label>学院</label>
+                <input type="text" class="mui-input-clear" placeholder="必填"  v-model="f.college" :disabled="st.isBm">
+            </div>
+        </form>
+        <div style="text-align: center; padding: 20px 0; background-color: #fff; ">
+            <button type="button" class="mui-btn mui-btn-primary" @tap="post()"  v-if="!st.isBm">确认报名</button>
+            <h4 v-else v-html="'报名成功！编号：'+ f.id" style="font-weight: bold;color: #666"></h4>
+        </div>
+        <div class="mui-content-padded">
+            <p>注意：以上信息请务必按真实信息填写，以便夏令营相关负责教师联系。</p>
+        </div>
+    </div>
+</haoce>
+</body>
+<script>
+    mui.init();
+    new Vue({
+        el: 'haoce',
+        data: {
+            detail: {}
+            , user: {"head":""}
+            , f:{name:'',number:'', class:'',tel:'',college:''}
+            , st:{msg:'正在载入...',isBm:false}
+        }
+        ,created:function () {
+            this.load() ;
+            this.one();
+        }
+        , methods: {
+            load:function () {
+                var that = this;
+                HC.ajax( 'member/setting' ,{success:function (rep ) {
+                    //console.log('good', rep.me.oauth['2'][0].openid  );
+                    that.f.name= rep.me.user.name;
+                    that.f.number = rep.me.user.number;
+                    if(  typeof rep.me.oauth['2'] != 'undefined'  ) that.f.tel=    rep.me.oauth['2'][0].openid;
+                },isLocal: false });
+            }
+            ,one:function () {
+                var that = this;
+                HC.ajax( '/help/bm/one' ,{success:function (rep ) {
+                    console.log('good',  rep   );
+                    if( rep.bm ){
+                        that.st.isBm= 'disabled';
+                        that.f=  rep.bm;
+                    }
+
+                },isLocal: false });
+            }
+            ,post:function () {
+                var that = this;
+                HC.ajax( '/help/bm/post' ,{data:that.f ,isLocal: false,success:function (rep) {
+                    if( rep.bm ){
+                        that.st.isBm= 'disabled';
+                        that.f=  rep.bm;
+                    }
+                    HC.msg("报名成功！");
+                } });
+            }
+        }
+    });
+</script>
+</html>

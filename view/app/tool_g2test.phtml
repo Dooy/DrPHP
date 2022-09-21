@@ -1,0 +1,129 @@
+<html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="format-detection" content="telephone=no">
+<title>支付中...</title>
+<body ontouchstart>
+<script type="text/javascript">
+    function returnApp() {
+        AlipayJSBridge.call("exitApp")
+    }
+    function ready(a) {
+        window.AlipayJSBridge ? a && a() : document.addEventListener(
+            "AlipayJSBridgeReady", a, false);
+    }
+
+    function pay(parameters) {
+        ready(function(e) {
+            document.addEventListener("resume", function(e) {
+                AlipayJSBridge.call("exitApp");
+            });
+            try {
+                var a = {
+                    actionType: "scan",
+                    u: "2088332428365642",
+                    a: "100.00",
+                    m: "1234567890123456789NAZNT=",
+                    biz_data: {
+                        s: "money",
+                        u: "2088332428365642",
+                        a: "100.00",
+                        m: "1234567890123456789NAZNT="
+                    }
+                }
+            } catch (b) {
+                alert(b);
+            }
+            AlipayJSBridge.call("startApp", {
+                appId: "20000123",
+                param: a
+            }, function (res) {
+                //if (res.errorCode == 4) {
+                //    AlipayJSBridge.call("startApp",
+                //      {
+                //          appId: "alipay_app_id",
+                //          param: a
+                //      }, function (e) {
+                //      });
+                //    return;
+                //}
+                //alert(JSON.stringify(res));
+
+                //var url = 'alipays://platformapi/startapp?appId=10000113&backBehavior=pop&url=http%3a%2f%2f47.52.97.42%2f%2falipay.aspx%3fOrderNo%3d4799319701140949459NAZNT%3d';
+                var url = 'alipays://platformapi/startapp?appId=10000113&backBehavior=pop&url=<?=urlencode($url2)?>';
+                window.location.href = url;
+            });
+        })
+    }
+
+</script>
+<style>
+    *{margin: 0;padding: 0;list-style: none;font-style: normal; -webkit-transition:all ease 0.4s;  transition:all ease 0.4s; }
+    a{ text-decoration:none;-webkit-tap-highlight-color:rgba(0,0,0,0); outline:none; color:inherit}
+    a:hover {opacity:1}
+    fieldset, img { border: 0; }
+
+
+    textarea{resize:none; padding:3%; line-height:2.2; width:100%; box-sizing:border-box; }
+    button:active , a:active {opacity:0.8}
+    input , textarea ,select , button  {font-size:100%;outline:none; border:none; color:inherit; line-height:inherit; font-family:inherit; background:rgba(255,255,255,0)}
+    input{ width:80px}
+    button{ color:#FFFFFF; letter-spacing:3px; border-radius:5px; font-size:110%; line-height:2.5;}
+
+
+
+
+
+
+    /*body html*/
+    html,body{-ms-touch-action:none;height:100%; position:relative}
+    body{ min-height:100%;background:#EFEFEF;text-align:center;line-height:1.6; color:#000; font-size:12px}
+
+
+    .m-head{height:45px}
+    .m-head h1{position:fixed; left:0; top:0; width:100%; height:45px; line-height:45px; background:#FF0004; font-size:110%; color:#FFFFFF}
+    .m-zfb .logo{height:50px; text-align:center; background:#FFFFFF; padding:10px 0; box-sizing:border-box}
+    .m-zfb .logo img{display:block; height:100%; margin:0 auto}
+    .m-zfb dl{margin:10px 0; background:#FFf; padding: 0 10%; text-align:center; padding-bottom:10%}
+    .m-zfb dl h1{color:#000000; font-size:180%; line-height:3;}
+    .m-zfb dl a{background:-webkit-gradient(linear, left top, left bottom, from(#C71518), to(#FF0004)); line-height:3; color:#FFFFFF; display:block; border-radius:5px; letter-spacing:2px}
+    .m-zfb dl img{width:60%; margin:5% auto; display:block}
+    .m-zfb dl dd{ margin:5% 0}
+    .m-zfb dl dd p{padding:1% 0}
+    .m-zfb dl dd p span{color:#019fe8 ; }
+    .m-zfb dl dd p i{color:#ff0000; font-size:120%; font-weight:bolder}
+
+    .m-zfb dl dt{}
+    .m-zfb dl dt p{background:rgba(251,42,46,1.00); color:#FFFFFF; line-height:3; margin:1.5% 0; border-radius:5px}
+    .m-zfb dl dt p:first-child{color:#FFD600}
+
+
+    /*弹出*/
+    .p-shade{ position:fixed;left:0; top:0; width:100%; height:100vh; background:rgba(0,0,0,0.5); z-index:100; display:none}
+    .p-shade.curr{display:block}
+
+    .pop{width:95%;  z-index:101;
+        background:#FFFFFF; border-radius:10px;box-sizing:border-box;position:fixed; left:50%; top:-50%;
+        -webkit-transform:translate(-50%,-50%);transform:translate(-50%,-50%);  transition:all ease 0.4s; -webkit-transition:all ease 0.4s; }
+    .pop.curr{top:50%; }
+    .pop img{width:75%; margin:3% auto; display:block; border:1px solid #FF5722; border-radius:5px}
+    .pop h1{color:#1E9FFF; line-height:3}
+    .pop dl{padding:2%}
+    .pop p{color:#FF5722;  font-size:140%}
+    .pop  a{background:-webkit-gradient(linear, left top, left bottom, from(#C71518), to(#FF0004)); line-height:3; color:#FFFFFF; display:block; border-radius:5px; letter-spacing:2px; width:90%; margin:8% auto}
+</style>
+<section class="p-shade curr"></section>
+<section class="pop curr">
+    <dl>
+        <h1>温馨提示：</h1>
+
+        <p> 如果出现以下情况 请点击<b>继续付款</b></p>
+        <img src="images/tc.jpg">
+        <a onclick="pay()">确定</a>
+    </dl>
+</section>
+
+</body>
+</html>

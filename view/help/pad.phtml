@@ -1,0 +1,149 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>师生们正在好策上读书</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+
+    <!--标准mui.css-->
+    <link rel="stylesheet" href="<?=$_cdn?>/res/hcapp/css/mui.min.css">
+    <script src="<?=$_cdn?>/res/hcapp/js/mui.min.js"></script>
+    <script src="<?=$_cdn?>/res/hcapp/js/vue.min.js"></script>
+    <script src="<?=$_cdn?>/res/hcapp/js/haoce.js?d=20180320"></script>
+
+
+
+    <link rel="stylesheet" type="text/css" href="<?=$_cdn?>/res/hcapp/css/book.css?v=20180320" />
+    <style>
+        .mui-table h5 span{ float: left; width: 25%; overflow: hidden;height: 15px;}
+        .mui-table-view-cell{padding: 5px 15px}
+
+        #fade li{  opacity: 0;  height: 0 ;overflow: hidden }
+        #fade .beforeEnter{  opacity: 0;  height: 0  }
+        #fade .enter{  opacity:0;  height: 61px;  transition: height .5s linear ; }
+        #fade .enter-2{ opacity: 1; transition: opacity 1.8s linear ;  }
+
+
+    </style>
+</head>
+<body>
+<haoce>
+    <div class="mui-content " style="max-width: 800px; margin: 0 auto;">
+        <!--顶部banner图 开始-->
+        <div style="position: relative;"><div id="logo" style="z-index: 5;top:25px;"><img src="https://cdn.haoce.com/res/img/512.png"  ></div></div>
+        <div class="banner" style="height: 100px">
+            <div class="banner-img" ><img src="https://cdn.haoce.com/res/img/512.png"></div>
+            <h1 class="title mui-ellipsis-2" v-html="book_school.school" style="color: #F4F4F4;text-align: center; top:35px;">师生们正在阅读读书...</h1>
+
+        </div>
+
+        <!--顶部banner图 结束
+        <ul class="mui-table-view mui-table-view-striped mui-table-view-condensed" v-if="list.length>0">
+            -->
+        <transition-group
+            name="staggered-fade"
+            tag="ul"
+            id="fade"
+            v-bind:css="false"
+            v-on:before-enter="beforeEnter"
+            v-on:enter="enter"
+            v-on:leave="leave"
+            class="mui-table-view mui-table-view-striped mui-table-view-condensed"
+        >
+            <li class="mui-table-view-cell" v-for="(v,k) in list"  :key="v.id" :data-index="k" >
+                <div class="mui-table">
+                    <h4 class="mui-ellipsis"  v-html="v.opt_value"></h4>
+                    <h5 style="margin-top: 8px;">
+                        <span style="color: #c89e02;width: 20%" v-html="st.tag[v.opt_type]?st.tag[v.opt_type].n:'未知操作'"  ></span>
+                        <span v-html="v.name"></span>
+                        <span v-html="v.school" style="width: 35%"></span>
+                        <span style="text-align: right;width: 20%" v-html="HC.dateUtils.format_time(v.ctime)"  ></span>
+                        <div style="clear: both"></div>
+                    </h5>
+
+                </div>
+            </li>
+        </transition-group>
+        <!-- </ul>-->
+    </div>
+</haoce>
+</body>
+<script>
+    var vm= new Vue({
+        el:'haoce',
+        data:{
+            book_school:{ school:'师生们正在...',logo:'https://cdn.haoce.com/upload/2017/10/22/59ec43554a984.png'}
+            ,list:[]
+            ,st:{max:0,tag:{}}
+        },
+        created:function () {
+            console.log('created', this.book_school);
+            this.loadLog();
+        },
+        mounted:function () {
+            setInterval( this.loadLog, 1000*10 );
+        },
+        methods:{
+            loadLog:function ( ) {
+                mui.ajax( '/help/pad/load?max='+ this.st.max +'&display=json' ,{
+                    dataType:'json', type:'get',  timeout:10000,//超时时间设置为10秒
+                    success:function(rep){
+                        if( ! rep.data.list  ||  rep.data.list.length<=0 ) return;
+                        vm.st.max=  rep.data.list[0].id ;
+                        vm.list =rep.data.list.concat(  vm.list );
+                        if( vm.list.length>300 ) vm.list = vm.list.slice(0,300);
+                        vm.st.tag = rep.data.tag;
+                    },
+                    error:function(xhr,type,errorThrown){            }
+                });
+            },
+            beforeEnter: function (el) {
+
+                //el.style.opacity = 0
+                //el.style.height = 0
+
+                el.classList.add('beforeEnter');
+            },
+            enter: function (el, done) {
+                var delay = el.dataset.index * 150
+                setTimeout(function () {
+
+                    el.classList.remove('beforeEnter');
+                    el.classList.add('enter');
+                    setTimeout( function () { el.classList.add('enter-2'); },600);
+                    done();
+                    /*
+
+                    Velocity(
+                        el,
+                        {   height: '61px'}, //
+                        { complete: done   }
+                    );
+                    Velocity(  el,
+                        { opacity: 1  }, //
+                        {  duration:1500 }
+                    );
+                     */
+                }, delay);
+
+            },
+            leave: function (el, done) {
+                var delay = 10;//el.dataset.index * 150
+                done();
+                /*
+                setTimeout(function () {
+                    Velocity(
+                        el,
+                        { opacity: 0 , height: 0},//
+                        { complete: done }
+                    )
+                }, delay)
+                */
+            }
+        }
+
+    });
+    mui.init( );
+
+</script>
+</html>

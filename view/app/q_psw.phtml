@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>HI PAY</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <?php include "bk_head.phtml";?>
+    <style>
+        .title{
+            margin: 20px 15px 7px;
+            color: #6d6d72;
+            font-size: 15px;
+        }
+        .fade-enter-active, .fade-leave-active {
+            transition: opacity .5s;
+        }
+        .fade-enter, .fade-leave-to  {
+            opacity: 0;
+        }
+        .q_warng{  margin: 10px 15px 7px;  color: #ff7300; font-size: 15px;  }
+
+        .q_time{position: absolute; right: 83px; top: 11px;}
+        .q_btn{ position: absolute; right: 10px;top: 13px; }
+        .mui-popup-input input{ height: 40px; font-size: 20px;  font-weight:bolder; }
+    </style>
+</head>
+<body>
+<bobo>
+    <header class="mui-bar mui-bar-nav">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+        <h1 class="mui-title">密码修改</h1>
+
+    </header>
+    <div class="mui-content">
+        <div class="title">修改密码       </div>
+        <div class="mui-input-group">
+
+
+            <div class="mui-input-row mui-password">
+                <label>旧密码</label>
+                <input type="password" class="mui-input-password" placeholder="旧的登录密码" v-model="f.password">
+            </div>
+            <div class="mui-input-row mui-password">
+                <label>新密码</label>
+                <input type="password" class="mui-input-password" placeholder="新密码" v-model="f.psw">
+            </div>
+            <div class="mui-input-row mui-password">
+                <label>重复密码</label>
+                <input type="password" class="mui-input-password" placeholder="重复新密码" v-model="f.repassword">
+            </div>
+
+            <div class="mui-button-row">
+                <button type="button" class="mui-btn mui-btn-primary" @click="post()" >修改</button>&nbsp;
+            </div>
+        </div>
+    </div>
+</bobo>
+</body>
+
+<script>
+new Vue({
+    el: 'bobo',
+    data: {
+        f:{password:'', psw:'', repassword:''}
+    }
+    ,
+    created: function () {
+    },
+    mounted: function () {
+    },
+    methods: {
+        post:function () {
+            if( this.f.psw != this.f.repassword ){
+                HC.msg("新密码 重复密码不符合！");
+                return ;
+            }
+            HC.ajax('/member/changPsw/change', {data: this.f , success:function (rep) {
+                    HC.msg("修改密码成功！！");
+             }});
+        }
+    }
+});
+</script>
+</html>

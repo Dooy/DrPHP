@@ -1,0 +1,177 @@
+<style>
+    textarea, #editor .dhtml {
+        display: inline-block;
+        width: 49%;
+        height: 100%;
+        vertical-align: top;
+        box-sizing: border-box;
+        padding: 0 20px;
+    }
+
+    textarea {
+        border-right: 1px solid #ccc;
+        resize: none;
+        outline: none;
+        background-color: #f6f6f6;
+        font-size: 14px;
+        font-family: 'Monaco', courier, monospace;
+        padding: 20px;
+    }
+
+    code {
+        color: #f66;
+    }
+</style>
+<haoce>
+    <?php if($novel):?>
+       <div style="text-align: center"><h2><?=$novel['novel']?></h2></div>
+    <?php endif;?>
+    <div style="padding: 8px 5px 5px 0px;">
+        <div class="sui-btn-group">
+            <a class="sui-btn" href="javascript:;" @click="addFQA()">新增</a>
+        </div>
+    </div>
+    <div class="dr-sim"  v-show="st.edit">
+        <?php if($novel):?>
+            <div style="text-align: center"><h2><?=$novel['novel']?></h2></div>
+        <?php endif;?>
+        <div class="dr-sim-close" @click="st.edit=false"><i class="icon-tb-close sui-icon"></i></div>
+        <div class="dr-vue" style="max-width: 1240px">
+            <div style="text-align: center; padding: 10px 0;" >
+                <input type="text" placeholder="请输入主题，在200个字内表达清楚" class="input-xxlarge input-xfat" style="width: 90%;" v-model="f.title">
+                <br><br>
+                <a href="javascript:void(0);" class="sui-btn btn-large btn-primary" @click="post()" v-if="st.edit==1">新增</a>
+                <a href="javascript:void(0);" class="sui-btn btn-large btn-primary" @click="editPost()" v-if="st.edit==2">保存修改</a>
+            </div>
+            <div id="editor" style="height: 600px;">
+                <textarea v-model="f.text" style="overflow: auto"  placeholder="请输入内容，支持Markdown写法" v-if="where.cat_id==10"></textarea>
+                <textarea v-model="f.text" style="overflow: auto"  placeholder="请输入内容" v-else></textarea>
+                <div v-html="compiledMarkdown" style="overflow: auto" class="dhtml"></div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div    v-if="list.length" >
+        <table class="sui-table table-bordered"  >
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>问题</th>
+                <th>作者</th>
+                <th>赞/回答</th>
+                <th >操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(v,k) in list">
+                <td v-html="k+1"></td>
+                <td v-html="v.text.title"></td>
+                <td v-html="user[v.user_id].name"></td>
+                <td >
+                    <span  v-html="v.good_cnt"></span>/<a :href="'/app/page/wendaOne?dafen=1&novel_id='+where.novel_id+'&wenda_id='+v.wenda_id" v-html="v.cnt" target="_blank"></a>
+                </td>
+                <td v-if="v.cat_id==2">
+                   来至系统
+                </td>
+                <td v-else>
+                    [<a href="javascript:;" @click="edit(v)">修改</a>]
+                    [<a   :href="'/app/page/wendaOne?novel_id='+where.novel_id+'&wenda_id='+v.wenda_id" target="_blank">查看</a>]
+                    <template  v-if="u.uid==v.user_id">[<a href="">删除</a>]</template>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</haoce>
+<script src="/res/hcapp/js/haoce.js?d=2018042802"></script>
+
+<script src="/res/hcapp/js/marked.min.js"></script>
+
+<script>
+var vm = new Vue({
+    el: 'haoce',
+    computed: {
+        compiledMarkdown: function () {
+            switch (this.where.cat_id){
+                case 10:
+                    if( this.f.text=='' ) {
+                        return '<div style="padding-top:50px;text-align: center "><a target="_blank" href="https://www.zybuluo.com/mdeditor?url=https://www.zybuluo.com/static/editor/md-help.markdown">编辑器支持markdown写法，支持图片等</a></div>';
+                    }
+                    return marked( this.f.text, { sanitize: true })
+                    break;
+            }
+            var str= this.f.text;
+            str = str.replace(/</ig,'&lt;').replace(/>/ig,'&gt;')
+            return str.nl2br();
+        }
+    },
+    data: {
+        f:{ text: '',title:'',cat_id:0,wenda_id:0 }
+        ,st:{ edit:false ,modify:{} }
+        ,where:<?=json_encode($where)?>
+        ,user:{}
+        ,list:[]
+        ,u:<?=json_encode($_cu)?>
+    }
+    ,methods:{
+        post:function () {
+            var furl='/wenda/one/post';
+            DR.ajax( furl,{ data: this.f},{success:function (rep ) {
+                console.log('v',rep );
+                vm.st.edit=false;
+            }});
+        }
+        ,addFQA:function () {
+            if(  this.st.edit == 1){
+                this.st.edit = false;
+                return ;
+            }
+           this.st.edit = 1;
+           this.f= { text: '',title:'',cat_id:this.where.cat_id ,wenda_id:0 };
+           if( this.where.novel_id ) this.f.novel_id =  this.where.novel_id;
+        }
+        ,load:function ( ) {
+            var that = this;
+            var url ='/wenda/list/cat/'+ this.where.cat_id;
+            if( this.where.novel_id ) url+='/'+ this.where.novel_id;
+            DR.ajax(url ,{  },{success:function (rep ) {
+                console.log('list',rep );
+                HC.marge( that.user, rep.data.user  );
+                that.list= that.list.concat( rep.data.list.list  );
+            }});
+        }
+        ,edit:function (v) {
+            this.st.modify= v;
+            this.f.text= v.text.text;
+            this.f.title= v.text.title;
+            this.f.wenda_id= v.wenda_id;
+            //this.f.cat_id= v.cat_id;
+            this.st.edit=2;
+        }
+        ,load_cat2:function () {
+            var that = this;
+            DR.ajax('/wenda/list/cat/2/'+ this.where.novel_id ,{  },{success:function (rep ) {
+                console.log('list',rep );
+                HC.marge( that.user, rep.data.user  );
+                that.list=  rep.data.list.list.concat(   that.list);
+            }});
+        }
+        ,dr_load:function () {
+            this.load();
+            if(this.where.cat_id==3) this.load_cat2();
+        }
+        ,editPost:function () {
+            DR.ajax( '/wenda/one/modify/'+ this.f.wenda_id ,{ data: {text: this.f.text,title:this.f.title }},{success:function (rep ) {
+                console.log('v',rep );
+                vm.st.edit=false;
+                vm.st.modify.text.text = vm.f.text;
+                vm.st.modify.text.title  = vm.f.title;
+                DR.tipSuccess("修改成功！");
+            }});
+        }
+    }
+});
+vm.dr_load();
+</script>

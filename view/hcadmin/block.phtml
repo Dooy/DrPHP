@@ -1,0 +1,131 @@
+<haoce>
+    <div style="padding: 8px 5px 5px 0px;">
+        <div class="sui-btn-group">
+            <a class="sui-btn" href="javascript:;" @click="addShow()">新增板块</a>
+        </div>
+    </div>
+    <div class="sui-form form-horizontal sui-validate" v-if="st.f || ! list.length">
+        <div class="control-group" v-if="f.block_id<=0">
+            <label for="inputEmail" class="control-label">学校：</label>
+            <div class="controls">
+                <input type="text" placeholder="请填写学校" data-rules="required" v-model="f.school">
+            </div>
+        </div>
+        <template v-else>
+            <div class="control-group" >
+                <label for="inputEmail" class="control-label">ID：</label>
+                <div class="controls">
+                    <div v-html="f.block_id"></div>
+                </div>
+            </div>
+            <div class="control-group" >
+                <label for="inputEmail" class="control-label">学校：</label>
+                <div class="controls">
+                    <div v-html="school[f.school_id].school"></div>
+                </div>
+            </div>
+        </template>
+        <div class="control-group">
+            <label for="inputEmail" class="control-label">板块：</label>
+            <div class="controls">
+                <input type="text" placeholder="请填写板块名称" data-rules="required" v-model="f.block">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label"></label>
+            <div class="controls">
+                <button  class="sui-btn btn-primary" @click="post()" v-if="f.block_id<=0">立即添加</button>
+                <button  class="sui-btn btn-primary" @click="post()" v-else>修改</button>
+            </div>
+        </div>
+    </div>
+    <table class="sui-table table-bordered" v-if="list.length">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>板块</th>
+            <th>学校</th>
+            <th>书</th><!-- /选读/完成/领取/耗时/字数 -->
+            <th>状态</th>
+            <th>班级</th>
+            <th>模式</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(v,k) in list">
+            <td v-html="v.block_id"></td>
+            <td v-html="v.block"></td>
+            <td v-html="school[v.school_id].school"></td>
+            <td  v-html="v.novel_cnt"></td>
+            <td>
+                <span class="sui-dropdown"><span class="dropdown-inner"><a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle"><span v-html="blockType[v.type].n" v-if="blockType[v.type]"></span> <i class="caret"></i></a>
+    <ul role="menu" aria-labelledby="drop1" class="sui-dropdown-menu">
+      <li role="presentation" class="{'active': tk==v.type}" v-for="(tv,tk) in blockType"><a role="menuitem" tabindex="-1" href="#" v-html="tv.n" @click="editType(v,tk)"></a></li>
+    </ul></span></span>
+            </td>
+            <td>
+                <span class="sui-dropdown"><span class="dropdown-inner"><a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle"><span v-html="attr.is_class[v.is_class]" v-if="blockType[v.type]"></span> <i class="caret"></i></a>
+    <ul role="menu" aria-labelledby="drop1" class="sui-dropdown-menu">
+      <li role="presentation" class="{'active': tk==v.is_class}" v-for="(tv,tk) in attr.is_class"><a role="menuitem" tabindex="-1" href="#" v-html="tv" @click="edit(v,'is_class',tk)"></a></li>
+    </ul></span></span>
+            </td>
+
+            <td>
+                <span class="sui-dropdown"><span class="dropdown-inner"><a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle"><span v-html="attr.hv[v.hv_type].n" v-if="blockType[v.type]"></span> <i class="caret"></i></a>
+    <ul role="menu" aria-labelledby="drop1" class="sui-dropdown-menu">
+      <li role="presentation" class="{'active': tk==v.hv_type}" v-for="(tv,tk) in attr.hv"><a role="menuitem" tabindex="-1" href="#" v-html="tv.n" @click="edit(v,'hv_type',tk)"></a></li>
+    </ul></span></span>
+            </td>
+            
+            <td> [<a href="javascript:" @click="modify(v)">修改</a>]
+                <template v-if="v.novel_cnt==0">[<a href="javascript:" @click="del(v,k)">删除</a>]</template>
+                <template v-else>[删除]</template>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="dr-page"><?=$list['page']?></div>
+</haoce>
+<script>
+    var vm = new Vue({
+        el: 'haoce',
+        data: {
+            f:{school:'',school_id:0,block:'',block_id:0}
+            ,st:{ f:false }
+            ,list: <?=json_encode($list['list'])?>
+            ,school: <?=json_encode( $school )?>
+            ,blockType:<?=json_encode( $blockType )?>
+            ,attr:<?=json_encode( $attr )?>
+        },
+        methods: {
+            addShow:function () {
+                this.st.f = ! this.st.f;
+                this.f = {school:'',school_id:0,block:'',block_id:0}
+            },
+            post:function () {
+                console.log('v',vm.f );
+                if( this.f.block_id>0 ) DR.ajax('/hcadmin/block/modify/'+ this.f.block_id,{'data':{'block':this.f.block }})
+                else  DR.ajax('/hcadmin/block/add',{'data':this.f})
+                return false;
+            }
+            ,modify:function (v) {
+                this.st.f = true;
+                this.f=v;
+            }
+            ,del:function (v,k ) {
+                DR.ajax('/hcadmin/block/del'+ v.block_id  );
+                this.list.splice(k,1);
+            }
+            ,editType:function (v,k) {
+                v.type=k;
+                DR.ajax('/hcadmin/block/type/'+ v.block_id +'/'+ k );
+            }
+            ,edit:function (blockName,k,v) {
+                console.log( v);
+                blockName[k]=v;
+                DR.ajax('/hcadmin/block/edit/'+ blockName.block_id +'/'+ k +'/'+v );
+            }
+        }
+    });
+</script>

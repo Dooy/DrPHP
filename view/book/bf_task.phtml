@@ -1,0 +1,67 @@
+<div class="control-group-cart"  >
+    <div class="flexbox control-group-cart-title">
+        <div class="flex"><b >任务细节设置</b></div>
+        <div class="group-cart-op">
+            <i class="sui-icon icon-tb-right"></i>
+        </div>
+    </div>
+    <div class="control-group-cart-content"  >
+
+        <div class="control-group">
+            <label class="control-label  "  >主题：</label>
+            <div class="controls">
+                <div class="input-prepend input-append">
+                    <input id="user_topic" name="user_topic" value="<?=$book['user_topic']>0?$book['user_topic']:1 ?>" class="span2 input-xfat" type="text" style="width: 30px;"  placeholder=""><span class="add-on">篇</span>
+                </div>
+            </div>
+            <div class="controls"  style="padding-left: 20px; ">
+                <div class="input-prepend input-append"><span class="add-on">每篇</span>
+                    <input id="word_topic" name="word_topic"  value="<?=$book['word_topic']>0?$book['word_topic']:80 ?>"  class="span2 input-xfat" type="text" style="width: 30px;"  placeholder=""><span class="add-on">字</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label  "  >回复：</label>
+            <div class="controls">
+                <div class="input-prepend input-append">
+                    <input id="user_comment" name="user_comment" value="<?=$book['user_comment']>0?$book['user_comment']:5 ?>" class="span2 input-xfat" type="text" style="width: 30px;"  placeholder=""><span class="add-on">篇</span>
+                </div>
+            </div>
+            <div class="controls" style="padding-left: 20px; ">
+                <div class="input-prepend input-append"><span class="add-on">每篇</span>
+                    <input id="word_comment" name="word_comment" value="<?=$book['word_comment']>0?$book['word_comment']:30 ?>" class="span2 input-xfat" type="text" style="width:30px;"  placeholder=""><span class="add-on">字</span>
+                </div>
+            </div>
+        </div>
+        <?php foreach ($tags as $k=>$v ): if( $k<=0) continue; ?>
+        <div class="control-group">
+            <label class="control-label  "  ><?=isset($v['n2'])?$v['n2']:$v['n']?>：</label>
+            <div class="controls"  >
+                <div class="input-prepend input-append"><span class="add-on">每篇</span>
+                    <input  name="opt[word_<?=$k?>]" value="<?=$book_opt['word_'.$k ]?>" class="span2 input-xfat" type="text" style="width:30px;"  placeholder="数值"><span class="add-on">字</span>
+                </div>
+                <div class="sui-msg msg-tips msg-naked  ">
+                    <div class="msg-con">留空 跟随主题字数限制</div>
+                    <s class="msg-icon"></s>
+                </div>
+            </div>
+        </div>
+        <?php endforeach; ?>
+
+        <div style="padding-left: 100px; ">
+            <div class="sui-msg msg-tips  msg-naked">
+                <div class="msg-con">留空会随系统默认显示</div>
+                <s class="msg-icon"></s>
+            </div>
+        </div>
+        <?php foreach ($tags as $k=>$v ):?>
+            <div class="control-group">
+                <label for="inputNick" class="control-label v-top hide-min"><?=isset($v['n2'])?$v['n2']:$v['n']?>：</label>
+                <div class="controls">
+                    <textarea   name="opt[tag_<?=$k?>]" style="width:450px;height:150px;"    placeholder="请填写<?=isset($v['n2'])?$v['n2']:$v['n']?>任务介绍" ><?=$book_opt['tag_'. $k]?></textarea>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+</div>

@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <?php include "bk_head.phtml";?>
+    <style>
+    </style>
+</head>
+<body>
+<bobo>
+    <div class="mui-content" id="bobo">
+        <!--
+        <pre><?php  print_r($_SERVER);  ?></pre>
+        -->
+
+        <div class="mui-content-padded">
+            <video src="http://pgc.cdn.xiaodutv.com/4140545998_4247292126_20170928124528.mp4?authorization=bce-auth-v1%2Fc308a72e7b874edd9115e4614e1d62f6%2F2017-09-28T04%3A45%3A32Z%2F-1%2F%2Fd9f7de9feb04641135e0f0f8d1b9268fcac9c79d01d756efc75151f85c6893cb&responseCacheControl=max-age%3D8640000&responseExpires=Sat%2C+06+Jan+2018+12%3A45%3A32+GMT&xcode=2c870c9d8719cf2d0c5a202dc08eef15fde2e395feb326a8&time=1532738785"
+                   controls="controls" :width="width" height="250" v-if="st.show">
+            </video>
+            <button @click="st.show=!st.show">god</button>
+
+            <h5>图标居左：</h5>
+            <button type="button" class="mui-btn mui-icon mui-icon-home">
+                首页
+            </button>
+            <button type="button" class="mui-btn mui-btn-primary mui-icon mui-icon-search">
+                搜索
+            </button>
+            <button type="button" class="mui-btn mui-btn-success mui-icon mui-icon-plus">添加</button>
+            <button type="button" class="mui-btn mui-btn-danger mui-btn-outlined">
+                <span class="mui-icon mui-icon-trash"></span>
+                删除
+            </button>
+            <button type="button" class="mui-btn mui-btn-link">
+                <span class="mui-icon mui-icon-back"></span>
+                返回
+            </button>
+            <h5>图标居右：</h5>
+            <button type="button" class="mui-btn mui-icon mui-icon-home mui-right">
+                首页
+            </button>
+            <button type="button" class="mui-btn mui-btn-primary mui-icon mui-icon-search mui-right">
+                搜索
+            </button>
+            <button type="button" class="mui-btn mui-btn-success mui-icon mui-icon-plus mui-right">添加</button>
+            <button type="button" class="mui-btn mui-btn-danger mui-btn-outlined">
+                删除
+                <span class="mui-icon mui-icon-trash"></span>
+            </button>
+            <button type="button" class="mui-btn mui-btn-link">
+                下一步
+                <span class="mui-icon mui-icon-forward"></span>
+            </button>
+        </div>
+    </div>
+
+</bobo>
+</body>
+<script>
+    mui.init();
+    new Vue({
+        el: 'bobo',
+        data: {
+            width:320
+            ,st:{show: false }
+        },
+        created:function(){
+    	},
+    	mounted:function(){
+            var d= document.getElementById('bobo');
+            console.log(d.offsetWidth );
+            this.width = d.offsetWidth;
+            //this.st.show = true ;
+    	},
+        methods:{
+    	}
+    });
+</script>
+</html>

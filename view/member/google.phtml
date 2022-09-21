@@ -1,0 +1,98 @@
+
+<form    class="sui-form form-horizontal" novalidate="novalidate" method="post" action="/member/google/change" id="googlePost">
+
+
+    <div class="control-group">
+        <label for="inputEmail" class="control-label"> </label>
+        <div class="controls">
+            <h3>设置谷歌验证码</h3>
+        </div>
+    </div>
+    <div class="control-group">
+        <label for="inputPassword" class="control-label">登录密码：</label>
+        <div class="controls">
+            <input type="password"  name="psw" placeholder="登录密码" data-rules="required" title="密码">
+        </div>
+    </div>
+    <?php if($google['isOld']):?>
+        <div class="control-group">
+            <label for="inputPassword" class="control-label">新验证码：</label>
+            <div class="controls">
+                <input type="text"  name="code" placeholder="6位数字" data-rules="required|number" >
+            </div>
+        </div>
+        <div class="control-group">
+            <label for="inputPassword" class="control-label">旧验证码：</label>
+            <div class="controls">
+                <input type="text"  name="old" placeholder="原有谷歌验证码" data-rules="required|number" >
+            </div>
+        </div>
+    <?php else:?>
+    <div class="control-group">
+        <label for="inputPassword" class="control-label">谷歌验证码：</label>
+        <div class="controls">
+            <input type="text"  name="code" placeholder="6位数字" data-rules="required|number" >
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <div class="control-group">
+        <label for="inputPassword" class="control-label">谷歌秘钥：</label>
+        <div class="controls">
+            <span><?=$google['signSecret']?></span>
+        </div>
+    </div>
+    <div class="control-group">
+        <label for="inputPassword" class="control-label">秘钥二维码：</label>
+        <div class="controls">
+             <div  id="qrCode" ></div>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label"></label>
+        <div class="controls">
+            <?php if($google['isOld']):?>
+                <button type="submit" class="sui-btn btn-primary">重置绑定</button>
+            <?php else:?>
+            <button type="submit" class="sui-btn btn-primary">验证并绑定</button>
+            <?php endif;?>
+        </div>
+    </div>
+    <input type="hidden"  name="google"  value="<?=$google['secret']?>" >
+
+    <div class="control-group">
+        <label class="control-label"></label>
+        <div class="controls">
+            帮助：<a href="https://jingyan.baidu.com/article/59703552b7a0b48fc0074099.html" target="_blank">谷歌身份验证器使用教程</a>
+            <br>建议使用谷歌原生的身份验证器管理动态码，使用微信小程序等其他软件管理动态码有风险请慎用
+        </div>
+    </div>
+
+</form>
+
+<script src="/res/js/qrcode.ajax.min.js"></script>
+<script>
+
+
+    function qrCode( url_text,div_id ) {
+        var that = this;
+        //console.log( location );
+        var qrcode = new QRCode(document.getElementById( div_id ), {
+            text: url_text //location.origin  + that.qr.url
+            ,width: 180,
+            height: 180,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
+    }
+
+    qrCode('<?=$google['url']?>','qrCode');
+
+    $(function () {
+        DR.ajaxAndValidate( 'googlePost');
+
+    });
+
+</script>

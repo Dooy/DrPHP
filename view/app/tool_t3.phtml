@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>支付宝</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <script src="/res/js/clipboard.min.js"></script>
+    <style>
+
+    </style>
+</head>
+<body>
+
+<!--
+<a href="alipays://platformapi/startapp?appId=20000691&url=<?=urlencode('HTTPS://QR.ALIPAY.COM/FKX021576XU10J3NDM1R48')?>">进入1</a>
+<br>
+<br>
+<a href="alipays://platformapi/startapp?appId=20000691&url=<?=urlencode('https://qr.alipay.com/tsx06627561ivncvwfm235a')?>">进入2</a>
+<br>
+<br>
+<a href="alipays://platformapi/startapp?appId=20000691&url=<?=urlencode('https://qr.alipay.com/tsx089438xxayascthwck5a')?>">进入2-2</a>
+<br>
+<br>
+<a href="alipays://platformapi/startapp?appId=20000691&url=<?=urlencode('https://qr.alipay.com/tsx052750wa5hqk56odmied')?>">进入2-3</a>
+<br>
+<br>
+<a href="alipays://platformapi/startapp?appId=20000691&url=<?=urlencode('https://qr.alipay.com/a7x04806x6yodm0o5aivi2f')?>">个人</a>
+-->
+<br>
+<br>
+<a href="alipays://platformapi/startapp?appId=20000691&url=<?=urlencode('alipays://platformapi/startapp?requestType=hotword_b&appId=20001003&keyword=WJKkp518DD')?>">口令跳转</a>
+
+<br>
+<br>
+<a href="alipays://platformapi/startapp?requestType=hotword_b&appId=20001003&keyword=WJKkp518DD">口令码</a><br>
+<br>
+<a href="alipays://platformapi/startapp?requestType=hotword_b&appId=20001003&keyword=<?=urlencode('qqmail2019@163.com')?>">口令联系人</a>
+
+<!--
+<div id="debug" style="padding: 50px 0;text-align: center; " onclick="open()">Loading...</div>
+-->
+<div  id="app"  data-clipboard-target="#bar" style="display: none">点我复制</div >
+<textarea id="bar" style="display: none">Mussum ipsum cacilds...</textarea>
+</body>
+<script>
+    var clipboard ;
+    window.onload=function () {
+        clipboard = new ClipboardJS('#app');
+        clipboard.on('success', function(e) {
+            console.info('Action:', e.action);
+            console.info('Text:', e.text);
+            console.info('Trigger:', e.trigger);
+            e.clearSelection();
+        });
+
+    }
+
+
+
+    var debug= document.getElementById('debug');
+    //location.href='<?=$url?>';
+    function open() {
+        location.href='<?=$url?>';
+    }
+
+
+
+</script>
+</html>

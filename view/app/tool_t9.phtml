@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>支付宝</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <!--<script src="https://gw.alipayobjects.com/as/g/h5-lib/alipayjsapi/3.1.1/alipayjsapi.min.js"></script>
+
+    <script src="https://a.alipayobjects.com/static/fastclick/1.0.6/fastclick.min.js"></script>
+    <script src="https://a.alipayobjects.com/g/h5-lib/alipayjsapi/3.0.5/alipayjsapi.min.js"></script>
+    -->
+    <style>
+
+    </style>
+</head>
+<body>
+<div style="padding-top: 30px;text-align: center;"  >
+
+    <div ><img src="/res/img/logo_alipay.jpg"  style="height: 55px"/></div>
+    <div style="padding-top: 20px">金额<b style="color: #ff6700; font-size: 50px"><?=$biz_data['amount']?></b>元</div>
+    <img src="http://mobile.qq.com/qrcode?url=<?=urlencode(  $qrcode )?>" />
+    <div  style="color: #ff6700; font-size: 16px" onclick="pay()">请长按识别图中二维码</div>
+    <div id="debug"></div>
+</div>
+
+</body>
+<script>
+    //function Date() { return {  getTime: function() {  return 2544292074596;  }  } };
+
+    function pay() {
+
+        var url = 'alipays://platformapi/startapp?appId=09999988&actionType=toCard&sourceId=bill&cardNo=6230520680052591473&bankAccount=&money=99.95&amount=99.95&bankMark=ABC&bankName=';
+        var url='https://www.alipay.com/?appId=09999988&actionType=toCard&sourceId=bill&cardNo=6215592605004704472&bankAccount=%E5%88%98%E8%8E%8E%E8%8E%8E&money=499.96&amount=499.96&bankMark=ICBC';
+        var url='https://www.alipay.com/?appId=09999988&actionType=toCard&sourceId=bill&cardNo=6215592605004704472&bankAccount=刘莎莎&money=499.96&amount=499.96&bankMark=ICBC';
+        //window.location.replace(url);
+        location.href= url ;
+        //alert('good news');
+    }
+
+    var debug= document.getElementById('debug');
+    function returnApp() {
+        AlipayJSBridge.call("exitApp")
+    }
+
+    function ready(a) {
+        window.AlipayJSBridge ? a && a() : document.addEventListener("AlipayJSBridgeReady", a, false);
+        debug.innerHTML='...';
+    }
+    // ready(function () {
+    //
+    //     AlipayJSBridge.call('scan', {
+    //         type: 'qr',
+    //         actionType: 'scanAndRoute',
+    //
+    //     }, function(result) {
+    //         //alert(result);
+    //     });
+    //     setTimeout(function () {
+    //         pay();
+    //     }, 800 );//延时半秒
+    // });
+
+    document.addEventListener("resume", function (a) {
+       // returnApp()
+    });
+    pay();
+</script>
+</html>

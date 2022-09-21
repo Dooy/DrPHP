@@ -1,0 +1,58 @@
+
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>main</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+
+    <!--标准mui.css-->
+    <link rel="stylesheet" href="//cdn.bootcss.com/mui/3.7.1/css/mui.min.css">
+    <script src="//cdn.bootcss.com/mui/3.7.1/js/mui.min.js"></script>
+    <script src="//cdn.bootcss.com/vue/2.3.0/vue.min.js"></script>
+    <script src="/res/hcapp/js/hc.vue.js"></script>
+
+    <style>
+        #pigai-content{ text-align: center;  height: 360px; margin-top: -200px;
+            position: fixed; top:50%;left:0px;right:0px; 			;}
+        .mui-btn{   padding: 8px 30px; width: 160px;  margin-bottom:10px ;}
+
+        .mui-icon-navigate:before{ font-size: 120px; color: #ccc;}
+
+        .mui-content-padded{text-align: center;   }
+        .mui-content{ text-align: center;}
+    </style>
+</head>
+<body>
+<bobo>
+    <div class="mui-content" id="error">
+        <div id="pigai-content">
+            <span class="mui-icon mui-icon-navigate"  ></span>
+            <p v-html="msg"> </p>
+            <div class="mui-content-padded ">
+
+                <a class="mui-btn mui-btn-primary" @tap="openWifi();" >马上升级</a>
+                <br>
+                <a class="mui-btn" @tap="restart()">再考虑</a>  <br>
+
+            </div>
+
+        </div>
+    </div>
+</bobo>
+</body>
+<script>
+    new Vue({
+        el: 'bobo',
+        data: {
+            msg:'发现新的版本'
+        },
+        created:function(){
+    	},
+    	mounted:function(){
+    	},
+        methods:{
+    	}
+    });
+</script>
+</html>

@@ -1,0 +1,50 @@
+<link href="<?=$WWW_RES?>/sui/css/sui-append.min.css" rel="stylesheet">
+<div class="dr-container">
+    <form id="form-novel" class="sui-form form-horizontal" novalidate="novalidate " action="/hcadmin/novel/editPost/<?=$novel['novel_id']?>">
+        <div class="control-group "> <h2 style="text-align: center">编辑 <?=$novel['novel']?></h2></div>
+        <div class="control-group ">
+            <label class="control-label "  >书名：</label>
+            <div class="controls">
+                <input  name="novel"  data-empty-msg="请填写描述" placeholder="请填写描述" value="<?=$novel['novel']?>" class="input-xxlarge" />
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label for="inputNick" class="control-label v-top hide-min">内容形式：</label>
+            <div class="controls">
+                <?php foreach ($ct_arr as $k=>$v): ?>
+                    <label data-toggle="radio" class="radio-pretty inline <?php if($k==$novel['is_shuan']): ?> checked<?php endif; ?>">
+                        <input type="radio" <?php if($k==$novel['is_shuan']): ?>checked="checked"<?php  endif; ?> name="is_shuan" value="<?=$k?>"><span><?=$v?></span>
+                    </label>
+                <?php endforeach;  ?>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label v-top hide-min">有声音频：</label>
+            <div class="controls">
+                <?php foreach ($yin as $k=>$v): ?>
+                <label data-toggle="radio" class="radio-pretty inline <?php if($k==$novel['is_yin']):?> checked<?php endif; ?>">
+                    <input type="radio" <?php if($k==$novel['is_shuan']):?>checked="checked"<?php endif; ?> name="is_yin" value="<?=$k?>"><span><?=$v?></span>
+                </label>
+                <?php endforeach; ?>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label v-top hide-min"> </label>
+            <div class="controls">
+                <button type="submit" class="sui-btn btn-primary btn-xlarge">修改</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+
+<script>
+
+    $(function () {
+        DR.ajaxAndValidate( 'form-novel');
+    })
+</script>

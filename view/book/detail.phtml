@@ -1,0 +1,258 @@
+<?php if($is_show):?>  <link href="<?=$_cdn?><?=$WWW_RES?>/sui/css/sui-append.min.css" rel="stylesheet"><?php endif;?>
+<div class="dr-container">
+    <div class="dr-box-padding flexbox" id="book-detail">
+        <div class="book-detail-img dr-box-hover"><img src="<?=H($book['book_img'])?>"></div>
+        <div class="flex">
+            <div class="dr-box-title ">
+                <div class="flexbox">
+                    <div class="flex " >
+                        <h3 style="margin: 0">
+                            <?php if($book['type']==-2): ?><span class="sui-label label-danger">已下架</span><?php endif; ?>
+                            <?php if($book['type']==-1): ?><span class="sui-label label-danger">已归档</span><?php endif; ?>
+                            <?=$book['book']?>
+                        </h3>
+                    </div>
+                    <div>
+                        <?php if( $book['school']!='好策'):?>
+                        <a href="<?=R('book/download/'. $book['book_id'])?>" class="sui-btn btn-bordered  btn-primary"  data-step="2" data-intro="第二步：好策能提供部分电子文档下载，如果条件允许请同学购买纸质书刊！"  data-position="left" >下载</a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+            </div>
+            <div class="des dr-box-content">
+
+
+                <div class="flexbox ">
+                    <div  title="作者" style="margin-right: 10px;" ><i class="sui-icon icon-tb-my"></i> <?=$book['book_writer']?> </div>
+                    <div class="flex" title="成员"><i class="sui-icon icon-tb-friendadd"></i> <?=$book['user_cnt']?>人 </div>
+                    <div class="flex" title="讨论"><i class="sui-icon icon-tb-message"></i> <?=$book['discuss_cnt']?></div>
+                    <div class="flex" title="字词数"><i class="iconfont icon-shuzi"></i> <?=$book['book_word_cnt']>0?$book['book_word_cnt']:'-'?>词</div>
+                    <div class="flex" title="页数"><i class="iconfont icon-yeshu"></i> <?=$book['book_page']>0?$book['book_page']:'-'?>页</div>
+                    <!-- <div class="flex dr-book-rate-w" title="难度"> 难度:<div class="dr-book-rate rate-5" title="语言难度" ></div></div>-->
+
+                    <?php if($book['book_plan']):?>
+                    <div  id="detail-tab">
+                       <ul class="sui-nav nav-tabs tab-navbar tab-light "  >
+                          <li class="<?=$book['book_plan']?'':'active'?>" data-ctrl="book_info"><a href="javascript:;">简介</a></li>
+                           <?php if($book['book_plan']):?>
+                          <li class="<?=$book['book_plan']?'active':''?>" data-ctrl="book_play"><a href="javascript:;">导读</a></li>
+                           <?php else:?>
+                           <!-- <li class="<?=$book['book_plan']?'active':''?>" data-ctrl="book_play"><a href="javascript:;" title="任务说明">任务</a></li>-->
+                           <?php endif;?>
+                        </ul>
+                    </div>
+                    <?php endif;?>
+
+                </div>
+
+
+                <div class="overview"  >
+                    <div id="book_info" class="dr-ctrl">
+                        <?=Hnl2br($book['book_info'])?>
+                    </div>
+                    <div id="book_play" class="dr-ctrl">
+                        <?php
+                        //$book['book_daodu']
+                        ?>
+                        <?=$book['book_plan']?nl2br($book['book_plan']):'' ?>
+                    </div>
+                </div>
+                <div class="more">
+                    <div class="more-float"> </div>
+                    <a href="javascript:;" class="overview-more">显示全部>></a>
+                    <div class="more-div">
+                        <?php  if($bookJoin): ?>
+                            <button  class="sui-btn  btn-info" data-bookid="<?=$book['book_id']?>" title="已经选好了，快读书做任务吧"> 已加入</button>
+                        <?php  elseif($_GET['no_limit']): ?>
+                            <button  class="sui-btn  btn-danger addbook"  data-bookid="<?=$book['book_id']?>" data-no-limit="1"> +补加</button>
+                        <?php  else: ?>
+                            <button  class="sui-btn  btn-danger addbook"  data-bookid="<?=$book['book_id']?>" title="我也要读这本书"  data-step="1" data-intro="<b>读书向导<br>第一步：选一本书加入"> +加入</button>
+                        <?php endif;  ?>
+                        <?php if( $book['user_id']==$_cu['uid']): ?>
+                            <a href="<?=R('book/book/mform/'.$book['book_id'])?>" class="sui-btn btn-bordered   btn-primary" title="修改本书的各项内容">编辑</a>
+                        <?php endif;?>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div  class="sp-v2"  >
+        <div class="sp6">
+            <div class="dr-box-padding" >
+                <div class="dr-box-header flexbox">
+                    <?php ob_start(); $icount=0;  foreach ( $tags as $k=>$v): ?>
+                        <?php if( $k<=0 || $book['tag_'.$k.'_config']): $icount++;  ?>
+                            <li class="<?php  if( $k==$p[2] && $p[3]==0): ?>active<?php endif ?>"><a href="<?=R('book/detail/'.$book['book_id'].'/'.$p[1].'/'.$k.'/0' )?>"><i class="sui-icon <?=$v['cl']?>"></i> <?=$v['n']?></a></li>
+                        <?php   endif; ?>
+                    <?php endforeach; $out2 = ob_get_contents();   ob_end_clean();  ?>
+                    <ul class="flex flexbox book-header " data-step="3"  data-intro="第三步：这里是任务区，读书完成后必须完成<b class='sui-text-danger'><?=$icount?>项任务</b>！">
+                        <?=$out2?>
+                    </ul>
+                    <div>
+                        <div  style="padding-top: 3px;"><a href="<?=R('book/detail/'.$book['book_id'].'/'.$p[1].'/'.$p[2].'/1' )?>">  精华</a> </div>
+                    </div>
+                </div>
+
+                <div class="dr-box-content">
+                    <?php if( 3==$tag_id ):?> <?php include "op_topic_3.phtml"; ?>
+                    <?php elseif( $tag_id==4|| $tag_id==5 || $tag_id==6):?>     <?php include "op_topic_4.phtml"; ?>
+
+                    <?php else:?>     <?php include "op_topic.phtml"; ?>
+                    <?php endif; ?>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="sp3">
+
+            <?php if($book_admin): ?>
+                <div class="dr-box-padding">
+                    <div class="dr-box-title">指导教师</div>
+                    <div class="dr-box-content book-admin">
+                        <?php   foreach( $book_admin  as $bk ): ?>
+                            <a class="book-admin-item" href="<?=R('book/user/'.$bk['user_id'] )?>">
+                                <div class="head"><img src="<?=H($user[$bk['user_id']]['head'])?>"></div>
+                                <?=$user[$bk['user_id']]['name']?>
+                            </a>
+                        <?php endforeach;?>
+                    </div>
+                </div>
+            <?php else: ?>
+            <div class="dr-box-padding">
+                <div class="dr-box-title">指导教师</div>
+                <a class="book-create" href="<?=R('book/user/'.$book['user_id'])?>">
+                    <div class="head-large"><img src="<?=H($user[$book['user_id']]['head'])?>"></div>
+                    <div href=""><?=$user[$book['user_id']]['name']?></div>
+                </a>
+            </div>
+            <?php endif; ?>
+            <?php  if($bookJoin && $progress): ?>
+            <div class="dr-box-padding">
+                <div class="dr-box-title">任务进度</div>
+                <div class="dr-box-content dr-progress">
+                    <?php
+                    $i=0; $clname = ['',' progress-danger','progress-success','progress-info','progress-warning'];
+                    foreach ( $progress as $k=>$v):    ?>
+                    <a class="sui-progress progress-small <?=$clname[$i++%4]?>" href="<?=R('book/detail/'.$book['book_id'].'/'.$p[1].'/'.$v['tag_id'].'/0' )?>">
+                        <div style="width: <?=$v['progress']?>%;" class="bar"></div>
+                        <div class="bar-text"><?=$v['n']?></div>
+                    </a>
+                    <?php endforeach;?>
+                </div>
+            </div>
+            <?php endif;?>
+
+            <?php if( $bookJoin && !$_is_teacher):?>
+                <div class="dr-box-padding">
+                    <div class="dr-box-title">
+                        <div class="flexbox">
+                            <div class="flex">加入情况</div>
+                            <a  title="点击我可以修改班级"  class="addbook" data-bookid="<?=$book['book_id']?>" data-readd="1"><span class="sui-text-info" style="font-size: 13px;">修改班级</span></a>
+                        </div>
+
+                    </div>
+                    <div class="dr-box-content dr-box-ul">
+                        <a  >时间：<?=date("Y-m-d H:i",$bookJoin['ctime'])?></a>
+                        <a  >班级：<?php if($bookJoin['class_id']<=0):?>未入班级 <?php else:?><?=$class_info['class']['class']?><?php endif;?> </a>
+                        <?php if($class_info):?>
+                        <a  >学号：<?=$class_info['stu']['number']?></a>
+                        <a  >姓名：<?=$class_info['stu']['name']?></a>
+
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php endif;?>
+
+            <?php if( isset($task_class_cnt) && ( $task_class_cnt>0|| $book['user_cnt']>0 ) ):?>
+            <div class="dr-box-padding">
+                <div class="dr-box-content book-admin">
+                    <a class="book-admin-item" href="<?=R('book/bookOther/classList/'.$book['book_id'])?>" target="_blank">
+                        <div class="book-number"><?=$task_class_cnt?></div>
+                        班级总数
+                    </a>
+                    <a class="book-admin-item"  href="<?=R('book/bookOther/user/'.$book['book_id'])?>" target="_blank">
+                        <div class="book-number"><?=$book['user_cnt']?></div>
+                        人数
+                    </a>
+                    <!--
+                    <a class="book-admin-item">
+                        <div class="book-number">6</div>
+                        我的班级
+                    </a>
+                    -->
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <?php if($book_hot): ?>
+            <div class="dr-box-padding">
+                <div class="dr-box-title">排行榜</div>
+                <div class="book-pm-user">
+                    <?php   foreach( $book_hot  as $k=> $bk ): ?>
+                    <div class="book-pm-user-item flexbox">
+                        <span class="sui-text-large <?php if($k<3): ?> color<?=$k+1?><?php else:?> color<?php endif; ?>"><?=$k+1?></span>
+                        <div class="head-small"><img src="<?=H($user[$bk['user_id']]['head'])?>"></div>
+                        <a class="flex" href="<?=R('book/user/'.$bk['user_id'] )?>">
+                            <div class="sui-text-large"><?=$user[$bk['user_id']]['name']?></div>
+                            <div>主题<?=$bk['topic_cnt']?>，回帖<?=$bk['comment_cnt']?></div>
+                        </a>
+                    </div>
+                    <?php endforeach;?>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <?php include  tplFile("book/i_add.phtml"); ?>
+
+
+
+        </div>
+    </div>
+</div>
+<?php include "op_select_class.phtml" ;?>
+
+
+
+
+<script>
+    var drifame= false;
+    $(function () {
+        //$('.book-new-add').click(BOOK.iframe);
+        $('.addbook').click(BOOK.addBook);
+        $('.overview-more').click(function () {
+            var d2 = dialog({
+                title: '详情',
+                content: '<div style="max-width: 600px;">' + $('#book-detail .overview').html() + '</div>'
+                //width:600, //height:500
+                , quickClose: true
+            });
+            d2.showModal();
+        });
+
+        $('.topic-good').click( BOOK.good   );
+        $('.topic-bao').click( BOOK.juBao   );
+        $('.ajax-url').click( BOOK.ajaxUrl    );
+
+        var ui={
+            tab: $('#detail-tab li'),
+            tab_ctrl: $('.overview .dr-ctrl')
+        }
+        ui.tab.click(function () {
+            var that = $(this);
+            ui.tab_ctrl.hide();
+            ui.tab.removeClass('active');
+            $('#'+ that.data('ctrl') ).slideDown();
+            that.addClass( 'active' );
+        });
+        $('#detail-tab .active').click();
+        <?php if($is_show):?>   $.introJs().start(); <?php endif; ?>
+    });
+
+
+</script>
+
+

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <title><?=($site_title?$site_title :'群富')?></title>
+
+    <link href="<?=$_cdn?><?=$WWW_RES?>/sui/css/sui.min.css" rel="stylesheet">
+    <!--<link href="<?=$WWW_RES?>/js/art/dialog.css" rel="stylesheet">
+    -->
+    <link href="<?=$_cdn?><?=$WWW_RES?>/css/dr.css?d=2018092801" rel="stylesheet">
+    <script type="text/javascript" src="<?=$_cdn?>/res/js/jquery.min.js"></script>
+    <script type="text/javascript" src="<?=$_cdn?>/res/js/vue.min.js"></script>
+    <script type="text/javascript" src="<?=$_cdn?>/res/sui/js/sui.min.js"></script>
+    <script type="text/javascript" src="<?=$_cdn?>/res//js/dr.js?d=2018091201"></script>
+    <script type="text/javascript" src="<?=$_cdn?>/res//js/art/dialog.js"></script>
+    <style>
+        body{margin: 0 auto;padding: 0; }
+        .slide-fade-enter-active {
+            transition: all .3s ease;
+        }
+        .slide-fade-leave-active {
+            transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+        }
+        .slide-fade-enter, .slide-fade-leave-to{
+            transform: translateX(300px);
+            opacity: 0;
+        }
+    </style>
+</head>
+<body style="background-color: #e8ecf0">
+<bobo>
+<div class="ad-head2">
+    <div class="flexbox">
+        <div class="flex"><span class="logo-txt"  >
+                <?=$_cu['name']?>(商户号：<?=$_cu['mc_id']?>)
+                <?php if($sv['pay']):?>
+                <span class="sui-dropdown" ><span class="dropdown-inner">
+                    <a role="button" data-toggle="dropdown" href="javascript:void(0);" class="dropdown-toggle"  >{{sv.pay[sv.pay_type]}} <i class="caret"></i></a>
+                    <ul role="menu" aria-labelledby="drop1" class="sui-dropdown-menu">
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" @click="changPayType(k)" v-for="(v,k) in sv.pay" v-html="v"></a></li>
+                    </ul>
+                    </span>
+                </span>
+                <?php endif;?>
+
+            </span>
+        </div>
+        <div class="ad-head-link">
+            <span  >欢迎<?=$_cu['name']?>回来</span><i>|</i>
+            <a href="<?=R('logout')?>">登出</a>
+        </div>
+    </div>
+    <div  class="menu-icon"><i class="sui-icon icon-pc-list" @click="st.is_min_tab= !st.is_min_tab"></i></div>
+</div>
+
+<ul class="ad-head-menu" :class="{'ad-tab':st.is_min_tab}">
+
+    <li><a  href="javascript:;" data-url="<?=R('merchant/mc/tj' )?>"  > <i class="sui-icon icon-tb-similar"></i> <span  >概况</span></a></li>
+    <li><a  href="javascript:;" data-url="<?=R('merchant/bill/today' )?>"  > <i class="sui-icon icon-tb-refund"></i> <span  >订单明细</span></a></li>
+
+
+    <li> <a  href="javascript:;" data-url="<?=R('merchant/xia')?>"  > <i class="sui-icon icon-tb-comment"></i> <span >提现下发</span></a></li>
+
+
+    <li> <a  href="javascript:;" data-url="<?=R('merchant/day')?>"  > <i class="sui-icon icon-tb-comment"></i> <span >按日结算</span></a></li>
+
+    <li >
+        <a class="menu-one" href="javascript:;"><i class="sui-icon icon-tb-settings"></i> <span >设置</span></a>
+        <ul class="leafmenu">
+            <li> <a  href="javascript:;" data-url="<?=R('merchant/tool')?>"  >小工具</a></li>
+            <li> <a  href="javascript:;" data-url="<?=R('member/changPsw')?>"  >修改密码</a></li>
+            <li> <a  href="javascript:;" data-url="<?=R('member/google')?>"  >谷歌验证码</a></li>
+            <li> <a  href="javascript:;" data-url="<?=R('member/log')?>"  >登录日志</a></li>
+        </ul>
+    </li>
+
+    <li v-if="st.is_min_tab"> <a  href="<?=R('logout')?>"><i class="sui-icon icon-tb-refresh"></i> <span>登出</span></a></li>
+
+
+
+
+
+</ul>
+<div class="ad-head-top">
+  <span>菜单名称</span>
+</div>
+<div class="ad-head-iframe" style=" -webkit-overflow-scrolling: touch;   " >
+    <iframe src="<?=R('merchant/mc/tj' )?>" style="width: 100%; height: 100%;border: 0px; overflow:auto " id="ad-iframe"></iframe>
+</div>
+
+<?php
+include "footer.phtml";
+?>
+
+    <transition name="slide-fade">
+        <div v-if="st.if_url!=''" style="background-color:#FFFFFF;overflow: hidden;bottom: 0;right: 0;width: 450px;top:61px;position: absolute;z-index: 20; box-shadow :-1px 0px 1px #666 ">
+            <iframe :src="st.if_url" style="width: 100%; height: 100%;border: 0px; overflow:auto "  ></iframe>
+            <div style="z-index: 21; border-radius:0 0  0  50%; top: -50px; position: absolute;
+        width: 100px; height: 100px; background-color:rgba(0,0,0,0.3);right: -50px;" @click="st.if_url=''"></div>
+            <div style="z-index: 22; cursor: pointer;position: absolute; right: 5px; top:5px; "  @click="st.if_url=''"> <i class="sui-icon icon-tb-close" style="font-size: 30px;color: #fff"></i></div>
+        </div>
+    </transition>
+</bobo>
+
+</body>
+
+<script>
+    $(function () {
+        var ui={
+            iframe:$('#ad-iframe')
+            ,a: $('.ad-head-menu a')
+            ,menu: $('.menu-one')
+        };
+        ui.a.click(function () {
+
+            vm.st.is_min_tab= true;
+            setTimeout(function () {
+                vm.st.is_min_tab= false;
+            },2000)
+            var that = $(this);
+            var url = that.data('url');
+            if( 'undefined'== typeof  url ) return false ;
+            ui.iframe.attr('src', url );
+            ui.a.removeClass('select' );
+            that.addClass('select');
+
+            return false ;
+            //alert( url );
+        });
+        ui.menu.click(function () {
+            var that = $(this);
+            var pli = that.parents( 'li');
+            var clname = pli.attr('class');
+
+            if('undefined' != typeof  clname && clname.indexOf( 'ad-head-open')>=0) pli.removeClass( 'ad-head-open');
+            else pli.addClass( 'ad-head-open');
+        });
+    });
+
+
+var vm= new Vue({
+        el: 'bobo',
+        data: {
+            st:{is_min_tab:false, is_click:false ,if_url:''}
+            ,sv:<?=json_encode($sv)?>
+        }
+        ,
+        created: function () {
+        },
+        mounted: function () {
+        },
+        methods: {
+            changPayType:function (k) {
+                //this.sv.pay_type= k;
+                var that = this;
+                var obj= $('#ad-iframe');
+                var url=  obj.attr('src');
+                var conf={
+                    url:url,
+                    isChang:true
+                }
+                //var isChang= arguments.length>1? arguments[1]:true;
+                if(arguments.length>1) $.extend(conf,arguments[1]);
+
+                DR.ajax('merchant/tool/payType/'+ k ,{ },{
+                    success:function (rep) {
+                        console.log( rep );
+                        that.sv.pay_type= k;
+                        if(!conf.isChang) return ;
+                        obj.attr('src', conf.url ); //+'?t='+Math.random()
+                    }
+                });
+
+            }
+        }
+    });
+
+
+    window.goo2=function (obj) {
+        vm.st.if_url=  obj.url ;
+        //hvm.st.fee= str;
+    }
+    window.goPayType=function (obj) {
+        vm.changPayType(obj.t,false);
+    }
+</script>
+
+</html>
+
+
+

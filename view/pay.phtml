@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>支付</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <style type="text/css">
+        body{ margin: 0 auto; background-color: #f7f7f7}
+        .dui-content{ max-width: 600px; margin: 0 auto; }
+        .dui-header{ height:  50px;  background-color: #fff ;    border-bottom: 1px solid #ddd; line-height: 50px ; font-size: larger; text-align: center;
+            overflow: hidden; color: #333;     white-space: nowrap;            text-overflow: ellipsis; }
+        .dui-main{ border:  1px solid #efefef; border-top: 0; background-color: #fff; min-height: 200px; margin-top: 27px;  border-bottom: 1px solid #ddd; }
+        .dui-relative{ position: relative; width: 100%;   }
+        .dui-wave{ height: 7px;  background: url("/res/img/wave.png") repeat-x; top: -6px; line-height: 0;font-size: 0;position: absolute;z-index: 2;width: 100%; }
+        .dui-qr{ padding: 20px; text-align: center; padding-top: 30px;}
+        .dui-qr-msg{ text-align: center; padding-bottom: 20px;  color: #666 }
+        .dui-qr-tips{ border-top: 1px dashed #e5e5e5 ; padding: 10px; font-size: 13px; text-align: center ;color: #666 }
+    </style>
+</head>
+
+<body>
+    <div class="dui-content" id="dui-qr-pay">
+        <div  style="display: none" :style="{'display': 'block'}">
+            <div class="dui-header"  v-if="er.error>0">矮油，发现错误！</div>
+            <div class="dui-header" v-html="post.goods_name" v-else> </div>
+            <div class="dui-main">
+                <div class="dui-relative">
+                    <div class="dui-wave"></div>
+                </div>
+                <template v-if="post.format=='app'">
+                    <div style="text-align: center;padding-top: 70px; color: red ; font-size: larger"  v-if="er.error>0" v-html="er.error_des"></div>
+                    <div style="text-align: center;padding-top: 80px; "  v-else>Loading...</div>
+                </template>
+                <div v-else>
+                    <div v-if="er.error==2018081122" style="padding-top: 50px;"></div>
+                    <div class="dui-qr" v-else>
+                        <img src="/res/img/error.png" style="width: 210px; height: 210px;" v-if="er.error>0 ">
+                        <img src="/res/img/shi.jpg" style="width: 210px; height: 210px;" v-else-if=" qr.timeLimit<=0">
+                        <div class="dui-relative" style="height:210px " v-else>
+                            <div id="qrcode" style="position: absolute;top:0;left: 50%;margin-left: -105px"></div>
+                        </div>
+                    </div>
+
+                    <div class="dui-qr-msg"  v-if="er.error>0" v-html="er.error_des"></div>
+                    <template v-else>
+                    <div class="dui-qr-msg"   >支付<b v-html="qr.price" style="color: orangered"></b>元</div>
+                    <div class="dui-qr-tips" v-if="st.is_fu" style="color: green">支付成功！</div>
+                    <div class="dui-qr-tips" v-else-if="qr.timeLimit>0">请使用支付宝扫一扫支付 <b v-html="qr.timeLimit" style="color: #333"></b>秒后过期</div>
+                    <div class="dui-qr-tips" v-else style="color: red">已经过期</div>
+                    </template>
+                </div>
+            </div>
+            <form  method="post" :action="post.return_url" v-if="st.is_fu">
+                <input :name="k" type="hidden" :value="v"  v-for="(v,k) in reData"/>
+                <input type="submit" id="goto" style="display:none">
+            </form>
+        </div>
+        <div style="padding: 50px; text-align: center" :style="{'display': 'none'}">正在载入...</div>
+    </div>
+</body>
+<script src="/res/js/vue.min.js"></script>
+<script src="/res/js/qrcode.ajax.min.js"></script>
+<script>
+    new Vue({
+        el: '#dui-qr-pay',
+        data: {
+            st:{ timer:null  ,is_fu:false},
+            post:<?=json_encode($_POST)?>,
+            qr:<?=json_encode($qr_var)?>,er:<?=json_encode($error)?>,reData:{}
+
+        }
+        ,
+        created: function () {
+        },
+        mounted: function () {
+            if( this.er.error==0){
+                if(this.post.format=='app'){
+                    location.href = this.qr.qr_url;
+                    return ;
+                }
+                this.qrCode('qrcode');
+                if( this.qr.timeLimit>0 ){
+                    this.st.timer = setInterval( this.timeGo, 1000);
+                }
+            }
+        },
+        methods: {
+
+            qrCode:function (id) {
+                var that = this;
+                //console.log( location );
+                var qrcode = new QRCode(document.getElementById( id), {
+                    text: that.qr.qr_url //location.origin  + that.qr.url
+                    ,width: 210,
+                    height: 210,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+            }
+            ,timeGo:function () {
+                this.qr.timeLimit--;
+                console.log(   this.qr.timeLimit );
+                if(  this.qr.timeLimit<-30 ) clearInterval( this.st.timer );
+                this.checkPay();
+                
+            }
+            ,checkPay:function () {
+                var that = this;
+                ajax({
+                    type:"post",
+                    url:"/api/checkPay/"+this.qr.mc_id+"/"+ this.qr.trade_no , //添加自己的接口链接
+                    timeOut:5000,
+                    before:function(){
+                        console.log("before");
+                    },
+                    success:function(str){
+                        //var obj = JSON.parse( str );
+                        eval("var obj="+ str +";")
+                        console.log(obj);
+                        if( obj.data.is_fu ){
+                            clearInterval(   that.st.timer);
+                            that.reData = obj.data.reData;
+                            that.st.is_fu = true;
+                            setTimeout(that.submitReturn, 800);
+                        }
+                    },
+                    error:function(){
+                        console.log("error");
+                    }
+                });
+            }
+            ,submitReturn:function () {
+                var obj= document.getElementById('goto');
+                obj.click();
+            }
+            ,isMobile:function () {
+                var ua = navigator.userAgent;
+                var ipad = ua.match(/(iPad).*OS\s([\d_]+)/);
+                var isIphone =!ipad && ua.match(/(iPhone\sOS)\s([\d_]+)/);
+                var isAndroid = ua.match(/(Android)\s+([\d.]+)/);
+                var isMobile = isIphone || isAndroid;
+                return isMobile;
+            }
+        }
+    });
+</script>
+</html>

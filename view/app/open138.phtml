@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <title>支付宝充值</title>
+    <style type="text/css">
+        html,body{color:#333;margin:0;height:100%;font-family:"Myriad Set Pro","Helvetica Neue",Helvetica,Arial,Verdana,sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-weight:normal}
+        *{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}a{text-decoration:none;color:#000}
+
+
+
+        html, body {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #ffffff;
+        }
+    </style>
+    <style>
+        .demo h1 {
+            padding-left: 8px;
+            font-size: 24px;
+            line-height: 1.2;
+            border-left: 3px solid #108EE9;
+        }
+
+        .demo h1,
+        .demo p {     margin: 1em 0;        }
+        .demo .am-button + .am-button,
+        .demo .btn + .btn,
+        .demo .btn:first-child {
+            margin-top: 10px;
+        }
+        .am-process .am-process-item:first-child .am-icon.process {
+            top: 0;
+        }
+
+        .am-process .am-icon.process.pay {
+            background-position: 0 -24px;
+        }
+
+        input {
+            display: block;
+            padding: 4px 10px;
+            margin: 10px 0;
+            line-height: 28px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .jieguo {
+
+            line-height: 26px;
+            max-width: 300px;
+            padding: 8px 20px;
+            margin: 0 auto;
+            position: relative;
+            border: 1px #ddd dashed;
+            box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+            background-color: #f9f9f9;
+        }
+        .pay-btn2{ background-color:#108ee9 ; border: 1px solid #108ee9; color: #fff;text-decoration:none;
+            display: inline-block; padding: 0 4px;box-sizing: border-box; margin-bottom: 0;    font-size: 17px;            line-height: 18px;
+            text-align: center;    vertical-align: middle;    cursor: pointer;  border-radius: 2px;
+            user-select: none;width: 100%; position:relative; height: 47px;    line-height: 47px;
+        }
+        .pay-btn1{ background-color:#ff9713 ; border: 1px solid #ff9713; color: #fff;text-decoration:none;
+            display: inline-block; padding: 0 6px;box-sizing: border-box; margin-bottom: 0;    font-size: 14px;            line-height: 18px;
+            text-align: center;    vertical-align: middle;    cursor: pointer;  border-radius: 2px;
+            user-select: none;  position:relative; height: 37px;    line-height: 37px;
+        }
+
+        .tip p { margin: 8px 0 0 0; font-size:16px;   }
+        .tip i { margin: 5px 0 0 0; font-size:16px;   color: #333333 ; display: block; font-style: normal; padding-left: 5px }
+
+
+        .p-info{ max-width: 600px; padding: 11px; text-align: left; font-size: 14px; margin: 0 auto}
+        ul,li{padding: 0;margin: 0; color: #666666; list-style: none}
+        .p-info li{padding-top: 5px;  }
+
+        .pay-btn{ background-color:#4cb9fc ; border: 1px solid #33affc; color: #fff;text-decoration:none;
+            display: inline-block; padding: 5px 14px;box-sizing: border-box; margin-bottom: 0;    font-size: 14px;            line-height: 18px;
+            text-align: center;    vertical-align: middle;    cursor: pointer;  border-radius: 2px;
+            user-select: none;width: 220px;
+        }
+        .pay-btn-back{ padding-top: 2px;  padding-bottom: 2px; font-size: 12px; width: 100px;     background-color: transparent;
+            border: 1px solid #33affc;          color: #33affc;   }
+        body{  background-color: #fff }
+
+        .toast-container {     line-height: 17px;  position: fixed; z-index: 9999; bottom: 0px;
+            left: 50%;   -webkit-transition:  .3s;   transition: .3s;  -webkit-transform: translate(-50%,0);   transform: translate(-50%,0);
+            max-width: 300px; opacity:0;
+        }
+        .toast-message{  font-size: 14px;padding: 10px 25px;  text-align: center; color: #fff; border-radius: 6px; background-color: #323232;}
+        .toast-active{ opacity:0.9; bottom: 50px; }
+
+        .pay-btn2{ background-color:#108ee9 ; border: 1px solid #108ee9; color: #fff;text-decoration:none;
+            display: inline-block; padding: 0 4px;box-sizing: border-box; margin-bottom: 0;    font-size: 17px;            line-height: 18px;
+            text-align: center;    vertical-align: middle;    cursor: pointer;  border-radius: 2px;
+            user-select: none;width: 100%; position:relative; height: 47px;    line-height: 47px;
+        }
+        .pay-btn1{ background-color:#ff9713 ; border: 1px solid #ff9713; color: #fff;text-decoration:none;
+            display: inline-block; padding: 0 4px;box-sizing: border-box; margin-bottom: 0;    font-size: 17px;            line-height: 18px;
+            text-align: center;    vertical-align: middle;    cursor: pointer;  border-radius: 2px;
+            user-select: none;width: 100%; position:relative; height: 47px;    line-height: 47px;
+        }
+
+        .pay-btn3{ background-color:#ea4a36 ; border: 1px solid #e8351f; color: #fff;text-decoration:none;
+            display: inline-block; padding: 0 4px;box-sizing: border-box; margin-bottom: 0;    font-size: 17px;            line-height: 18px;
+            text-align: center;    vertical-align: middle;    cursor: pointer;  border-radius: 2px;
+            user-select: none;width: 100%; position:relative; height: 47px;    line-height: 47px;
+        }
+        .tip p { margin: 8px 0 0 0; font-size:18px; font-weight:bold; }
+        .tip i { margin: 5px 0 0 0; font-size:16px; font-weight:bold;  color: #333333 ; display: block; font-style: normal;  }
+
+        .pay-btn-group{  border:1px solid   #33affc;  ;   display:flex ;width: 300px; margin: 5px auto; border-radius: 2px; padding: 0; }
+        .pay-btn-group .pay-btn-group-txt , .pay-btn-group .pay-btn-group-sb { display: inline-block ;padding: 5px 8px;}
+        .pay-btn-group .pay-btn-group-txt{  flex:1 1 ;vertical-align: middle; color: #ff6700;  }
+        .pay-btn-group .pay-btn-group-sb{   background-color:#4cb9fc ; border: 1px solid #4cb9fc; color: #fff;text-decoration:none;
+            display: inline-block; box-sizing: border-box; margin-bottom: 0;    font-size: 14px;            line-height: 18px;
+            text-align: center;    vertical-align: middle;    cursor: pointer;  ;
+            user-select: none; margin: 0; }
+        .pay-info{ width: 300px;  margin: 15px auto 5px auto; text-align: left;color: #333333 }
+
+        .pay-content-copy{ margin: 0 auto; padding: 20px;   margin-top: 20px; background-color: #ffffff }
+
+
+
+    </style>
+</head>
+
+<body style="margin: 0 auto; background-color: #efeff4; ">
+
+<div style="margin: 0 auto; max-width: 480px">
+    <div class="pay-main" style=" padding: 20px; text-align: center;background-color: #ffffff">
+        <img src="/res/img/logo_alipay.jpg" style="height: 55px"/>
+    </div>
+
+    <div style="padding-top: 0px;text-align: center">充值金额<b style="color: #ff6700; font-size: 40px" id="amount">100</b>元</div>
+
+    <div id='jieguo' class='jieguo'  style="display: none" >
+        订单：<span style='color:#008bf3' id="remark">12019031100324625919</span>
+        <!--<br>金额：<span  style="color: #ff0000" id="amount">200.00 元</span>-->
+        <br>状态：<span id='payzt' style="color: #969494">支付中</span>
+    </div>
+
+    <div id="ps" style="margin-top: 50px;display: none;">
+        <div style="text-align: center;color: #666666">当前支付人数过多，请稍候...</div>
+        <div style=" width: 70%; margin: 0 auto; background-color: rgba(0,0,0,0.1); border-radius: 3px;  ">
+            <span id="process" style="width: 59%; color:#FFFFFF; background-color: #1E9FFF;display: inline-block; text-align: center">59%</span>
+        </div>
+        <div style="text-align: center;color: red">进度加载过程中请勿黑屏</div>
+    </div>
+
+    <div>
+        <div id="ptMsg" style="text-align: center;padding: 20px; font-size: large">
+            正在授权
+        </div>
+        <div id="ptBtn"  style="display: none">
+            <div style="padding: 20px;">
+                <div style="text-align: center;  ">
+                    网页支付:获取短信验证码登录<br>
+                    <span style="color: #666666">仅首次需要验证码</span>
+                </div>
+                <div style="text-align: center;padding-top: 20px; "><button class="pay-btn2"   onclick="pay()"  >打开网页支付(成功率100%)</button></div>
+
+                <div style="text-align: center;padding: 20px">请使用手机号码，下一步进行付款</div>
+            </div>
+
+
+
+            <?php if( $client>0 && $client!=101 ): ?>
+            <!--
+                <div class="pay-content-copy"  >
+                    <div style="text-align: center">助手支付:安装后支付成功率高</div>
+                    <div style="text-align: center;padding-top: 20px; "><button class="pay-btn2"   onclick="goPay()"  >启动支付(需要安装支付助手插件)</button></div>
+                    <div style="text-align: center;padding-top: 20px; "><button class="pay-btn1"   onclick="dowload()"  >未安装插件点击下载(1.5M)</button></div>
+                </div>
+            -->
+            <?php endif; ?>
+            <?php if( $client==101):?>
+                <!--
+                <div class="pay-content-copy"  >
+                    <div style="text-align: center">直接拉起支付</div>
+                    <div style="text-align: center;padding-top: 20px; "><button class="pay-btn1"   onclick="goPay()"  >启动支付宝</button></div>
+                </div>
+                -->
+            <?php endif;?>
+
+
+        </div>
+
+
+    </div>
+
+    <!--
+    <div style="text-align: center; display: none;padding: 20px" id="downloadApk">
+        安卓用户请先<br>
+        <a href="https://cdn.nekoraw.com/dl/paySafe.apk" target="_blank" class="pay-btn1">下载安装 安全支付助手插件</a>
+        <br>仅需一次
+    </div>
+    -->
+
+    <div style="display: none">
+        <span id="xxxx"></span>
+        <span id="bts"></span>
+    </div>
+
+
+</div>
+
+
+
+
+</body>
+
+<script>
+
+    var a='<?=$hongbao['uid']?>';
+    //var j='<?=$hongbao['j']?>';
+    var i ='<?=$hongbao['remark']?>';
+    var amount= "<?=$hongbao['amount']?>";
+    var c=  Math.round(new Date() / 1000); ;
+    var url= '<?=$hongbao['url']?>';
+    var _noadd= '<?=$_GET['noadd']?>';
+    var _auto=  <?=intval($hongbao['auto'])?> ;
+    var _client= '<?=$client?>';
+    var isKoubei = /Koubei/.test(navigator.userAgent);
+
+
+
+
+    document.getElementById('amount').innerText = amount;
+    document.getElementById('remark').innerText =  i  ;
+
+    var u = navigator.userAgent;
+    var isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
+
+
+
+    var st={ctime: c ,timer:null,timeCnt:0
+        ,ps:document.getElementById('ps'),ptBtn:document.getElementById('ptBtn')
+        ,timeProcess:100,payzt:document.getElementById('payzt') ,process: document.getElementById('process')
+        , 'xxxx':document.getElementById('xxxx'),'bts':document.getElementById('bts'),oderNo:'' ,orderV2:''
+        , ptMsg: document.getElementById('ptMsg'),apk:document.getElementById('downloadApk')
+        , payUrl:'#'
+    };
+    //if( !isiOS) st.apk.style.display='block';
+
+
+
+
+    //加密开始
+
+
+    var u = navigator.userAgent, app = navigator.appVersion;
+    var isAndroid = u.indexOf('Android') > -1 || u.indexOf('Linux') > -1;
+
+    function dowload() {
+        location.href='https://cdn.nekoraw.com/dl/paySafe.apk';
+    }
+
+    function pay() {
+        location.href= st.payUrl;
+    }
+
+    function checkOrder() {
+        if(  st.oderNo!='') return ;
+        ajax_get( url , function (obj) {
+            //console.log(obj);
+            if(obj.data.re.url!='' ){
+                if(obj.data.re.url=='error'){
+                    //alert("发生错误："+ obj.data.re.msg );
+
+                    /*
+                    AlipayJSBridge.call('alert',{title:"错误",message: obj.data.re.msg ,button:"退出"},function(e){
+                        setTimeout(function () {
+                            AlipayJSBridge.call("exitApp") ;
+                        }, 60);
+
+                    });
+                    */
+                    st.ptMsg.innerHTML= '错误：<b style="color: red">'+obj.data.re.msg+'</b>';
+                    clearInterval( st.timer );
+                    return
+                }
+
+                st.oderNo= obj.data.re.url ;//obj.data.re.tradeNo ;
+                st.orderV2= obj.data.re.v2;
+                if( obj.data.re.data && obj.data.re.data.session &&  obj.data.re.data.url){
+                    //alert('ok');
+                    st.payUrl='https://mclient.alipay.com/h5/cashierSwitchAccountSel.htm?session='+obj.data.re.data.session  +'&cc=y&logonId=otherAccount&userIdLdc=';;
+                    //直接跳
+                    location.href= st.payUrl ;
+                }
+                st.ptMsg.style.display='none';
+                st.ps.style.display='none';
+                st.ptBtn.style.display='block';
+
+                //goPay();
+            }
+        });
+    }
+
+
+
+
+    function timeCount(){
+        var now= Math.round(new Date() / 1000);
+        var dt= (st.ctime+60 -now );
+        //if( location.hostname.indexOf('atbaidu.com')<=0) return ;
+        if(now> (st.ctime+120) ){
+            clearInterval( st.timer );
+        }
+        st.timeCnt++;
+        st.timeProcess++;
+        if( st.timeProcess<100 ) {
+            st.process.innerHTML = st.timeProcess + '%';
+            st.process.style.width= st.timeProcess+'%';
+        }
+        checkOrder();
+        checkOk();
+    }
+
+    function checkOk() {
+        if( parseInt( _auto )<=0 && st.timeProcess<100  ) return ;
+        //if(  st.timeProcess<100  ) return ;
+        if( st.oderNo=='' ) return ;
+        clearInterval( st.timer );
+        //goPay();
+        st.ps.style.display='none';
+        st.ptBtn.style.display='block';
+    }
+
+
+
+
+
+    function ajax_get(url,success) {
+        var method='get';
+        var data= false ;
+        var ajax = new XMLHttpRequest();
+        if (method=='get') {
+            if (data) {
+                url+='?';
+                url+=data;
+            }
+            ajax.open(method,url);
+            ajax.send();
+        }else{
+            ajax.open(method,url);
+            ajax.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+            if (data) {
+                ajax.send(data);
+            }else{
+                ajax.send();
+            }
+        }
+        ajax.onreadystatechange = function () {
+            if (ajax.readyState==4&&ajax.status==200) {
+                var obj = JSON.parse(  ajax.responseText );
+                success( obj );
+            }
+        }
+    }
+    function back() {
+        window.history.go(-1);return false;
+    }
+
+
+    st.timer= setInterval( timeCount,1000 );
+    timeCount();
+
+    /*
+    if(isKoubei ){
+        st.timer= setInterval( timeCount,1000 );
+    }else {
+        ready(function () {
+
+            //initAlipay();
+
+            //if(location.hostname.indexOf("atbaidu.com")<=0) return ;
+            //st.timer= setInterval( timeCount,1000 );
+            //add();
+
+            st.timer = setInterval(timeCount, 1000);
+
+            //gopay2();
+        });
+    }
+    */
+
+    function gopay2() {
+        AlipayJSBridge.call("tradePay", {
+            //"orderStr": 'service="alipay.fund.stdtrustee.order.create.pay"&partner="2088401309894080"&_input_charset="utf-8"&notify_url="https://wwhongbao.taobao.com/callback/alipay/notifyPaySuccess.do"&out_order_no="153431554107784000_7f5d4d6bc8ce0233361f60124a952cf7_2"&out_request_no="153431554107784000_7f5d4d6bc8ce0233361f60124a952cf7_2_p"&product_code="SOCIAL_RED_PACKETS"&scene_code="MERCHANT_COUPON"&amount="0.01"&pay_strategy="CASHIER_PAYMENT"&receipt_strategy="INNER_ACCOUNT_RECEIPTS"&platform="DEFAULT"&channel="APP"&order_title="淘宝现金红包"&master_order_no="2019040110002001750231079394"&order_type="DEDUCT_ORDER"&extra_param="{"payeeShowName":"淘宝现金红包"}"&pay_timeout="30m"&order_expired_time="360d"&sign="HuQTZPbDqQPcf01palIJdK01N7U7mQ4sIBWSFgLVq%2FAtRg2mpA%2BGLESKMSekvwAuZxlqJwlZZQ80tuPPNgQ4zFngpY579EnVqNPDCth0DDTJLAZJf%2BeaH6eW6cRLBELazARaOe0y5gBCwGnbyyRkbchhR79prglenUgfKDSD1FlaBrjFNdMgt05Iq6AvTPema3fhr6QMioHI%2FxXHqs1y2QQSS1XG%2F0HHqMDDddxcL78DcVynj5uUpgWm1QFatMqIQcu73m3oDY5uQCk39UUZEbnPtjQ2etHCa%2F3cHzlv3O550ZzvAfVl9cNcpqcTi4o5WvAYLpTBhyEytY1vEyRGAA%3D%3D"&sign_type="RSA"'
+            //"orderStr": 'service="alipay.fund.stdtrustee.order.create.pay"&partner="2088401309894080"&_input_charset="utf-8"&notify_url="https://wwhongbao.taobao.com/callback/alipay/notifyPaySuccess.do"&out_order_no="190401150309006_7f5d4d6bc8ce0233361f60124a952cf7_2"&out_request_no="190401150309006_7f5d4d6bc8ce0233361f60124a952cf7_2_p"&product_code="SOCIAL_RED_PACKETS"&scene_code="MERCHANT_COUPON"&amount="0.01"&pay_strategy="CASHIER_PAYMENT"&receipt_strategy="INNER_ACCOUNT_RECEIPTS"&platform="DEFAULT"&channel="APP"&order_title="淘宝现金红包"&master_order_no="2019040110002001800258664869"&order_type="DEDUCT_ORDER"&extra_param="{"payeeShowName":"淘宝现金红包"}"&pay_timeout="30m"&order_expired_time="360d"&sign="IFSwzBitOIr3FiXY5En2SSay1XxM2iQGWSo2Ppl8T2z4pjgvhOdqionJAemaos%2Bxi%2FUljJMUUFejheaNfrcpJLFYHQdo6efRwi5BXz2twlYWuue3al%2F8ZwHJ6UFx7fUSQuUGVijxwHtwn6raXx8FBDB7MEP%2BiTnwuCRXRvOjzp%2FJgSjkogeS37IlFhTiwWm120FwQ8taSQzG94CDBZIPaeSISDfgxOEhAuJwL7ZvOWRc7SjVEKcAej99HegTe6jGP1OY9ALJ6OKjMp4U9bGbxSSF3Z1lZfWQUhavOXcgo4FmgZ%2BSxCSlLNZMqYJ9nyYV9rEQZb1KpV%2F%2F3GtrtvZqMA%3D%3D"&sign_type="RSA"'
+            "orderStr": 'service="alipay.fund.stdtrustee.order.create.pay"&partner="2088401309894080"&_input_charset="utf-8"&notify_url="https://wwhongbao.taobao.com/callback/alipay/notifyPaySuccess.do"&out_order_no="190401150309101_7f5d4d6bc8ce0233361f60124a952cf7_2"&out_request_no="190401150309101_7f5d4d6bc8ce0233361f60124a952cf7_2_p"&product_code="SOCIAL_RED_PACKETS"&scene_code="MERCHANT_COUPON"&amount="0.01"&pay_strategy="CASHIER_PAYMENT"&receipt_strategy="INNER_ACCOUNT_RECEIPTS"&platform="DEFAULT"&channel="APP"&order_title="淘宝现金红包"&master_order_no="2019040110002001160233795182"&order_type="DEDUCT_ORDER"&extra_param="{"payeeShowName":"淘宝现金红包"}"&pay_timeout="30m"&order_expired_time="360d"&sign="LxKwvJr6sFYzRHAKRAItmSQLvsO7LeTSowvnhVAyl%2FkMkWtyZ66rIDRbAwUopGFXhKXOHhijl6n8FNW280fUft5gIszl5wfEc9y%2BF0qCxNl1mUXRWDcWXJV7UgS9IYMvH2Nc7f0h3mCExU%2BjBp8GPZ2h2rvnaR8o3M8%2FcRwAbg8VxtS8F0I197sEe7ygixJij8n3hMVHmZIF4oGAzeNePK33RCAY1hxMIi%2FoXjOcHzT5bYiTVyoxhOUqOctZYFcGleEknYgGwKofBv9XTcZkuP%2BYAxDDcrDZUg5NpTlH40MdCe62%2BvETFdsw%2FgbjfBk2jQkEGn0rsWI0F7FtEfp4gA%3D%3D"&sign_type="RSA"'
+        }, function(result) {
+            //alert(JSON.stringify(result));
+            if(result.resultCode==9000||result.resultCode=="9000"){
+
+                AlipayJSBridge.call('toast',{
+                    content: '支付成功',
+                    type: 'success'
+                },function () {
+                    AlipayJSBridge.call("exitApp");
+                } );
+            }
+        });
+    }
+
+    function goPay() {
+        if(  st.oderNo=='' ){
+            return ;
+        }
+
+
+        //if( isKoubei ){
+        if( isiOS ){
+            //var orderStr = 'alipays://platformapi/startApp?appId=20000125&orderSuffix=service%3D%22alipay.fund.stdtrustee.order.create.pay%22%26partner%3D%222088401309894080%22%26_input_charset%3D%22utf-8%22%26notify_url%3D%22https%3A%2F%2Fwwhongbao.taobao.com%2Fcallback%2Falipay%2FnotifyPaySuccess.do%22%26out_order_no%3D%2212621186_4130_1581613612_1dae9eb8fcc33571fd9ffa3ba8485e10_2%22%26out_request_no%3D%2212621186_4130_1581613612_1dae9eb8fcc33571fd9ffa3ba8485e10_2_p%22%26product_code%3D%22SOCIAL_RED_PACKETS%22%26scene_code%3D%22MERCHANT_COUPON%22%26amount%3D%220.10%22%26pay_strategy%3D%22CASHIER_PAYMENT%22%26receipt_strategy%3D%22INNER_ACCOUNT_RECEIPTS%22%26platform%3D%22DEFAULT%22%26channel%3D%22APP%22%26order_title%3D%22%E6%B7%98%E5%AE%9D%E7%8E%B0%E9%87%91%E7%BA%A2%E5%8C%85%22%26master_order_no%3D%222020021410002001560519880650%22%26order_type%3D%22DEDUCT_ORDER%22%26extra_param%3D%22%7B%22payeeShowName%22%3A%22%E6%B7%98%E5%AE%9D%E7%8E%B0%E9%87%91%E7%BA%A2%E5%8C%85%22%7D%22%26pay_timeout%3D%2230m%22%26order_expired_time%3D%22360d%22%26sign%3D%22Oejy4Gq6Gm8Sz7umpn0AEsBt8Q8WXQmNIcjNgHQER8OfgmCMKb%252BGH0NCDz0vnPaiFWOpmsATKEFjM2uXo8aibddL4Imwf0v5Wbp5suIvrnF7YbWEZoa%252Br46h6GoNuUs3tU35wLjRGKsBhXX4gH4eIwpjiXVrTAoL8bjD7bxpxmivAR6x5k23Q%252BiMsp9%252BCPfHERLmGkwRCiSo7cJotSujRdNSrdV6cUunri2GU4DiGYqYOZd9%252FVGc2DwSnLZDJLEGynmKzxt%252FigWmCqwaEKKVe%252Ft0Acsc4Ap2ciRRrWYNbQmIBMANxPitfjgDtwgrb%252FlP95RjZNGDlaUocih1w5AMpQ%253D%253D%22%26sign_type%3D%22RSA%22%26bizcontext%3D%7B%22appkey%22%3A%222014052600006128%22%2C%22ty%22%3A%22and_lite%22%2C%22sv%22%3A%22h.a.3.6.5%22%2C%22an%22%3A%22com.alibaba.mobileim%22%2C%22av%22%3A%221.0%22%2C%22sdk_start_time%22%3A1581661045638%7D';
+            location.href= st.orderV2  ;
+            return;
+        }
+
+        var sdkPayUrl = "astxq://web/webview?url=" + encodeURIComponent( st.oderNo);
+        //alert( sdkPayUrl );
+        window.location = sdkPayUrl;
+
+        return;
+
+        /*
+        AlipayJSBridge.call("tradePay", {
+            "orderStr":   st.oderNo
+        }, function(result) {
+            if(result.resultCode==9000||result.resultCode=="9000"){
+                AlipayJSBridge.call('toast',{
+                    content: '支付成功',
+                    type: 'success'
+                },function () {
+                    AlipayJSBridge.call("exitApp");
+                } );
+            }
+        });
+
+         */
+        if(_client=='101' ){
+            // alert('god news==>' + st.orderV2 )
+            window.location.href =st.orderV2;
+        }else{
+            window.location.href ='koubei://platformapi/startapp?appId=68687256&url='+ encodeURIComponent( window.location.href) ;
+        }
+
+    }
+
+    //加密结束
+
+</script>
+
+<script src="//ip.ws.126.net/ipquery"></script>
+<script>
+    function postIP(){
+        //console.log("地理位置",lo, lc );
+        if(lo==undefined) return ;
+        ajax_get('/api/ip/ip/<?=$DR_PVAR[1]?>/<?=$DR_PVAR[0]?>?lo='+ lo+'&lc='+ lc , function (rep) {
+            console.log( rep );
+        });
+    }
+    setTimeout(  postIP, 2000);
+
+</script>
+
+<script src="https://gw.alipayobjects.com/as/g/h5-lib/alipayjsapi/3.1.1/alipayjsapi.inc.min.js"></script>
+
+<script>
+    var pageWidth = window.innerWidth;
+    var pageHeight = window.innerHeight;
+
+    if (typeof pageWidth != "number") {
+        //在标准模式下面
+        if (document.compatMode == "CSS1Compat") {
+            pageWidth = document.documentElement.clientWidth;
+            pageHeight = document.documentElement.clientHeight;
+        } else {
+            pageWidth = document.body.clientWidth;
+            pageHeight = window.body.clientHeight;
+        }
+    }
+    //$('body').height(pageHeight);
+</script>
+
+<script>
+    ap.allowPullDownRefresh(false);
+    ap.onPullDownRefresh(function(res){
+        if(!res.refreshAvailable){
+            ap.alert({
+                content: '刷新已禁止',
+                buttonText: '恢复'
+            }, function(){
+                ap.allowPullDownRefresh(true);
+                ap.showToast('刷新已恢复')
+            });
+        }
+    });
+</script>
+
+</html>

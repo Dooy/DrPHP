@@ -1,0 +1,239 @@
+<div class="dr-min "  >
+
+    <div class="sui-form form-horizontal"><div class="control-group">
+        <label   class="control-label"></label>
+        <div class="controls"><h1>创建账号</h1></div>
+    </div></div>
+
+    <ul class="sui-nav nav-tabs nav-xlarge" id="regtab">
+        <li content="email"  ><a href="#index1">邮箱注册</a></li>
+        <li   class="active" content="tel" ><a href="#index2">手机号码注册</a></li>
+    </ul>
+
+
+
+    <form id="form-msg" class="sui-form form-horizontal tab-pane active" novalidate="novalidate">
+
+
+        <div class="control-group ct-email ct">
+            <label class="control-label sui-text-xlarge"  >邮箱：</label>
+            <div class="controls input-append">
+                <input type="text"   id="email" class="input-xfat" name="email" placeholder="邮箱" data-rules="required|email">
+                <span class="add-on"  content="email" >获取验证码</span>
+            </div>
+        </div>
+
+        <div class="control-group ct-tel ct" style="display: none">
+            <label  class="control-label sui-text-xlarge"  >手机号码：</label>
+            <div class="controls input-append">
+                <input type="text" id="tel" class="input-xfat" name="tel" placeholder="手机号码" data-rules="required|tel"  data-empty-msg="请填写号码">
+                <span class="add-on"  content="tel" >获取验证码</span>
+            </div>
+        </div>
+        <!--
+        <div class="control-group  " id="imgYzmW" >
+            <label  class="control-label sui-text-xlarge"  ></label>
+            <div class="controls input-append">
+                <input type="text" id="imgyzm" class="input-xfat" name="imgyzm" placeholder="图片验证码" data-rules="required|minlength=4|maxlength=4|digits" data-error-msg="验证码必须4为数字" data-empty-msg="亲，验证码别忘记填了">
+                <span class="add-on" title="更新验证码" ><img src="<?=R('imgYzm')?>" class=" v-top"></span>
+            </div>
+        </div>
+        -->
+        <div class="control-group"  id="imgYzmW" style="display: none">
+            <label for="inputNick" class="control-label sui-text-xlarge"></label>
+            <div class="controls">
+                <div><img src="<?=R('vCode')?>" class="vCode"></div>
+                <div class="sui-msg msg-tips msg-naked  ">
+                    <div class="msg-con">点出上面的汉字</div>
+                    <s class="msg-icon"></s>
+                </div>
+            </div>
+            <input type="hidden" id="imgyzm" value="" name="imgyzm" >
+        </div>
+
+
+        <div class="control-group  ">
+            <label for="inputNick" class="control-label sui-text-xlarge">验证码：</label>
+            <div class="controls">
+                <input type="text" id='yzm' class="input-xfat"  name="yzm" placeholder="6位数字" data-rules="required|minlength=6|maxlength=6|digits" data-error-msg="验证码必须6为数字" data-empty-msg="亲，验证码别忘记填了"/>
+            </div>
+        </div>
+
+
+
+
+        <div class="control-group">
+            <label for="inputPassword" class="control-label sui-text-xlarge">密码：</label>
+            <div class="controls">
+                <input type="password"class="input-xfat" id="inputPassword" name="password" placeholder="密码设置6到12位"  data-rules="required|minlength=6|maxlength=12">
+            </div>
+        </div>
+        <div class="control-group">
+            <label for="repassword" class="control-label sui-text-xlarge">重复密码：</label>
+            <div class="controls">
+                <input type="password" class="input-xfat" id="repassword" placeholder="与密码一致" data-rules="required|match=password" name="repassword">
+            </div>
+        </div>
+
+
+        <div class="control-group">
+            <label for="inputNick" class="control-label sui-text-xlarge">真实姓名：</label>
+            <div class="controls">
+                <input type="text" class="input-xfat" id="inputNick" name="name" placeholder="请填写真实姓名" data-rules="required|minlength=2|maxlength=12" data-error-msg="昵称必须是2-12位" data-empty-msg="亲，姓名别忘记填了">
+            </div>
+        </div>
+
+
+        <div class="control-group">
+            <label   class="control-label sui-text-xlarge">角色：</label>
+            <div class="controls">
+                <label data-toggle="radio" class="radio-pretty inline">
+                    <input type="radio" name="ts" value="1" data-rules="required"><span>老师</span>
+                </label>
+                <label data-toggle="radio" class="radio-pretty inline">
+                    <input type="radio" name="ts" value="2" data-rules="required"><span>学生</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label  class="control-label sui-text-xlarge v-top">学校：</label>
+            <div class="controls">
+                <input   id="autocomplete" type="text" name="school" placeholder="输入并选择您的学校" class="input-large" autocomplete="off">
+                <div class="sui-msg msg-tips msg-naked  ">
+                    <div class="msg-con">请勿乱选，系统根据你选择的学校匹配相应老师</div>
+                    <s class="msg-icon"></s>
+                </div>
+            </div>
+        </div>
+        <!--
+        <div class="control-group">
+                <label  class="control-label sui-text-xlarge v-top">学校：</label>
+            <div class="controls">
+                <select name="school">
+                    <option value="云南大学">云南大学</option>
+                    <option value="华中科技大学">华中科技大学</option>
+                    <option value="中山大学">中山大学</option>
+                    <option value="黑龙江大学">黑龙江大学</option>
+                    <option value="佳木斯大学">佳木斯大学</option>
+                    <option value="广东第二师范学院">广东第二师范学院</option>
+                    <option value="华南理工大学">华南理工大学</option>
+                    <option value="南方科技大学">南方科技大学</option>
+                    <option value="西北农林科技大学">西北农林科技大学</option>
+                    <option value="暨南大学">暨南大学</option>
+                    <option value="华南师范大学">华南师范大学</option>
+                    <option value="海南大学">海南大学</option>
+                    <option value="华中农业大学">华中农业大学</option>
+                    <option value="东北林业大学">东北林业大学</option>
+                    <option value="西安电子科技大学">西安电子科技大学</option>
+                    <option value="空军军医大学">1941</option>
+                    <option value="深圳大学">深圳大学</option>
+                    <option value="西南林业大学">西南林业大学</option>
+                    <option value="广东财经大学">广东财经大学</option>
+                    <option value="海南师范大学">海南师范大学</option>
+                    <option value="海南医学院">海南医学院</option>
+                    <option value="广东金融学院">广东金融学院</option>
+                    <option value="贵州理工学院">贵州理工学院</option>
+                    <option value="海南热带海洋学院">海南热带海洋学院</option>
+                    <option value="北京理工大学珠海学院">北京理工大学珠海学院</option>
+                    <option value="海口经济学院">海口经济学院</option>
+                    <option value="广东外语外贸大学">广东外语外贸大学</option>
+                    <option value="广东培正学院">广东培正学院</option>
+
+                    <option value="广东白云学院">广东白云学院</option>
+                    <option value="南方医科大学">南方医科大学</option>
+                    <option value="广东工业大学">广东工业大学</option>
+                    <option value="广州医科大学">广州医科大学</option>
+                    <option value="仲恺农业工程学院">仲恺农业工程学院</option>
+                    <option value="广州中医药大学">广州中医药大学</option>
+
+                    <option value="北京印刷学院">北京印刷学院</option>
+                    <option value="北京物资学院">北京物资学院</option>
+                    <option value="河池学院">河池学院</option>
+
+                    <option value="大连理工大学">大连理工大学</option>
+                    <option value="大连海事大学">大连海事大学</option>
+                    <option value="大连海洋大学">大连海洋大学</option>
+                    <option value="大连交通大学">大连交通大学</option>
+                    <option value="大连工业大学">大连工业大学</option>
+                    <option value="大连大学">大连大学</option>
+                    <option value="大连民族大学">大连民族大学</option>
+                    <option value="大连医科大学">大连医科大学</option>
+                    <option value="辽宁对外经贸学院">辽宁对外经贸学院</option>
+                    <option value="湖北大学">湖北大学</option>
+
+                </select>
+                <div class="sui-msg msg-tips msg-naked  ">
+                    <div class="msg-con">请勿乱选，系统根据你选择的学校匹配相应老师</div>
+                    <s class="msg-icon"></s>
+                </div>
+            </div>
+        </div>
+-->
+
+        <div class="control-group">
+            <label for="sanwei" class="control-label"></label>
+            <div class="controls">
+                <button type="submit" class="sui-btn btn-primary btn-xlarge">立即注册</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="v-clode-dt" id="v-code-0"></div>
+<div class="v-clode-dt" id="v-code-1"></div>
+<script src="/ajax/reg/school"></script>
+<script>
+$(function () {
+    $('#autocomplete').autocomplete({
+        lookup: schools,
+        minChars: 0,
+        onSelect: function (suggestion) {
+            //$('#selection').html('You selected: ' + suggestion.value);
+        }
+    });
+
+    var config={
+        vtab:'',
+        time:0,
+        timecl:-1
+    }
+    var ui={
+        yzm:$('#yzm'),
+        tel:$('#tel'),
+        email:$('#email'),
+        tablist:$('#regtab li'),
+        from:  $("#form-msg")
+
+    }
+    ui.tablist.click(function (e) {
+        var _that = $(this);
+        config.vtab = (_that.attr('content'));
+       $('#regtab .active').removeClass('active');
+        _that.addClass('active');
+        $('.ct').hide();
+        $('.ct-'+config.vtab).show();
+        ui.email.val(  config.vtab !='email'?'ddd':'' );
+        ui.tel.val(  config.vtab !='tel'? '139':'' );
+    });
+    $('#regtab .active').click();
+
+   ui.from.validate({
+        messages: {
+            email: ["亲，没填邮箱呢", "邮箱不要瞎填哦"],
+            tel: ["亲，没填号码呢", "号码不要瞎填哦"],
+            password: "亲，密码必须是6-12位哦"
+            ,repassword:["亲，密码别忘记了","必须与密码一致"]
+            ,ts:"身份很总要哟"
+        }
+        , success: function() {
+            var data = ui.from.serialize();
+            //DR.tip( "good : "+ config.vtab +"<br>"+data  );
+            DR.ajax('ajax/reg?tab='+ config.vtab, {'data':data });
+            return false;
+        }
+    });
+    MEMBER.yzm( 'reg',{btn:  $('.ct .add-on'),'type':'vCode',img:$('.vCode') } );
+
+    });
+</script>

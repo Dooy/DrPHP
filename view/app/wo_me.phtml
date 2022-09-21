@@ -1,0 +1,239 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>我的</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <?php include "wo_head.phtml";?>
+    <style>
+        #tabs, #tabs *{ touch-action: none; }
+        .mui-bar-tab .mui-tab-item2 .mui-icon~.mui-tab-label {
+            font-size: 11px;
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .mui-bar-tab .mui-tab-item2 .mui-icon {
+            top: 3px;
+            width: 24px;
+            height: 24px;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+        .mui-bar-tab .mui-tab-item2 {
+            display: table-cell;
+            overflow: hidden;
+            width: 1%;
+            height: 50px;
+            text-align: center;
+            vertical-align: middle;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            color: #929292;
+        }
+        .mui-bar-tab .mui-tab-item2.mui-active {
+            color: #007aff;
+        }
+    </style>
+</head>
+<body  >
+<bobo>
+    <!--我的-->
+
+    <template v-if="st.tab=='login'">
+        <div style="text-align: center;padding: 50px 0;">
+            请先登录！
+        </div>
+    </template>
+    <template v-else>
+    <div id="tabbar-with-contact" class="mui-control-content mui-active">
+
+        <header class="mui-bar mui-bar-nav header">
+            <h1 class="mui-title h1">我的</h1>
+        </header>
+        <div class="mui-card-content my">
+            <img :src="cu.u.head" class="myimg" style="border-radius: 50%;">
+            <span class="acc" style="top: 10%; margin-left: 5%;">ID:<b v-html="cu.u.uid"></b></span>
+            <span class="acc" style="top: 35%; margin-left: 5%;">昵称:<b v-html="cu.u.name"></b></span>
+            <span class="acc" style="top: 60%; margin-left: 5%;">余额：<b v-html="cu.ma.amount/100"></b>元</span>
+            <span class="acc" style="top: 60%; margin-left: 20%;">
+        </div>
+        <ul class="mui-table-view ullist">
+            <li class="mui-table-view-cell mui-collapse-content">
+                <img src="https://cdn.nekoraw.com/res/wo/img/zichan.png" class="imglist">
+                <a href="/app/page/q_cw" class="mui-navigate-right" style=" margin-left: 10%;font-size: 0.9em; bottom: 4px; ">
+                    我的资产
+                </a>
+            </li>
+            <li class="mui-table-view-cell mui-collapse-content">
+                <img src="https://cdn.nekoraw.com/res/wo/img/chongzhi.png" class="imglist">
+                <a href="/app/page/q_cw?tab=cz" class="mui-navigate-right" style=" margin-left: 10%;font-size: 0.9em; bottom: 4px; ">
+                    充值管理
+                </a>
+            </li>
+            <li class="mui-table-view-cell mui-collapse-content">
+                <img src="https://cdn.nekoraw.com/res/wo/img/tixian.png" class="imglist">
+                <a href="/app/page/q_cw?tab=tx" class="mui-navigate-right" style=" margin-left: 10%; font-size: 0.9em;bottom: 4px; ">
+                    提现管理
+                </a>
+            </li>
+            <!--
+            <li class="mui-table-view-cell mui-collapse-content">
+                <img src="https://cdn.nekoraw.com/res/wo/img/tixian.png" class="imglist">
+                <a href="/user/bill.html" class="mui-navigate-right" style=" margin-left: 10%; font-size: 0.9em;bottom: 4px; ">
+                    资金日志
+                </a>
+            </li>
+            -->
+            <li class="mui-table-view-cell mui-collapse-content">
+                <img src="https://cdn.nekoraw.com/res/wo/img/tixian.png" class="imglist">
+                <a href="/app/page/q_cw" class="mui-navigate-right" style=" margin-left: 10%; font-size: 0.9em;bottom: 4px; ">
+                    支出明细(财务)
+                </a>
+            </li>
+
+            <template v-if="cu.ma.role!=11">
+
+            <li class="mui-table-view-cell mui-collapse-content">
+                <img src="https://cdn.nekoraw.com/res/wo/img/erweima.png" class="imglist">
+                <a href="/app/page/q_account" class="mui-navigate-right" style=" margin-left: 10%; font-size: 0.9em;bottom: 4px; ">
+                    收款账号管理
+                </a>
+            </li>
+
+
+            <li class="mui-table-view-cell mui-collapse-content" id="yqhy"  >
+                <img src="https://cdn.nekoraw.com/res/wo/img/fenxiang.png" class="imglist">
+                <a href="/app/page/q_ma" class="mui-navigate-right" style=" margin-left: 10%; font-size: 0.9em;bottom: 4px; ">
+                    成员管理(代理)
+                </a>
+            </li>
+            </template>
+            <template v-else>
+
+                <li class="mui-table-view-cell mui-collapse-content">
+                    <img src="https://cdn.nekoraw.com/res/wo/img/erweima.png" class="imglist">
+                    <a href="/app/page/q_card" class="mui-navigate-right" style=" margin-left: 10%; font-size: 0.9em;bottom: 4px; ">
+                        收款卡管理
+                    </a>
+                </li>
+
+            </template>
+
+            <!--
+            <li class="mui-table-view-cell mui-collapse-content">
+                <img src="https://cdn.nekoraw.com/res/wo/img/guanyu.png" class="imglist">
+                <a href="https://pubres.aihecong.com/web/link/chatLink.html?entId=11662" class="mui-navigate-right" style=" margin-left: 10%;font-size: 0.9em; bottom: 4px; " onClick="ib_wopen();">
+                    在线客服
+                </a>
+            </li>
+            -->
+
+            <li class="mui-table-view-cell mui-collapse-content" v-if="cu.ma.version==90">
+                <img src="https://cdn.nekoraw.com/res/wo/img/guanyu.png" class="imglist">
+                <a href="/app/page/q_b2a_qy" class="mui-navigate-right" style=" margin-left: 10%;font-size: 0.9em; bottom: 4px; " >
+                    网银.企业支付宝
+                </a>
+            </li>
+            <li class="mui-table-view-cell mui-collapse-content" v-if="cu.ma.version==90">
+                <img src="https://cdn.nekoraw.com/res/wo/img/chongzhi.png" class="imglist">
+                <a href="/app/page/q_jd" class="mui-navigate-right" style=" margin-left: 10%;font-size: 0.9em; bottom: 4px; " >
+                    网银.京东
+                </a>
+            </li>
+
+            <li class="mui-table-view-cell mui-collapse-content">
+                <img src="https://cdn.nekoraw.com/res/wo/img/ziliao.png" class="imglist">
+                <a href="/app/page/q_member" class="mui-navigate-right" style=" margin-left: 10%;font-size: 0.9em; bottom: 4px; ">
+                    个人资料
+                </a>
+            </li>
+            <li class="mui-table-view-cell mui-collapse-content">
+                <img src="https://cdn.nekoraw.com/res/wo/img/shezhi.png" class="imglist">
+                <a href="/app/page/q_setting" class="mui-navigate-right" style=" margin-left: 10%;font-size: 0.9em; bottom: 4px; ">
+                    设置
+                </a>
+            </li>
+
+        </ul>
+
+    </div>
+
+
+    <nav class="mui-bar mui-bar-tab" style="background:#1f253d;"  id="tabs">
+        <template v-for="v in tabArr" >
+        <a class="mui-tab-item2 " :href="'/app/page/'+v.url+'#'" :class="{'mui-active': v.url==st.ts}" @click="toTab(v)">
+            <span class="mui-icon " :class="v.cls"></span>
+            <span class="mui-tab-label" v-html="v.name">我的</span>
+        </a>
+        </template>
+    </nav>
+    </template>
+
+
+</bobo>
+</body>
+<script>
+new Vue({
+    el: 'bobo',
+    data: {
+
+        st:{tab:'init',isLogin:false,showNav:false,ts:'wo_me'}
+        ,cu:{u:{uid:'', head:'',name: '' }, ma:{amount:'0', realname:'',type:10,version:0,role:1 }}
+        ,tabArr:[
+            {cls:'mui-icon-home',name:'首页',url:'q_bang'}
+            ,{cls:'mui-icon-email',name:'抢单',url:'q_dan'}
+            ,{cls:'mui-icon-contact',name:'我的',url:'wo_me'}
+        ]
+    }
+    ,
+    created: function () {
+        this.loadInfo();
+    },
+    mounted: function () {
+
+        var that = this;
+        setTimeout(function () {
+            that.st.showNav= true;
+        },300);
+    },
+    methods: {
+        loadInfo:function () {
+            var  that = this;
+            HC.ajax('/vip', { success:function (rep) {
+                    if( rep._cu==false ||  !rep.ma ) {
+                        that.st.tab='login';
+                        //that.st.tab='login';
+                        return;
+                    }
+                    //this.cu.u= rep.data.
+                    that.cu.u = rep._cu;
+                    that.cu.ma  = rep.ma;
+                    console.log(rep );
+                    that.st.tab='ok';
+                    if( that.cu.ma.type<10) location.href='/app/page/q_member';
+
+                    if( rep.ma.role==11){
+                        that.tabArr= [
+                            {cls:'mui-icon-home',name:'首页',url:'q_bang'}
+                            ,{cls:'mui-icon-plus',name:'上分',url:'f_cz'}
+                            ,{cls:'mui-icon-navigate',name:'下发',url:'f_xia'}
+                            ,{cls:'mui-icon-contact',name:'我的',url:'wo_me'}
+                        ];
+                    }else if( rep.ma.is_shoudan){
+                        that.tabArr= [
+                            {cls:'mui-icon-home',name:'首页',url:'q_bang'}
+                            ,{cls:'mui-icon-email',name:'收单',url:'q_danv2'}
+                            ,{cls:'mui-icon-contact',name:'我的',url:'wo_me'}
+                        ];
+                    }
+
+                }});
+        }
+        ,toTab:function (v) {
+            location.href='/app/page/'+v.url
+        }
+    }
+});
+</script>
+</html>

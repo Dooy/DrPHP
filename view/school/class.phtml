@@ -1,0 +1,82 @@
+<form class="sui-form form-horizontal" id="form-class" action="<?=R($action)?>">
+    <div class="control-group">
+        <label class="control-label v-top">   </label>
+        <div class="controls">
+            <h1><?=$act_title?></h1>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label v-top"> 班级名称：</label>
+        <div class="controls">
+            <input type="text" value="<?=$class['class']?>" name="class" class="input-large" data-rules="required"  placeholder="请填写名称" data-empty-msg="名称别忘记了">
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label v-top"> 年级：</label>
+        <div class="controls">
+            <select name="grade">
+                <option value="">请选择年级</option>
+                <?php foreach ($grade as $k=>$v ) :?>
+                    <option value="<?=$k?>" <?php if($k==$class['grade']):?>selected<?php endif; ?> > <?=$v?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+    </div>
+
+    <?php if($teacher):?>
+        <!--
+    <div class="control-group">
+        <label class="control-label v-top"> 转让班群：</label>
+        <div class="controls">
+            <select name="user_id">
+                <option value="">请选择老师</option>
+                <?php foreach ($teacher as $k=>$v ) :?>
+                    <option value="<?=$v['user_id']?>" <?php if($v['user_id']==$class['user_id']):?>selected<?php endif; ?> > <?=$v['name']?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+    </div>
+    -->
+    <?php endif; ?>
+
+    <div class="control-group">
+        <label class="control-label"  > </label>
+        <div class="controls">
+            <button type="submit" class="sui-btn btn-primary">提交</button>
+        </div>
+    </div>
+</form>
+
+<hr>
+<?php if($teacher && $class):?>
+<form class="sui-form form-horizontal" id="form-class-teacher" action="<?=R($_c.'/class/edit_role/'.$class['class_id'])?>">
+
+    <div class="control-group">
+        <label class="control-label v-top">老师：</label>
+        <div class="controls">
+    <?php   foreach ($teacher as $k=>$v ) : $checked= (isset($class['role'][$k] ))?'checked':'';    ?>
+            <label class="checkbox-pretty inline <?=$checked?>">
+                <input type="checkbox" <?=$checked?>  value="<?=$v['user_id']?>" name="uid[]"><span><?=$v['name']?></span>
+            </label>
+    <?php endforeach; ?>
+        </div>
+    </div>
+    <input type="hidden" name="is_post" value="1">
+
+    <div class="control-group">
+        <label class="control-label"  > </label>
+        <div class="controls">
+            <button type="submit" class="sui-btn btn-primary">编辑任课教师</button>
+        </div>
+    </div>
+
+</form>
+<?php endif; ?>
+
+<script>
+    $(function () {
+        DR.ajaxAndValidate( 'form-class');
+        DR.ajaxAndValidate( 'form-class-teacher');
+    });
+</script>

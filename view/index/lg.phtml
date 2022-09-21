@@ -1,0 +1,139 @@
+<style>
+    .loayout {display: flex;height: 100vh; flex-direction:row ;overflow: hidden}
+    .loayout .layout-item{
+        flex: 1;
+    }
+    .lg-left{
+        position: relative;
+
+    }
+    .lg-left .dr-min{
+        position:absolute;
+        left: 50%;
+        top: 50%;
+        margin-left: -200px;
+        margin-top: -180px;
+        width: 400px;
+    }
+    .lg-right{
+
+        position: relative;
+        height: 100%;
+        background: url(<?=$_cdn?>/res//img/bj.png) no-repeat 50% 50%;
+    }
+    .logo-cy{ position: absolute; width: 280px;height: 100px;
+        top: 50%;left: 50%; margin-top: -100px; margin-left: -140px;text-align: center}
+    .logo-cy-img{display: inline-block;}
+    .logo-cy b{font-weight: bold; font-size: 80px; color: #f9f9f9; line-height: 80px; vertical-align:middle;
+        text-rendering: optimizelegibility;
+    }
+    .logo-cy-a {position: relative; height: 20px}
+    .logo-cy-a span{ position: absolute;right: -5px; font-size: 30px; top: -35px;color: rgba(255,255,255,0.9) ;
+        font-style: italic;text-rendering: optimizelegibility;font-weight: bold;
+    }
+    body{width: 100%; height: 100%; box-sizing:border-box}
+
+    @media screen and (max-width: 700px) {
+        /*.lg-right{display: none}*/
+        .loayout{ flex-direction:column}
+        .logo-cy{ margin-top: -50px;}
+
+        .lg-left .dr-min{top: 0px; margin-top: 20px;}
+    }
+</style>
+<div class="loayout">
+    <div class="lg-right  layout-item">
+
+        <div class="logo-cy">
+            <div class="logo-cy-img"><img src="<?=$_cdn?>/res/img/cy400.png" style="width: 100px;vertical-align:middle;"></div>
+            <b>诚意</b>
+            <div class="logo-cy-a"><span>A</span></div>
+        </div>
+
+    </div>
+    <div class="lg-left layout-item">
+        <div class="dr-min "  >
+
+            <form id="form-msg" class="sui-form form-horizontal" novalidate="novalidate">
+                <div class="control-group">
+                    <label   class="control-label"></label>
+                    <div class="controls"><h1>登录</h1></div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label sui-text-xlarge"  >账号：</label>
+                    <div class="controls ">
+                        <input type="text"   id="openid" class="input-xfat" name="openid" placeholder="" data-rules="required">
+                    </div>
+                </div>
+                <?php if($loginback=='/merchant'):?>
+
+                    <div class="control-group">
+                        <label class="control-label sui-text-xlarge"  >商户号：</label>
+                        <div class="controls ">
+                            <input type="text"   id="merchant_id" class="input-xfat" name="merchant_id" placeholder="" data-rules="required">
+                        </div>
+                    </div>
+
+                <?php endif; ?>
+                <?php if($loginback=='/cha'):?>
+                    <input type="hidden" name="fr" value="cha"/>
+                <?php endif; ?>
+
+
+
+
+
+                <div class="control-group">
+                    <label for="inputPassword" class="control-label sui-text-xlarge">密码：</label>
+                    <div class="controls">
+                        <input type="password"class="input-xfat" id="psw" name="psw" placeholder="密码6到12位"  data-rules="required|minlength=6|maxlength=12">
+                        <input type="hidden" id="psw_encrypt" name="psw_encrypt" value=""/>
+                    </div>
+                </div>
+
+                <?php if($_GET['sq']):?>
+
+                    <div class="control-group">
+                        <label class="control-label sui-text-xlarge"  >授权码：</label>
+                        <div class="controls ">
+                            <input type="text"   id="sq" class="input-xfat" name="sq" placeholder="有授权码权限更大" data-rules="required">
+                        </div>
+                    </div>
+
+                <?php endif; ?>
+
+                <div class="control-group">
+                    <label for="inputPassword" class="control-label sui-text-xlarge" style="font-size: 13px">谷歌验证码：</label>
+                    <div class="controls">
+                        <input type="text"class="input-xfat"  name="google" placeholder="未设置可不填"   >
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="sanwei" class="control-label"></label>
+                    <div class="controls">
+                        <button type="submit" class="sui-btn btn-primary btn-xlarge">登录</button>
+
+                    </div>
+                </div>
+
+
+                <div class="control-group">
+                    <label for="sanwei" class="control-label"></label>
+                    <div class="controls">
+
+                        <!--
+                    <div style="width: 190px;"  >
+                        <a href="<?=R('forgot')?>"  class="pull-left">找回密码</a> <a href="<?=R('reg')?>"  class="pull-right">马上注册</a>
+                    </div>
+                    -->
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+</div>
+

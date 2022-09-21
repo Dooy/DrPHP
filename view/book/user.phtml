@@ -1,0 +1,148 @@
+<div class="dr-container">
+    <div class="dr-box-padding"  id="user-header" style="height: 240px; ">
+        <div style="position: absolute; top: 30px;left: 0; z-index: 3; width: 100%;">
+            <div class="head-large-x"><img src="<?=H($me['head'])?>"></div>
+            <h1><?=$me['name']?></h1>
+            <ul   id="user-total" class="dr-box-content total flexbox">
+                <li>
+                    <b><?=$me_tj['book_cnt']?></b>
+                    <span>图书</span>
+                </li>
+                <li>
+                    <b><?=$me_tj['topic_cnt']?></b>
+                    <span>主题</span>
+                </li>
+                <li>
+                    <b><?=$me_tj['comment_cnt']?></b>
+                    <span>回复</span>
+                </li>
+            </ul>
+        </div>
+        <div class="user-bground" style="background-image:url(<?=H($me['head'])?>)" ></div>
+    </div>
+    <?php if($me_book):?>
+    <div class="dr-box-padding">
+        <div class="dr-box-title">正在学习</div>
+        <div class="dr-box-content sui-text-large">
+            <?php if($is_myself):?>
+
+                <div class="sui-msg  msg-block msg-info">
+                    <div class="msg-con">想重新加入班级可以直接点击班级名称变更</div>
+                    <s class="msg-icon"></s>
+                </div>
+
+            <?php endif;?>
+            <table class="sui-table  ">
+                <thead>
+                <tr>
+                    <th>书名</th>
+                    <th >班级</th>
+                    <th class="hide-min">加入时间</th>
+                    <th class="hide-min">发帖/回复</th>
+                    <?php if($is_myself || $_is_admin ):?> <th >操作</th><?php endif; ?>
+                </tr>
+                </thead>
+                <tbody>
+                <?php foreach ( $me_book as $k=>$v): ?>
+                <tr>
+                    <td>
+                        <?php if($v['type']): ?><span class="sui-label label-"><?=$bookUserType[$v['type']]['n']?></span><?php endif; ?>
+                        <?php if($v['book_id_merge']['type']==-2): ?><span class="sui-label label-danger">已下架</span>
+                        <?php elseif($v['book_id_merge']['type']==-1): ?><span class="sui-label label-danger">已归档</span>
+                        <?php elseif($is_myself && $v['book_id_merge']['term_key']!=$term): ?><span class="sui-label label-danger">非本学期</span>
+                        <?php endif; ?>
+                        <a href="<?=R('book/detail/'. $v['book_id'])?>"><?=$v['book_id_merge']['book']?></a>
+                    </td>
+                    <td >
+                        <span  class="<?php if($v['class_id']<=0):?>sui-text-warning<?php endif;?> addBook" <?php if($is_myself):?>style="cursor: pointer;"
+                               title="点我可以重新选择班级" data-bookid="<?=$v['book_id']?>" data-readd="1" <?php endif;?>
+                            <?php if($get['no_limit']=='1'): ?> data-no-limit="1" <?php endif?>
+                        ><?=($v['class_id']>0?$class[$v['class_id'] ]['class']:'未入班')?></span>
+                    </td>
+                    <td class="hide-min"><?=date("Y-m-d H:i", $v['ctime'])?></td>
+                    <td class="hide-min"><?=$v['topic_cnt']?>/<?=$v['comment_cnt']?></td>
+                    <?php if($is_myself || $_is_admin ):?>
+                        <td >
+                            [<a href="javascript:;" class="ajax-url" data-url="<?=R('book/join/del/'. $v['id'])?>">退选</a>]
+                            <?php if($is_myself):?> [<a href="javascript:;" class="ajax-url" data-url="<?=R('book/me/upTj/'. $v['book_id'])?>">更新</a>]<?php endif; ?>
+                        </td>
+                    <?php endif; ?>
+                </tr>
+                <?php endforeach; ?>
+                </tbody>
+             </table>
+
+        </div>
+    </div>
+    <?php endif;?>
+    <?php if($me_topic['list']):?>
+    <div class="dr-box-padding">
+        <div class="dr-box-title">我的主题</div>
+        <div class="dr-box-content sui-text-large">
+            <table class="sui-table  ">
+                <thead>
+                <tr>
+                    <th>帖子</th>
+                    <th class="hide-min">类型</th>
+                    <th class="hide-min">时间</th>
+                    <th>回复</th>
+                    <th>查看</th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php foreach ( $me_topic['list'] as $k=>$v): ?>
+                <tr>
+                    <td><a href="<?=R('book/topic/'. $v['topic_id'])?>"><?=$v['topic']?></a> </td>
+                    <td class="hide-min"><?=$tag[ $v['tag_id']]['n']?></td>
+                    <td class="hide-min"><?=date("Y-m-d H:i", $v['ctime'])?></td>
+                    <td><?=$v['comment_cnt']?></td>
+                    <td><?=$v['view_cnt']?></td>
+                </tr>
+                <?php endforeach; ?>
+
+                </tbody>
+            </table>
+        </div>
+        <?php if($p[1]=='' && $me_topic['page']!=''): ?>
+            <div class="more sui-text-large"><a href="<?=R('book/user/'.$me['user_id'].'/topic')?>">更多我的主题>></a></div>
+        <?php elseif($me_topic['page']):?>
+            <div class="more"><?=$me_topic['page']?></div>
+        <?php endif; ?>
+
+    </div>
+    <?php endif;?>
+    <?php if($me_comment['list']):?>
+    <div class="dr-box-padding">
+        <div class="dr-box-title">我的回复</div>
+        <div class="dr-box-content sui-text-large">
+            <?php foreach ( $me_comment['list'] as $k=>$v): ?>
+             <div class="user-comment-item">
+                 <div class="flexbox">
+                     <b class="flex"><?=$v['comment']?></b>
+                     <div class="des2 hide-min"><?=date("Y-m-d H:i", $v['ctime'])?></div>
+                 </div>
+                 <div>
+                     <span class="des2">所在主题：</span><a href="<?=R('book/topic/'. $v['topic_id'])?>"><?=$v['topic_id_merge']['topic']?></a>
+                 </div>
+             </div>
+            <?php endforeach;?>
+
+
+        </div>
+        <?php if($p[1]=='' && $me_comment['page']!=''): ?>
+        <div class="more sui-text-large"><a href="<?=R('book/user/'.$me['user_id'].'/comment')?>">更多我的回复>></a></div>
+        <?php elseif($me_comment['page']):?>
+            <div class="more"><?=$me_comment['page']?></div>
+        <?php endif; ?>
+    </div>
+    <?php endif;?>
+
+
+</div>
+<?php if( $is_myself) include "op_select_class.phtml";?>
+<script>
+    $(function () {
+        $('.ajax-url').click( DR.ajaxUrl  ) ;
+        <?php if( $is_myself):?>$('.addBook').click(BOOK.addBook ) <?php endif;?>
+    });
+</script>

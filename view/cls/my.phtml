@@ -1,0 +1,46 @@
+<div class="sui-container">
+    <?php if(! $tmy['list']) :?>
+    <div class="sui-msg msg-large msg-block msg-tips">
+        <div class="msg-con">亲，你未加入班群，请在右边上方查找班群</div>
+        <s class="msg-icon"></s>
+    </div>
+    <?php else :?>
+
+    <div class="sui-row-fluid">
+        <?php $kk=0;  foreach($tmy['list'] as $v ):$kk++; ?>
+        <?php if( $kk%2==1 && $kk>1): ?>
+    </div> <div class="sui-row-fluid">
+        <?php endif;?>
+        <div class="span6">
+            <table class="sui-table table-bordered-simple">
+                <thead>
+                <tr>
+                    <th colspan="5">
+                        <label class="checkbox">
+                            <input type="checkbox">
+                        </label><?=$v['class']?><span class="pull-right gray">加入: <?=date("Y-m-d",$v['ctime'])?></span>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td   class="center"  width="20%">班群号<br><h3><?=$v['class_id']?></h3></td>
+                    <td class="center" >学号<br><h3 style="font-weight: normal"><?=$v['number']?></h3></td>
+                    <td class="center" width="15%">同学<br><h3><?=$v['cls_info']['stu_cnt']?></h3></td>
+                    <td class="center" width="15%">任务<br><h3><?=$v['task_cnt']?>/<?=$v['cls_info']['task_cnt']?></h3></td>
+                    <td class="center" width="20%">
+                        <ul class="unstyled">
+                                <li><a href="#">查看任务</a></li>
+                                <li><a href="<?=R('cls/join/'.$v['class_id'])?>">完善</a></li>
+                                <li><a href="<?=R('cls/operate_stu/del?id='.$v['id'])?>">退出</a></li>
+                        </ul>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <?php endforeach; ?>
+    </div>
+    <?=$tmy['page']?>
+    <?php endif; ?>
+</div>

@@ -1,0 +1,69 @@
+<link href="<?=$WWW_RES?>/css/msui.css" rel="stylesheet">
+<div class="dr-container pull-left" style="width: 100%;">
+    <form id="form-book" class="sui-form form-horizontal" novalidate="novalidate" action="<?=$action?>">
+        <div class="control-group">
+            <label class="control-label sui-text-xlarge "  ></label>
+            <div class="controls">
+                <div class="dr-box-hover" title="点击图片增加或者修改" style="width: 80px; height: 80px;"><img src="<?=$school['logo']?>" id="bk_img" ></div>
+                <a href="javascript:;" id="upload">上传LOGO</a><br>
+                <span>大小：160px*160px </span>
+                <input type="hidden" value="<?=$school['logo']?>" name="logo" id="logo"/>
+            </div>
+        </div>
+
+        <div class="control-group ">
+            <label class="control-label"  >学校：</label>
+            <div class="controls">
+                <input type="text" data-rules="required"  id="school"  name="school" placeholder="请填写学校名称" data-empty-msg="请填写学校名称" value="<?=$school['school']?>">
+            </div>
+        </div>
+        <div class="control-group ">
+            <label class="control-label"  >校训：</label>
+            <div class="controls">
+                <input type="text" data-rules="required"  id="school_slogan"  name="school_slogan" placeholder="请填写校训" data-empty-msg="校训别忘记了" value="<?=$school['school_slogan']?>">
+            </div>
+        </div>
+        <div class="control-group ">
+            <label class="control-label"  >校域名：</label>
+            <div class="controls">
+                <input type="text" data-rules="required"  id="school_ename"  name="school_ename" placeholder="学校唯一代码" data-empty-msg="校域名别忘记了" value="<?=$school['school_ename']?>">
+            </div>
+        </div>
+        <div class="control-group">
+            <label for="inputNick" class="control-label v-top "> </label>
+            <div class="controls">
+                <button type="submit" class="sui-btn btn-primary btn-xlarge">提交</button>
+            </div>
+        </div>
+    </form>
+
+
+<?php if( $gt_action ):?>
+    <div style="padding: 20px ; border: 1px dashed #ccc; margin-bottom: 10px;  ">
+        <div class="title">功能区</div><br>
+        <button href="javascript:void(0);" class="sui-btn ajax-class ajax-url"   data-url="<?=$_c?>/bookSchool/pl_sms?school_id=<?=$school['id']?>&school=<?=$school['school']?>">批量选课截止提醒短信</button>
+    </div>
+<div class=" " style=" background-color: #eeeeee;padding: 2px 0 30px 0; ">
+    <?php include "op_gt.phtml" ?>
+</div>
+<?php endif; ?>
+</div>
+<div style="clear: both"></div>
+
+<script type="text/javascript" src="<?=$_cdn?>/res/js/plupload/plupload.full.min.js"></script>
+
+<script>
+    $(function () {
+        DR.uploadone( 'upload',{cb:function (rep) {
+            //alert(rep.file )
+            var file= '/'+ rep.file;
+            $('#bk_img').attr('src',file);
+            $('#logo').val( file );
+        },query:'from=book'} );
+        DR.ajaxAndValidate( 'form-book');
+        DR.ajaxAndValidate( 'form-gt');
+        //DR.ajaxUrl();
+        $('.ajax-url').click( DR.ajaxUrl );
+
+    });
+</script>

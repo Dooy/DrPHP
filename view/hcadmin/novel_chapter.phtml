@@ -1,0 +1,398 @@
+
+<!-- /res/js/jplayer/blue.monday/css/jplayer.blue.monday.min.css -->
+<link href="https://cdn.haoce.com/res/js/jplayer/blue.monday/css/jplayer.blue.monday.min.css" rel="stylesheet" type="text/css" />
+<script src="<?=$_cdn?><?=$WWW_RES?>/js/plupload/plupload.full.min.js"></script>
+<style>
+    .show_play{
+        width: 440px; position: fixed; top:80px; left: 20px;
+    }
+    .tb_select{ background-color: #c89e02}
+    .book-img{     height: 200px;        width: 145px;        overflow: hidden; }
+    .book-img img{        width: 100%;   height: 100%; }
+</style>
+
+<haoce>
+    <div class="flexbox">
+        <div class="book-img" style="padding: 10px; " id="upload_img"><img :src="novel.novel.img?novel.novel.cdn_img: '/res/img/feng.png'"></div>
+        <div class="flex">
+            <div style="padding-bottom: 15px;">
+                <h1 v-html="novel.novel.novel"  @click="show.titleEdit= !show.titleEdit " style="cursor: pointer" title="点我编辑标题"></h1>
+
+                <form class="sui-form" v-if="show.titleEdit">
+                     <input  name="novel" @blur="editPost()"  data-empty-msg="请填写描述" placeholder="请填写描述" class="input-xxlarge input-xfat" v-model="novel.novel.novel"/>
+                 </form>
+
+                <div class="sui-btn-group">  <a class="sui-btn" v-for="(v2,k2) in novel.ct_arr" @click="novel.novel.is_shuan=k2, editPost()" href="javascript:;" :class="{'btn-primary':novel.novel.is_shuan==k2}" v-html="v2" ></a>  </div>
+                <div style="padding-top: 20px; ">
+                    <div class="sui-btn-group">
+                        <a class="sui-btn" href="javascript:;" @click="DR.ajax('hcadmin/novel/wordCount/'+novel.novel.novel_id);">更新字数</a>
+                        <a class="sui-btn" href="javascript:;"  @click="DR.ajax('hcadmin/novel/addChapter/'+novel.novel.novel_id);">新增章节</a>
+                        <a class="sui-btn" href="javascript:;"  @click="DR.ajax('hcadmin/novel/copy/'+novel.novel.novel_id);" title="中英分离成2本书" v-if="HC.inArray(novel.novel.is_shuan,[2,4,5,8]) ">中英分离</a>
+                        <!--  v-if="novel.novel.site=='haoce'" -->
+                    </div>
+                    <div class="sui-btn-group">  <a class="sui-btn" v-for="(v2,k2) in novel.yin_arr"  @click="novel.novel.is_yin=k2, editPost()"  href="javascript:;"  :class="{'btn-primary':novel.novel.is_yin==k2}" v-html="v2+'音频'"></a>  </div>
+                </div>
+
+                <div style="padding-top: 15px;">
+                    <div>
+                    分类标签：<span  class="sui-btn btn-bordered btn-small" v-html="vt.tag" style="margin-right: 5px;"   v-for="(vt,kt) in st.tagList" title="单击删除！" @click="delTag(vt,kt)"></span>
+
+
+                    <input type="text" placeholder="以空格或者,分开" class="input-default" v-model="st.tag">
+                        <a href="javascript:void(0);" class="sui-btn btn-bordered btn-small btn-info" @click="addTag()" >+新增</a>
+                    </div>
+                </div>
+            </div>
+
+            <div id="jquery_jplayer_1"></div>
+            <div v-show="show.p" :class="{'show_play': show.scTop>100 }"   >
+                <div id="jp_container_1" class="jp-audio" role="application" aria-label="media player" >
+                    <div class="jp-type-single">
+                        <div class="jp-gui jp-interface">
+                            <div class="jp-controls">
+                                <button class="jp-play" role="button" tabindex="0">play</button>
+                                <button class="jp-stop" role="button" tabindex="0">stop</button>
+                            </div>
+                            <div class="jp-progress">
+                                <div class="jp-seek-bar">
+                                    <div class="jp-play-bar"></div>
+                                </div>
+                            </div>
+                            <div class="jp-volume-controls">
+                                <button class="jp-mute" role="button" tabindex="0">mute</button>
+                                <button class="jp-volume-max" role="button" tabindex="0">max volume</button>
+                                <div class="jp-volume-bar">
+                                    <div class="jp-volume-bar-value"></div>
+                                </div>
+                            </div>
+                            <div class="jp-time-holder">
+                                <div class="jp-current-time" role="timer" aria-label="time">&nbsp;</div>
+                                <div class="jp-duration" role="timer" aria-label="duration">&nbsp;</div>
+                                <div class="jp-toggles">
+                                    <button class="jp-repeat" role="button" tabindex="0">repeat</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="jp-details">
+                            <div class="jp-title" aria-label="title" v-html="p.chapter">&nbsp;</div>
+                        </div>
+                        <div class="jp-no-solution">
+                            <span>Update Required</span>
+                            To play the media you will need to either update your browser to a recent version or update your <a href="http://get.adobe.com/flashplayer/" target="_blank">Flash plugin</a>.
+                        </div>
+                    </div>
+                </div>
+                <div v-if="p.chapter">
+                    <!-- <h4 v-html="'正在播放: '+p.chapter"></h4> -->
+                    <p class="sui-btn-group">
+                        <button class="sui-btn"  v-html="parseInt( vm.status.currentTime)+'s 前切'" @click="del_time( vm.status.currentTime )"></button>
+                        <button class="sui-btn"  v-html="'后切 '+parseInt(-vm.status.currentTime)+'s'"  @click="del_time( -vm.status.currentTime )"></button>
+                    </p>
+                </div>
+            </div>
+            <!-- end jquery_jplayer -->
+
+
+        </div>
+    </div>
+
+
+
+<table class="sui-table table-bordered" v-if="novel.chapter.length">
+    <thead>
+    <tr>
+        <th>Chapter ID </th>
+        <th>Chapter</th>
+        <th>字数/赞/笔记/查看</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <template v-for="(v,k) in novel.chapter">
+    <tr :class="{'tb_select': show.k==k }">
+        <td v-html="k+1"></td>
+        <td>
+            <span  v-html="v.chapter" ></span>
+            <span class="sui-label label-danger" v-if="v.del_time!=0" v-html="v.del_time>0?'从'+v.del_time+'s开始':'播放至'+ -v.del_time+'s' "></span>
+            <template v-if="novel.novel.is_shuan==3"> <span class="sui-label label-warning" v-if="v.body_cn=='' " >空</span></template>
+            <template v-else>     <span class="sui-label label-warning" v-if="v.body=='' " >空</span>            </template>
+        </td>
+        <td>
+            <span  v-html="v.word" ></span>/
+            <span  v-html="v.good_cnt" ></span>/
+            <span  v-html="v.comment" ></span>/
+            <span  v-html="v.view" ></span>
+        </td>
+        <td>
+            [<a href="javascript:;"  @click="v.ctime= !v.ctime, console.log('chapter',v)">查看</a>]
+            <template v-if="v.mp3!=''">[<a href="javascript:;"  @click="show.k=k ,play(v)">播放</a>]</template>
+            [<a href="javascript:;" @click="show.f=true, f=v, show.k=k ">编辑</a>]
+            <template v-if="novel.novel.site=='haoce'  ">
+                [<a href="javascript:;"  @click="delChapter(k)" >删除</a>]
+                [<a href="javascript:;" title="向上" @click="pull(k,-1)"><i class="sui-icon icon-tb-pullup"></i></a>]
+                [<a href="javascript:;" title="向下" @click="pull(k,1)"><i class="sui-icon icon-tb-pulldown"></i></a>]
+            </template>
+            <template v-if="show.orderLog==k"> [<a href="javascript:;"  @click="saveOrder()">保存</a>]</template>
+        </td>
+    </tr>
+    <tr  v-if="!v.ctime">
+        <td colspan="5">
+            <div class="flexbox">
+                <div class="flex">
+                    <h3 style="text-align: center"  v-if="isDisable( novel.novel.is_shuan,[6,7,8])">日文</h3>
+                    <h3 style="text-align: center" v-else>英文</h3>
+                    <div v-if="isDisable( novel.novel.is_shuan,[5,8])" class="sui-btn-group">
+                        <a href="javascript:;" class="sui-btn " @click="show.language=''" :class="{'btn-primary':show.language=='' }">混合</a>
+                        <a href="javascript:;" class="sui-btn" @click="show.language='5_en'" :class="{'btn-primary':show.language=='5_en' }">英文</a>
+                        <a href="javascript:;" class="sui-btn" @click="show.language='5_cn'" :class="{'btn-primary':show.language=='5_cn' }">中文</a>
+                    </div>
+                    <div  v-html="showBodyEn(v.body)" style="padding-right: 20px;"></div>
+                </div>
+                <div class="flex">
+                    <h3 style="text-align: center">中文</h3>
+                    <div  v-html="HC.html(v.body_cn)" style="padding-left: 20px;"></div>
+                </div>
+            </div>
+
+        </td>
+    </tr>
+    </template>
+
+    </tbody>
+</table>
+
+
+
+
+    <div class="dr-sim"  v-show="show.f">
+        <div class="dr-sim-close" @click="show.f=false"><i class="icon-tb-close sui-icon"></i></div>
+        <div class="dr-vue" style="max-width: 1240px">
+            <h1 class="dr-vue-head" v-html="f.chapter"> </h1>
+            <div class="sui-form" style="text-align: center"> <input  name="novel"   data-empty-msg="请填写标题描述" placeholder="请填写标题描述" class="input-xxlarge input-xfat" v-model="f.chapter"/></div>
+
+            <div  style="text-align: center"><button type="submit" class="sui-btn btn-primary" @click="save()">修改</button></div>
+
+
+
+            <div class="flexbox">
+                <div class="flex" style="text-align: right">
+                    <h3 style="text-align: center" v-if="isDisable( novel.novel.is_shuan,[6,7,8])">日文</h3>
+                    <h3 style="text-align: center" v-else>英文</h3>
+                    <textarea style="height: 590px;width: 95%; text-align: left" class="input-xxlarge" v-model="f.body" disabled v-if="isDisable( novel.novel.is_shuan,[3])"></textarea>
+                    <textarea style="height: 590px;width: 95%; text-align: left" class="input-xxlarge" v-model="f.body" v-else></textarea>
+                </div>
+                <div class="flex" style="margin-left: 10px;">
+                    <h3 style="text-align: center">中文</h3>
+                    <textarea style="height: 590px;width: 95%;" class="input-xxlarge" v-model="f.body_cn" disabled v-if="isDisable( novel.novel.is_shuan,[1,2,5,6,8])"></textarea>
+                    <textarea style="height: 590px;width: 95%;" class="input-xxlarge" v-model="f.body_cn" v-else></textarea>
+                </div>
+            </div>
+
+
+
+
+
+        </div>
+    </div>
+
+</haoce>
+
+<script src="https://cdn.haoce.com/res//js/jplayer/jquery.jplayer.min.js"></script>
+<script src="/res/hcapp/js/haoce.js?d=20180405"></script>
+<script>
+    var vm = new Vue({
+        el:'haoce',
+        data:{
+            novel:<?=json_encode($novel)?>,
+            f:{ chapter:'good'},
+            p:{chapter:false},
+            u:<?=json_encode($_cu)?>,
+            status:{},
+            show:{ f:false,k:-1,p:false, scTop:0, titleEdit: false ,language:'',orderLog:-1 }
+            ,st:{tag:'',tagList:[] }
+
+        },
+        created:function () {
+          this.loadTag();
+        },
+        methods:{
+            isDisable:function ( is_shuan, Arr) {
+                for( var i=0;i<Arr.length; i++) if( Arr[i]== is_shuan) return true;
+                return false;
+            }
+            ,delTag:function(v,k){
+                console.log('delTag',v );
+                DR.ajax('/hcadmin/novel/delTag/'+ v.id );
+                this.st.tagList.splice( k,1);
+            }
+            ,addTag:function () {
+                if( this.st.tag=='') {
+                    DR.tip( '别文件输入TAG');
+                    return true;
+                }
+                var that = this;
+                DR.ajax('/hcadmin/novel/addTag/'+ this.novel.novel.novel_id,{'data':{'text': this.st.tag }},{success:function (rep) {
+                    //DR.tipSuccess('增加成功！');
+                    that.st.tag = '';
+                    that.loadTag();
+                } });
+            }
+            ,loadTag:function ( ) {
+                var that = this;
+                DR.ajax('/hcadmin/novel/loadTag/'+ this.novel.novel.novel_id,{},{ success:function (rep) {
+                    that.st.tagList = rep.data.tag  ;
+                    console.log('tagList', that.st.tagList );
+                } });
+            }
+            ,play:function (f) {
+                this.p= f ;
+                this.show.p= true;
+                my_jPlayer.jPlayer("setMedia", {
+                    mp3: f.mp3
+                });
+                my_jPlayer.jPlayer("play");
+            }
+            ,pull:function ( k,upDown) {
+                if( upDown==-1 ){//up
+                    if(k<=0) {
+                        DR.tip('已经是第一个了！');
+                        return ;
+                    }
+                }
+                if(upDown==1){ //down
+                    if( (k+1)>= vm.novel.chapter.length){
+                        DR.tip('已经是最后一个了！');
+                        return ;
+                    }
+                }
+                var  to= this.show.orderLog = k+upDown;
+                var _chapter =vm.novel.chapter;
+                var tem = _chapter[ to];
+                _chapter[ to]= _chapter[ k];
+                _chapter[ k]=tem;
+                for(var p in _chapter ){
+                    _chapter[p].chapter_id=p+1;
+                }
+                //console.log( k, to, _chapter );
+                this.novel.chapter=  [] ;
+                this.novel.chapter= _chapter ;
+            }
+            ,saveOrder:function () {
+                var d={'novel_id': this.novel.novel.novel_id,'site':this.novel.novel.site  };
+                d.order = [];
+                for(var p in  this.novel.chapter ){
+                    d.order.push( this.novel.chapter[p].cp_id  );
+                }
+                DR.ajax('/hcadmin/novel/saveOrder',{'data': d });
+                this.show.orderLog =-1;
+            }
+            ,delChapter:function (k ) {
+                if( !confirm('确定要删除？') ) return;
+                var v= this.novel.chapter[k];
+                this.novel.chapter.splice(k,1);
+                DR.ajax('/hcadmin/novel/delChapter',{'data': {chapter: v} });
+                console.log( v );
+            }
+            ,save:function () {
+                this.show.f = false;
+                DR.ajax('/hcadmin/novel/saveChapter',{'data':{novel: vm.novel.novel,chapter: this.f }})
+                //console.log( this.f );
+            }
+            ,del_time:function (time) {
+                var time = parseInt( time);
+                DR.ajax('/hcadmin/novel/saveChapter',{'data':{novel: vm.novel.novel,chapter:{cp_id: this.p.cp_id,del_time:time  } }});
+                this.p.del_time= time;
+            }
+            ,editPost:function () {
+                //console.log('d', vm.novel.novel );
+                DR.ajax('hcadmin/novel/editPost/'+ vm.novel.novel.novel_id,{'data':  vm.novel.novel} );
+            }
+            ,showBodyEn:function ( body ) {
+                if ( vm.show.language == '5_en') {
+                    return vm.enterSplit(body,'en' );
+                }
+                if (vm.show.language == '5_cn') {
+                    return vm.enterSplit(body,'cn' );
+                }
+                return HC.html(body);
+            },
+            enterSplit:function (body,en_cn) {
+                body =  body.replace(/^[\s\n\r]+|[\s\n\r]+$/g, '');
+                var arr = body.split(/[\n\r]+/g);
+                var obj={'en':[],'cn':[]};
+                var j = 0;
+                for( var i=0;i<arr.length;i++ ){
+                    var str=  arr[i].replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+                    if(str=='' ) continue;
+                    if(j%2==0) obj.en.push( str );
+                    else obj.cn.push( str );
+                    j++;
+                }
+                return  en_cn=='en'? HC.html( obj.en.join("\n") ):  HC.html( obj.cn.join("\n") );
+            }
+        }
+    });
+    window.addEventListener("scroll", function(event) {
+         vm.show.scTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop;
+        //console.log(scrollTop);
+    });
+
+    /*
+    function show( id ) {
+        $('#tr_'+ id ).toggle();
+    }
+
+*/
+    var	my_jPlayer = null;
+    $(function () {
+        my_jPlayer = $("#jquery_jplayer_1");
+        my_jPlayer.jPlayer({
+            ready: function () {
+                //$("#jp_container .track-default").click();
+            },
+            timeupdate: function(event) {
+                //that_now.html( parseInt(event.jPlayer.status.currentPercentAbsolute, 10) + "%");
+                DR.log( 'timeupdate', event.jPlayer.status  );
+                vm.status = event.jPlayer.status;
+            },
+            play: function(event) {
+                //my_playState.text(opt_text_playing);
+                //DR.log( 'play', event.jPlayer );
+            },
+            pause: function(event) {
+                //my_playState.text(opt_text_selected);
+
+            },
+            ended: function(event) {
+                //that_now.html('播放完成');
+            },
+            swfPath: "/res/js/jplayer",
+
+            supplied: "mp3,m4a, oga",
+            wmode: "window",
+            useStateClassSkin: true,
+            autoBlur: false,
+            smoothPlayBar: true,
+            keyEnabled: true,
+            remainingDuration: true,
+            toggleDuration: true
+        });
+    });
+    //
+
+    $(function () {
+        DR.uploadone( 'upload_img'
+            ,{
+                cb:function (rep) {
+                    console.log('rep', rep );
+                    vm.novel.novel.img= rep.f.f2 ;
+                    vm.novel.novel.cdn_img= '/'+ rep.f.file;
+                    vm.editPost();
+                }
+                ,query:'abc=123'
+                ,url:'<?=R('hcadmin/novel/imgChange/'.$novel['novel']['novel_id'])?>'
+                ,ext:'png,jpg,jpge'
+            });
+
+    });
+</script>

@@ -1,0 +1,138 @@
+<style>
+    .v-hide input{ width: 30px; text-align: center }
+</style>
+<div class="dr-container">
+
+
+    <div class="dr-box-padding"  id="school-banner"  >
+
+        <div class="pull-left" id="school-name">
+
+            <h3><?=$site_title?></h3>
+            <h4><?=$class['class']?></h4>
+        </div>
+        <ul class="pull-right total" id="school-total">
+            <li>
+                <b><?=$class['stu_cnt']?></b>
+                <span>人数</span>
+            </li>
+            <li>
+                <b><?=$class['class_id']?></b>
+                <span>班群号</span>
+            </li>
+
+        </ul>
+        <br style="clear: both"/>
+    </div>
+
+    <div  class="sp-v2"  >
+        <div id="haoce_vue" class="sp6">
+            <div class="dr-box-padding" >
+                <form>
+                    <table class="sui-table ">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>姓名</th>
+                            <th>学号</th>
+                             <th>加入</th>
+                             <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="(v,k) in whileList">
+                            <td v-html="k+1"></td>
+                            <td>
+                                <input type="text" v-model="v.name" v-if="v.user_id=='-1'" >
+                                <span v-html="v.name" v-else></span>
+                            </td>
+                            <td>
+                                <input type="text" v-model="v.number"  v-if="v.user_id=='-1'">
+                                <span v-html="v.number" v-else></span>
+                            </td>
+                            <td v-html="v.user_id<=0 ?'否':'是'"></td>
+                            <td>
+                                <template v-if="v.user_id=='0'">[<a href="javascript:;" @click="v.user_id='-1';" style="color: #0a6cd6">改</a>]</template>
+                                <template v-if="v.user_id=='-1'">[<a href="javascript:;" @click="save(v);"  style="color: #0a6cd6">保存</a>]</template>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+
+            <!--
+            <div class="flexbox">
+                <div class="dr-page flex"> </div>
+                <div><a href="<?=R($DR_SELF,  ['export'=>1] )?>" class="sui-btn  btn-info">导出</a> </div>
+            </div>
+            -->
+
+
+        </div>
+        <div class="sp3">
+            <div class="dr-box-padding">
+                <div class="dr-box-title">创建人</div>
+                <a class="book-create" >
+                    <div class="head-large"><img src="<?=H($user[$class['user_id']]['head'])?>"></div>
+                    <div href=""><?=$user[$class['user_id']]['name']?></div>
+                </a>
+            </div>
+            <?php if($class_role):?>
+                <div class="dr-box-padding">
+                    <div class="dr-box-title">任课教师</div>
+                    <div class="dr-box-content book-admin">
+                        <?php   foreach( $class_role  as $bk ): ?>
+                            <a class="book-admin-item" >
+                                <div class="head"><img src="<?=H($user[$bk['user_id']]['head'])?>"></div>
+                                <?=$user[$bk['user_id']]['name']?>
+                            </a>
+                        <?php endforeach;?>
+                    </div>
+                </div>
+            <?php endif;?>
+
+            <div  class="dr-box-padding">
+                <div class="dr-box-title">终分（最终成绩）说明</div>
+                <div class="dr-box-content">
+                    <div class="des2">
+                        1.多本书先取完成的
+                        <br>2.多本书完成条件相同，取成绩高的
+                        <br>3.每本书都有自己的任务，权重仅考虑本书相关的任务
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+<script src="<?=$_cdn?><?=$WWW_RES?>/js/plupload/plupload.full.min.js"></script>
+<script src="<?=$_cdn?><?=$WWW_RES?>hcapp/html/vue.min.js"></script>
+<script>
+    var vm = new Vue({
+        el:'#haoce_vue',
+        data: {
+            term:<?=json_encode($term)?>
+            , whileList:<?=json_encode($while)?>
+        },
+        methods:{
+            save:function (v) {
+                //console.log('save',v );
+                DR.ajax('/cls/operate/modifyWhile',{data: v   },{ success:function (rep) {  v.user_id='0'; DR.tipSuccess('修改成功！')  }});
+            }
+        }
+    });
+
+    $(function () {
+        DR.uploadone( 'upload'
+            ,{
+                cb:function (rep) {  }
+                ,query:'class_id=<?=$class['class_id']?>'
+                ,url:'<?=R('cls/studentList/implode')?>'
+                ,ext:'xls,xlsx'
+            });
+
+    });
+</script>

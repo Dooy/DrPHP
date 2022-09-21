@@ -1,0 +1,38 @@
+<div class="dr-min">
+    <form id="form-join" class="sui-form form-horizontal" novalidate="novalidate" action="<?=R('ajax_student/cls/join')?>">
+        <div class="control-group">
+            <label   class="control-label"></label>
+            <div class="controls"><h1>加入 <?=$cls_stu['class']['class']?></h1></div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label sui-text-xlarge"  >学号：</label>
+            <div class="controls ">
+                <input type="text"   id="number" class="input-xfat" name="number" value="<?=$cls_stu['stu']['number']?>"  placeholder="学校的唯一学号" data-rules="required"  data-empty-msg="亲，学号别忘记填了">
+            </div>
+        </div>
+
+
+        <div class="control-group">
+            <label class="control-label sui-text-xlarge"  >姓名：</label>
+            <div class="controls ">
+                <input type="text"   id="name" class="input-xfat" name="name" placeholder="姓名老师第一眼看到" value="<?=$cls_stu['stu']['name']?>" data-rules="required" data-empty-msg="亲，姓名别忘记填了">
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label for="sanwei" class="control-label"></label>
+            <div class="controls">
+                <button type="submit" class="sui-btn btn-primary btn-xlarge">完善</button>
+            </div>
+        </div>
+        <input type="hidden" name="class_id" value="<?=$cls_stu['class']['class_id']?>">
+
+    </form>
+</div>
+
+<script>
+    $(function () {
+        DR.ajaxAndValidate('form-join'  );
+    })
+</script>

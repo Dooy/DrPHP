@@ -1,0 +1,102 @@
+<script src="<?=$_cdn?><?=$WWW_RES?>/js/plupload/plupload.full.min.js"></script>
+
+<div style="padding: 8px 5px 5px 0px;">
+    <form id="user-search" action="<?=R( $_c.'/userlist/search')?>"  class="sui-form pull-left">
+        <select name="sq">
+            <?php foreach ($sq as $k=>$v): ?>
+                <option value="<?=$k?>" <?php if($k==$get['sq']):?>selected<?php endif;?> ><?=$v?></option>
+            <?php endforeach; ?>
+        </select>
+        <input type="text" placeholder="姓名、邮箱、手机号码" class="input-medium" name="q" value="<?=$get['q']?>">
+
+        <button type="submit" class="sui-btn ">查找</button>
+    </form>
+    <div class="sui-btn-group pull-right" style="padding: 3px 0 0 3px;">
+        <div class="sui-btn-group">
+            <?php foreach ( $ts as $k=> $v ): ?>
+                <a class="sui-btn <?php if($k== $ts_key): ?>btn-primary<?php endif; ?>" href="<?=R($_c.'/userList/ts/'.$k   )?>"><?=$v?></a>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <div style="clear: both"></div>
+</div>
+<?php if ( $userlist['list']  ) : ?>
+
+
+    <table class="sui-table table-bordered">
+        <thead>
+        <tr>
+            <th>UID</th>
+            <th>姓名<br>学号</th>
+            <th>登录次数<br>学校</th>
+            <th>性别<br>角色</th>
+            <th>选书/发帖/回复<br>
+                朗读/期中/期末/摘抄
+            </th>
+            <th>最新登录<br>创建</th>
+            <th>账号</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ( $userlist['list'] as $v ) : ?>
+            <tr>
+                <td><?=$v['user_id']?> </td>
+                <td><?=$v['name']?><?php if( isset( $v['attr']['p3']) ): ?><br><span class="sui-label label-warning">管理员</span><?php endif;?>
+                <br><?=$v['number']?>
+                </td>
+                <td><?=$v['login_cnt']?><br><?=$v['school']?></td>
+                <td><?=$sex[$v['sex']]?><br><?=$ts[$v['ts']]?></td>
+                <td><?=$v['tjrz']['book_cnt']?>/<?=$v['tjrz']['topic_cnt']?>/<?=$v['tjrz']['comment_cnt']?><br>
+                    <?=$v['tjrz']['tag_3_cnt']?>/ <?=$v['tjrz']['tag_4_cnt']?>/ <?=$v['tjrz']['tag_5_cnt']?>/ <?=$v['tjrz']['tag_6_cnt']?>
+                </td>
+                <td><?= $v['last_time']>0? date("Y-m-d", $v['last_time']):'未'?><br><?=date("Y-m-d", $v['ctime'])?></td>
+                <td><?php $ik=0; foreach ($v['oauth'] as  $v2): if($ik>0) echo"<br>" ; $ik++; ?><?=$v2['openid']?><?php  endforeach; ?></td>
+                <td>
+                    [<a data-url="<?=R($_c.'/user/edit/'. $v['user_id'])?>" class="dr-iframe" href="javascript:;">编辑</a>]
+                     [<a data-url="<?=R('/school/novelView/uid/'. $v['user_id'],['tb'=>'list'])?>"   class="dr-iframe"  href="javascript:;" title="阅读打卡记录">阅读</a>]
+                    <br>[<a href="javascript:;" onclick="vm.loadRecycleLog( '<?=$v['user_id']?>','<?=$v['name']?>');" >回收站</a>]
+                </td>
+            </tr>
+        <?php endforeach;?>
+        </tbody>
+    </table>
+    <div class="dr-page"><?=$userlist['page']?></div>
+<?php else: ?>
+    <div class="sui-msg msg-large msg-block msg-error">
+        <div class="msg-con">该条件下 无匹配结果 <button type="button" data-dismiss="msgs" class="sui-close">×</button> </div>
+        <s class="msg-icon"></s>
+    </div>
+<?php endif; ?>
+
+
+<?php include ( tplFile( "hcadmin/i_user.phtml") ); ?>
+<script>
+    $(function () {
+        DR.uploadone( 'upload'
+            ,{
+                cb:function (rep) {
+                    alert("成功："+rep.rz.success+"条\n失败："+  rep.rz.error.length +'条' );
+                    if(rep.rz.error.length>0 ){
+                        var des_str= '';
+                        for(var i=0;i< rep.rz.error.length ; i++ ){
+                            var dt= rep.rz.error[i];
+                            des_str+=  dt.d.A+"："+  dt.error +"<br>";
+                        }
+                        //DR.tip('<div style="text-align: left;">' + des_str+'</div>' ,{style:'error'});
+                        var d = dialog({
+                            title: '错误详情',
+                            content: '<div style="text-align: center;padding: 10px 15px;text-align: left;"  >'+des_str+'</div>' ,
+                            //width:200
+                        });
+                        d.show();
+                    }
+                }
+                ,query:'abc=123'
+                ,url:'<?=R('hcadmin/user/implode')?>'
+                ,ext:'xls,xlsx'
+            });
+        $('.dr-iframe').click( DR.iframe_fun );
+
+    });
+</script>

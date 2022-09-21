@@ -1,0 +1,360 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>HI PAY</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <?php include "bk_head.phtml";?>
+    <style>
+        #bohe ul, #bohe li{ padding: 0 ;margin: 0; list-style: none}
+        #bohe li{width: 187px; float: left; height: 120px; position: relative;overflow: hidden }
+        @media screen  and (max-width: 374px) {
+            #bohe li{width: 50%;}
+        }
+        #bohe .title{ position: absolute;height: 20px; width: 100%; text-align: center;left: 0;bottom: 0px; background-color: rgba(0,0,0,0.2) ;color: #fff }
+        .pos{ position: absolute;right: 2px; top:2px; font-size: 12px;border-radius: 2px; background-color: rgba(0,0,0,0.5); color: #fff;padding: 0 3px;}
+
+
+         ul,li{ list-style: none;padding: 0;margin: 0;}
+        .pigai-main-list li{ float: left;  width: 33.3%; text-align: center;  margin-bottom: 5px;  }
+        .pigai-main-list li a{color: #666;}
+
+        .pigai-main-list li .mui-media-body{ color: #333;}
+        .pigai-main-list li	.mui-icon{font-size:50px; ;}
+        .mui-mark{position: relative;}
+        .mui-mark:after{content: " "; background-color: rgba(255,0,0,0.9); position: absolute;
+            z-index: 10; width: 12px;height: 12px; overflow: hidden ; border-radius: 50%;
+            top: 8px;right:0px;font-size: 10px;color: #FFFFFF;
+        }
+
+        .mui-page .mui-table-view:first-child{ margin-top: 15px;}
+        .mui-page .mui-table-view { margin-top: 20px;  }
+
+
+    </style>
+</head>
+<body>
+<bobo>
+    <!-- login -->
+    <div class="mui-content"  v-if="st.tab=='init'" style="text-align: center;padding: 50px 0">
+        Loading....
+    </div>
+    <div class="mui-content"  v-else-if="st.tab=='login'" >
+
+        <div style="margin-top: 30px;" id="login">
+            <div style="text-align: center;padding-bottom: 10px;">
+                <h3>登录</h3>
+            </div>
+            <div id='login-form' class="mui-input-group">
+                <div class="mui-input-row">
+                    <label>账号</label>
+                    <input   type="text" class="mui-input-clear mui-input" placeholder="账号" v-model="f.openid">
+                </div>
+                <div class="mui-input-row">
+                    <label>密码</label>
+                    <input  type="password" class="mui-input-clear mui-input mui-input-password" placeholder="请输入密码" v-model="f.psw">
+                </div>
+
+                <div class="mui-input-row">
+                    <label>身份验证</label>
+                    <input  type="text" class="mui-input-clear mui-input" placeholder="谷歌身份验证，未绑定可留空"  v-model="f.google">
+                </div>
+            </div>
+
+            <div class="mui-content-padded ">
+                <button  class="mui-btn mui-btn-block mui-btn-primary" v-html="st.isLogin?'登录中...':'登录'" @click="login()" style="padding: 10px;"></button>
+            </div>
+        </div>
+    </div>
+    <!-- end login -->
+
+    <div v-else-if="st.tab=='setting'" >
+
+        <div class="mui-navbar-inner mui-bar mui-bar-nav">
+            <button type="button" class="mui-left mui-btn  mui-btn-link mui-btn-nav mui-pull-left" @click="st.tab='main'">
+                <span class="mui-icon mui-icon-left-nav"></span>
+            </button>
+            <h1 class="mui-center mui-title">设置</h1>
+        </div>
+
+        <div class="mui-page-content mui-page" >
+            <div class="mui-scroll-wrapper" style="top: 45px;">
+                <div class="mui-scroll">
+                    <ul class="mui-table-view mui-table-view-chevron">
+                        <li class="mui-table-view-cell mui-media">
+                            <a   href="#account">
+                                <img class="mui-media-object mui-pull-left head-img" id="head-img" :src="cu.u.head">
+                                <div class="mui-media-body">
+                                    <span v-html="cu.u.name"></span>
+                                    <p class='mui-ellipsis' v-html="'UID:'+cu.u.uid"> </p>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                    <ul class="mui-table-view mui-table-view-chevron">
+                        <li class="mui-table-view-cell">
+                            <a href="/app/page/q_google" class="mui-navigate-right">绑定谷歌身份验证器</a>
+                        </li>
+                        <li class="mui-table-view-cell">
+                            <a href="/app/page/q_lab" class="mui-navigate-right">实验室</a>
+                        </li>
+                    </ul>
+                    <ul class="mui-table-view">
+                        <li class="mui-table-view-cell" style="text-align: center;">
+                            <a @tap="logout()">退出登录</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!-- end login -->
+
+
+    <!-- start main -->
+    <div class="mui-content"  v-if="st.tab=='main'">
+        <div id="slider" class="mui-slider" tpl="tpl_slider" >
+            <div class="mui-slider-group mui-slider-loop">
+                <!-- 额外增加的一个节点(循环轮播：第一个节点是最后一张轮播) -->
+                <div class="mui-slider-item mui-slider-item-duplicate">
+                    <a   @tap="HC.vue(images.last)"><img :src="images.last.img"></a>
+                </div>
+                <!-- 第一张 -->
+                <div class="mui-slider-item" v-for="v in images.list">
+                    <a @tap="HC.vue(v)" ><img :src="v.img">	</a>
+                </div>
+
+
+                <!-- 额外增加的一个节点(循环轮播：最后一个节点是第一张轮播) -->
+                <div class="mui-slider-item mui-slider-item-duplicate">
+                    <a   @tap="HC.vue(images.first)" ><img :src="images.first.img"></a>
+                </div>
+
+            </div>
+            <div class="mui-slider-indicator">
+                <div class="mui-indicator " v-for="v in images.list"></div>
+            </div>
+        </div>
+        <div style="padding-left: 15px;padding-top: 8px;">
+            <h3 v-html="'欢迎 '+cu.u.name" style="margin: 0; font-size: 18px"></h3>
+
+        </div>
+
+        <template v-if="cu.ma.type<10">
+            <div class="mui-table-view" style="margin-top: 20px;">
+                <div   style="padding: 40px 0; text-align: center;color: #333 ">
+                    您的身份处于 不可用状态，请先完善
+
+                    <br>
+                    <br>
+                    <a  class="mui-btn mui-btn-primary" href="/app/page/q_member">立即完善</a>
+
+                    <br>
+                    <br>
+                    <a   @tap="logout()">切换账号</a>
+                </div>
+            </div>
+        </template>
+        <template v-else>
+            <!--
+            <ul class="mui-table-view mui-table-view-chevron" style="margin-top: 15px">
+                <li class="mui-table-view-cell">
+                    <a href="/app/page/q_google" class="mui-navigate-right" style="color: #ff7300">系统将在9月20日启用谷歌验证码请先设置</a>
+                </li>
+            </ul>
+            -->
+
+        <div class="mui-table-view" style="margin-top:15px ;padding: 10px 1px;" v-if="items.length">
+            <ul class="pigai-grid pigai-main-list"  >
+                <template v-if="cu.ma.version==80">
+                    <li><a  href="/app/page/tb_qr" >
+                            <span class="mui-icon mui-icon-chatbubble" ></span>
+                            <div class="mui-media-body" >代付扫码</div>
+                        </a></li>
+                    <li><a  href="/app/page/q_tb_sh" >
+                            <span class="mui-icon mui-icon-locked" ></span>
+                            <div class="mui-media-body" >扫码审核</div>
+                        </a></li>
+
+                    <li><a  href="/app/page/q_tb_sms" >
+                            <span class="mui-icon mui-icon-email" ></span>
+                            <div class="mui-media-body" >短信核销</div>
+                        </a></li>
+                </template>
+                <!--
+                <template v-else-if="cu.ma.version==60 || cu.ma.version==65">
+                    <li><a  href="/app/page/q_pingan" >
+                            <span class="mui-icon mui-icon-chatbubble" ></span>
+                            <div class="mui-media-body" >平安银行</div>
+                        </a></li>
+                </template>
+                -->
+                <template v-else>
+                    <template v-if="cu.ma.version==90">
+                        <li><a  href="/app/page/q_b2a" >
+                                <span class="mui-icon mui-icon-chatbubble"  style="color: #007aff"></span>
+                                <div class="mui-media-body" >支.网银</div>
+                            </a></li>
+                    </template>
+
+                    <template class="" v-for="item in items">
+                    <li v-if="isShowItem(item)"><a   :href="item.url" >
+                            <span :class="item.cls"  :style="item.style"  style="color: #007aff"></span>
+                            <div class="mui-media-body"  :style="item.style_title"> {{item.title}}</div>
+                        </a></li>
+                    </template>
+
+                    <!--
+                    <li><a  href="/app/page/q_danv2" >
+                            <span class="mui-icon mui-icon-chatbubble" style="position: relative"><span class="mui-badge" style="top: 5px; margin-left: -20px;">测</span></span>
+                            <div class="mui-media-body" >抢单</div>
+                        </a></li>
+                    -->
+                </template>
+
+                <!--
+                <li><a  href="/app/page/q_lab" >
+                        <span class="mui-icon mui-icon-plus" style="position: relative"></span>
+                        <div class="mui-media-body" >实验室</div>
+                    </a></li>
+
+                    -->
+
+                <li><a   @tap="st.tab='setting'" >
+                        <span class="mui-icon mui-icon-gear" ></span>
+                        <div class="mui-media-body">设置</div>
+                    </a></li>
+
+                <div style="clear: both;"></div>
+            </ul>
+        </div>
+        </template>
+
+
+    </div>
+    <!-- end main -->
+
+</bobo>
+</body>
+<script>
+var vm = new Vue({
+    el: 'bobo',
+    data: {
+        st:{tab:'init',isLogin:false}
+        ,cu:{u:{uid:'', head:'',name: '' }, ma:{amount:'0', realname:'',type:10,version:0 }}
+        ,f:{google:'', openid:'', psw:''}
+        ,images:{first:{} ,last:{}, list:[] }
+        ,items: []
+    }
+    ,
+    created: function () {
+        this.loadInfo();
+
+        var vue_main= this;
+        var list=[];
+        list.push({'img':'https://cdn.haoce.com/res/hcapp/images/shuijiao500x250.jpg','url':'https://www.haoce.com', open_type:'http' });
+        list.push({'img':'https://cdn.haoce.com/res/hcapp/images/muwu500x250.jpg','url':'https://www.haoce.com', open_type:'http' });
+        vue_main.images.first= list[0];
+        vue_main.images.last= list[list.length-1];
+        vue_main.images.list= list;
+
+        vue_main.items = [{"title":"派单",style_title:"color:#007aff","url":"/app/page/q_dan","id":"bookMe","cls":"mui-icon mui-icon-location","open_type":"http_native"  },{"title":"收款账号","url":"/app/page/q_account","id":"bookSchool","cls":"mui-icon mui-icon-map","open_type":"http_native" }];
+
+        vue_main.items.push( {"title":"充值" ,"url":"/app/page/q_cw?tab=cz","id":"bookMe","cls":"mui-icon mui-icon-paperplane","open_type":"http_native"  }  );
+        vue_main.items.push( {"title":"财务" ,"url":"/app/page/q_cw","id":"bookMe","cls":"mui-icon mui-icon-list","open_type":"http_native"  }  );
+        vue_main.items.push( {"title":"代理" ,"url":"/app/page/q_ma","id":"bookMe","cls":"mui-icon mui-icon-contact","open_type":"http_native"  }  );
+
+
+    },
+    mounted: function () {
+        //this.notice();
+    },
+    methods: {
+        login:function () {
+            var that = this;
+            //return ;
+            HC.ajax('/index/login/post' ,{ data: this.f,success:function (rep) {
+                     that.loadInfo();
+                     try {
+                         api.setPrefs({key: 'loginF', value: JSON.stringify(that.f)});
+                     }catch (e) {
+                     }
+                }})
+        }
+        ,logout:function () {
+            var  that = this;
+            HC.ajax('/logout', { success:function (rep) {
+                    that.st.tab='login';
+            }});
+        }
+        ,isShowItem:function (v) {
+            if( this.cu.ma.version==90 ){
+                switch ( v.url) {
+                    case '/app/page/q_dan':
+                    case '/app/page/q_account':
+                        return false;
+                        break;
+                }
+            }
+            return true;
+        }
+        ,loadInfo:function () {
+            var  that = this;
+            HC.ajax('/vip', { success:function (rep) {
+                if( rep._cu==false ||  !rep.ma ) {
+                    that.st.tab='login';
+                    return;
+                }
+                //this.cu.u= rep.data.
+                    that.cu.u = rep._cu;
+                    that.cu.ma  = rep.ma;
+                    console.log(rep );
+                    that.st.tab='main';
+                    //that.st.tab='setting';
+                    setTimeout( that.sImg, 800);
+
+                }});
+        }
+        , sImg:function () {
+            setTimeout(function(){
+                var slider = mui('#slider' );
+                slider.slider({	interval: 5000});
+            },3000);
+
+        }
+        ,ready:function () {
+            var that = this;
+            api.getPrefs({  key: 'loginF' },  function(ret, err) {
+                    var userName =  ret.value;
+                    try {
+                        var f =JSON.parse( userName );
+                        HC.extend( that.f, f );
+                        that.f.google='';
+                    }catch (e) {
+                    }
+                }
+            );
+
+        }
+        ,notice:function () {
+            var btnArray = ['先放放', '去设置'];
+            //<div style="width: 320px">系统将在 2019-09-11 9:00 （<span style="color:red">今晚9点</span>）全面启用登录需谷歌验证码，请大家先下载谷歌验证器，并先验证绑定！</div>
+            mui.confirm('系统将在 2019-09-15 21:00，全面启用登录需谷歌验证码，请大家先下载谷歌验证器，并先验证绑定！', '通知', btnArray, function(e) {
+                if (e.index == 1) {
+                    //info.innerText = '你刚确认MUI是个好框架';
+                    location.href='/app/page/q_google';
+                } else {
+                    //info.innerText = 'MUI没有得到你的认可，继续加油'
+                }
+            })
+        }
+    }
+});
+
+try {
+    apiready = vm.ready;
+}catch (e) {
+}
+</script>
+</html>

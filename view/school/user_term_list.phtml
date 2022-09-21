@@ -1,0 +1,58 @@
+<div style="padding: 8px 5px 5px 0px;">
+    <!--
+    <form id="user-search" action="<?=R( $_c.'/userlist/search')?>"  class="sui-form pull-left">
+        <select name="sq">
+            <?php foreach ($sq as $k=>$v): ?>
+                <option value="<?=$k?>" <?php if($k==$get['sq']):?>selected<?php endif;?> ><?=$v?></option>
+            <?php endforeach; ?>
+        </select>
+        <input type="text" placeholder="姓名、邮箱、手机号码" class="input-medium" name="q" value="<?=$get['q']?>">
+
+        <button type="submit" class="sui-btn ">查找</button>
+    </form>
+    -->
+    <div class="sui-btn-group pull-right" style="padding: 3px 0 0 3px;">
+        <a href="" class="sui-btn btn-primary">导出</a>
+    </div>
+    <div style="clear: both"></div>
+</div>
+<?php if ( $list['list']  ) : ?>
+    <table class="sui-table table-bordered">
+    <thead>
+    <tr>
+        <th>UID</th>
+        <th>姓名<br>学校</th>
+        <th>学号<br>班级</th>
+        <th>选书<br>发帖/回帖</th>
+        <th>朗读<br>期中/期末</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php foreach ( $list['list'] as $k=> $v ) : ?>
+        <tr>
+            <td><?=$v['user_id']?></td>
+            <td><?=$v['name']?><br><?=$v['school']?></td>
+            <td><?=$v['number']?><?=$v['ts']==1?'(教师)':'' ?><br><?=$v['class']?></td>
+            <td><?=$v['tjrz']['book_cnt']?><br><?=$v['tjrz']['topic_cnt']?>/<?=$v['tjrz']['comment_cnt']?></td>
+            <td><?=$v['tjrz']['tag_3_cnt']?><br><?=$v['tjrz']['tag_4_cnt']?>/<?=$v['tjrz']['tag_5_cnt']?></td>
+            <td>[<a href="javascript:;" data-url="<?=R($_c.'/user/edit/'. $v['user_id'])?>"  class="dr-iframe">编辑</a> ]</td>
+        </tr>
+    <?php endforeach;?>
+    </tbody>
+    </table>
+<div class="dr-page"><?=$list['page']?></div>
+<?php else: ?>
+    <div class="sui-msg msg-large msg-block msg-error">
+        <div class="msg-con">该条件下 无匹配结果 <button type="button" data-dismiss="msgs" class="sui-close">×</button> </div>
+        <s class="msg-icon"></s>
+    </div>
+<?php endif; ?>
+
+
+<script>
+    $(function () {
+        $('.dr-iframe').click( DR.iframe_fun );
+    });
+</script>
+

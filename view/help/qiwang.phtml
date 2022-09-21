@@ -1,0 +1,52 @@
+<div class="dr-container">
+
+    <div class="flexbox">
+        <div class="flex">
+            <form class="form-inline sui-form" action="<?=R('help/qiwang/post')?>" method="post">
+                <div class="input-prepend"><span class="add-on">低分</span>
+                    <input  type="text" placeholder="" class="span2 input-xfat input-small" name="config[min]" value="<?=$config['min']?>">
+                </div>
+
+                <div class="input-prepend"><span class="add-on">中分</span>
+                    <input  type="text" placeholder="" class="span2 input-xfat input-small"  name="config[agv]" value="<?=$config['agv']?>">
+                </div>
+                <div class="input-prepend"><span class="add-on">高分</span>
+                    <input  type="text" placeholder="" class="span2 input-xfat input-small"  name="config[max]" value="<?=$config['max']?>">
+                </div>
+                <br>
+                <br>
+                <textarea rows="20" style="width: 80%" placeholder="请先要换算的内容复制过来" name="txt"><?=isset($_POST['txt'])?$_POST['txt']:''?></textarea>
+                <br>
+                <button href="javascript:void(0);" class="sui-btn btn-large btn-primary">计算</button>
+            </form>
+        </div>
+        <div class="flex">
+            <?php if($arr_arr ):?>
+
+            <table class="sui-table table-bordered-simple">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>原分数</th>
+                    <th>换算后</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <th>均分</th>
+                    <th><?=$arr['agv']?></th>
+                    <th><?=$re['agv']?></th>
+                </tr>
+                <?php foreach($arr_arr as $k=>$v ):?>
+                <tr>
+                    <td><?=$k+1?></td>
+                    <td><?=$arr_arr[ $key_arr[$k]]?></td>
+                    <td><?=$re_arr[ $key_arr[$k]]?></td>
+                </tr>
+                 <?php endforeach;?>
+                </tbody>
+            </table>
+            <?php endif;?>
+        </div>
+    </div>
+</div>

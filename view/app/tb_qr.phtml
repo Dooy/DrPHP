@@ -1,0 +1,116 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>HI PAY</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <?php include "bk_head.phtml";?>
+    <style>
+        .title{
+            margin: 20px 15px 7px;
+            color: #6d6d72;
+            font-size: 15px;
+        }
+        .fade-enter-active, .fade-leave-active {
+            transition: opacity .5s;
+        }
+        .fade-enter, .fade-leave-to  {
+            opacity: 0;
+        }
+        .q_warng{  margin: 10px 15px 7px;  color: #ff7300; font-size: 15px;  }
+
+        .q_time{position: absolute; right: 83px; top: 11px;}
+        .q_btn{ position: absolute; right: 10px;top: 13px; }
+        .mui-popup-input input{ height: 40px; font-size: 20px;  font-weight:bolder; }
+    </style>
+</head>
+<body>
+<bobo>
+    <header class="mui-bar mui-bar-nav">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+        <h1 class="mui-title">代付二维码</h1>
+        <a class="mui-btn mui-btn-blue mui-btn-link mui-pull-right"  href="javacript:;" @click="sao()" >扫码</a>
+    </header>
+    <div class="mui-content">
+        <template v-if="qrList.list.length">
+        <div class="title">
+            代付商品列表
+        </div>
+        <ul class="mui-table-view" >
+
+            <li class="mui-table-view-cell mui-media"  v-for="v in qrList.list">
+                <a href="javascript:;">
+                    <img class="mui-media-object mui-pull-left" src="/res/img/nopo.jpg">
+                    <div class="mui-media-body">
+                        <span v-if="v.fee>0" v-html=" v.fee/100+'元' " style="color: #ff7300;position: absolute;right: 5px;top: 0px; font-size: 14px;"></span> <span v-html="v.biz_no"></span>
+                        <p class='mui-ellipsis'>
+                            <span v-html="sv.qrType[v.type]"></span>
+                            <span    v-html="HC.dateUtils.date_format(v.ctime,'MM/dd HH:mm')"></span>
+                            <span v-html="v.opt_value.d.data.applyerUserName" v-if="v.opt_value && v.opt_value.d"></span>
+                        </p>
+                    </div>
+                </a>
+            </li>
+        </ul>
+        </template>
+        <div v-else style="text-align: center; padding: 50px 0;">请点击右上角<span @click="sao()">扫码</span> 将代付二维码扫进来</div>
+
+    </div>
+</bobo>
+</body>
+<script>
+    new Vue({
+        el: 'bobo',
+        data: {
+            st:{tab:'',page:1}
+            ,qrList:{ list:[]}
+            ,sv:{}
+        }
+        ,
+        created: function () {
+            this.load();
+        },
+        mounted: function () {
+        },
+        methods: {
+            sao:function () {
+                var that = this;
+                var FNScanner = api.require('FNScanner');
+                //alert( FNScanner );
+                FNScanner.open({
+                    autorotation: true
+                }, function(ret, err) {
+                    if (ret && ret.eventType=='success'   ) {
+                        if( ret.content ){
+                            that.create(ret.content);
+                            //alert(  ret.content );
+                            /*
+                            that.f.qr = ret.content;
+                            setTimeout(function () {
+                                that.qrCode( that.f.qr,'qrCode' );
+                            },800);
+                            */
+                        }
+                    } else {
+                        //alert(JSON.stringify(err));
+                    }
+                });
+            }
+            ,load:function () {
+                var that = this;
+                HC.ajax('/vip/taobao/load' ,{success:function (rep) {
+
+                        that.qrList= rep.list;
+                        that.sv= rep.sv ;
+                    }} );
+            }
+            ,create:function (qr_txt) {
+                var that = this;
+                HC.ajax('/vip/taobao/create' ,{data:{qr:qr_txt }, success:function (rep) {
+                    that.load();
+                    }} );
+            }
+        }
+    });
+</script>
+</html>

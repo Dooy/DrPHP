@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <title><?=($site_title?$site_title.'-':'')?>HI PAY</title>
+    <link href="<?=$WWW_RES?>/sui/css/sui.min.css" rel="stylesheet">
+
+    <link href="<?=$WWW_RES?>/css/dr.css?d=0929" rel="stylesheet">
+
+    <script type="text/javascript" src="/res/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/res/js/vue.min.js"></script>
+
+    <style>
+        body{margin: 0 auto;padding: 0; }
+        .slide-fade-enter-active {
+            transition: all .3s ease;
+        }
+        .slide-fade-leave-active {
+            transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+        }
+        .slide-fade-enter, .slide-fade-leave-to{
+            transform: translateX(300px);
+            opacity: 0;
+        }
+        @media screen and (max-width: 540px) {
+            .ad-head-open .leafmenu.hide2 {
+                display: none
+            }
+        }
+    </style>
+</head>
+<body style="background-color: #e8ecf0">
+<bobo>
+<div class="ad-head2">
+    <div class="flexbox">
+        <div class="flex"><a class="logo-txt"  ><?=$site_title?> </a></div>
+        <div class="ad-head-link">
+            <a  >欢迎<?=$_cu['name']?>回来</a><i>|</i>
+            <a href="<?=R('logout')?>">登出</a>
+        </div>
+    </div>
+    <div  class="menu-icon"><i class="sui-icon icon-pc-list" @click="st.is_min_tab= !st.is_min_tab"></i></div>
+</div>
+
+<ul class="ad-head-menu"  :class="{'ad-tab':st.is_min_tab}">
+    <li> <a  href="javascript:;" data-url="<?=R('finance/tj')?>"  ><i class="sui-icon icon-tb-refund"></i> <span>总览</span></a></li>
+
+    <!--
+    <li >
+        <a class="menu-one" href="javascript:;"><i class="sui-icon icon-tb-profile"></i> <span>商户</span></a>
+        <ul class="leafmenu"  :class="{'hide2':!st.is_min_tab}">
+            <li> <a  data-url="<?=R('finance/mcList')?>" href="javascript:;"   >财务查询</a></li>
+            <li> <a  data-url="<?=R('finance/mcadd')?>" href="javascript:;"   >开户与管理</a></li>
+        </ul>
+    </li>
+    -->
+
+    <li> <a  href="javascript:;" data-url="<?=R('finance/mcList')?>"  ><i class="sui-icon icon-tb-profile"></i> <span>商户管理</span></a></li>
+    <li> <a  href="javascript:;" data-url="<?=R('finance/mcTj')?>"  ><i class="sui-icon icon-tb-comment"></i> <span>商户收银</span></a></li>
+
+    <?php if($_cu['uid']==5):?>
+        <li> <a  href="javascript:;" data-url="<?=R('finance/workshop')?>"  ><i class="sui-icon icon-tb-redpacket"></i> <span>工作室</span></a></li>
+    <?php else:?>
+    <li >
+        <a class="menu-one" href="javascript:;"><i class="sui-icon icon-tb-redpacket"></i> <span>工作室</span></a>
+        <ul class="leafmenu"  :class="{'hide2':!st.is_min_tab}">
+            <?php foreach ($userList as $k=>$v ) :?>
+            <li> <a  data-url="<?=R('finance/transfer/tab/today?uid='.$v['user_id'])?>" href="javascript:;"   ><?=$v['name']?></a></li>
+            <?php endforeach; ?>
+        </ul>
+    </li>
+    <?php endif;?>
+
+
+
+    <?php if( in_array( $_cu['uid'],[4373,7,1619,2321])):?>
+    <li>
+        <a class="menu-one" href="javascript:;"><i class="sui-icon icon-tb-friend"></i> <span>商户代理</span></a>
+        <ul class="leafmenu"  :class="{'hide2':!st.is_min_tab}">
+            <li> <a data-url="<?=R('console/ma2')?>"  href="javascript:;"   >开户审核</a></li>
+            <!--
+            <li> <a data-url="<?=R('console/ma2cw/vChong/')?>" href="javascript:;"   >充值审核</a></li>
+            -->
+            <li> <a data-url="<?=R('console/ma2cw/vTi/')?>" href="javascript:;">提现审核</a></li>
+            <li> <a data-url="<?=R('console/ma2cw/tj')?>" href="javascript:;">跑量对账</a></li>
+            <li> <a data-url="<?=R('console/ma2dui')?>" href="javascript:;"   >总对账</a></li>
+            <li> <a data-url="<?=R('console/ma2cw')?>" href="javascript:;"   >收支明细</a></li>
+            <li> <a data-url="<?=R('console/map')?>" href="javascript:;"   >代理视图</a></li>
+        </ul>
+    </li>
+    <?php endif; ?>
+
+    <li>
+        <a class="menu-one" href="javascript:;"><i class="sui-icon icon-tb-barcode"></i> <span>其他</span></a>
+        <ul class="leafmenu"  :class="{'hide2':!st.is_min_tab}">
+            <li> <a  data-url="/bi/trade/yesterday" href="javascript:;"   >分档统计</a></li>
+            <li> <a  data-url="/bi/bu/" href="javascript:;"   >补单分析</a></li>
+        </ul>
+    </li>
+
+
+    <li >
+        <a class="menu-one" href="javascript:;"><i class="sui-icon icon-tb-settings"></i> <span >设置</span></a>
+        <ul class="leafmenu">
+            <li> <a  href="javascript:;" data-url="<?=R('member/changPsw')?>"  >修改密码</a></li>
+            <li> <a  href="javascript:;" data-url="<?=R('member/google')?>"  >谷歌验证码</a></li>
+            <li> <a  href="javascript:;" data-url="<?=R('member/log')?>"  >登录日志</a></li>
+            <?php if($_cu['uid']==5):?>
+                <li> <a  href="javascript:;" data-url="<?=R('member/log/sys')?>"  >系统日志</a></li>
+            <?php endif;?>
+        </ul>
+    </li>
+
+
+    <li v-if="st.is_min_tab"> <a  href="<?=R('logout')?>"><i class="sui-icon icon-tb-refresh"></i> <span>登出</span></a></li>
+
+</ul>
+<div class="ad-head-top">
+  <span>菜单名称</span>
+</div>
+<div class="ad-head-iframe" style=" -webkit-overflow-scrolling: touch;  " >
+    <iframe src="<?=R('finance/main')?>" style="width: 100%; height: 100%;border: 0px; overflow:auto " id="ad-iframe"></iframe>
+</div>
+    <transition name="slide-fade">
+    <div v-if="st.if_url!=''" style="overflow: hidden;bottom: 0;right: 0;width: 450px;top:61px;position: absolute;z-index: 20;border-left:1px solid #e6e6e6; ">
+        <iframe :src="st.if_url" style="width: 100%; height: 100%;border: 0px; overflow:auto "  ></iframe>
+        <div style="z-index: 21; border-radius:0 0  0  50%; top: -50px; position: absolute;
+        width: 100px; height: 100px; background-color:rgba(0,0,0,0.3);right: -50px;" @click="st.if_url=''"></div>
+        <div style="z-index: 22; cursor: pointer;position: absolute; right: 5px; top:5px; "  @click="st.if_url=''"> <i class="sui-icon icon-tb-close" style="font-size: 30px;color: #fff"></i></div>
+    </div>
+    </transition>
+
+
+
+</bobo>
+</body>
+
+<script>
+    $(function () {
+        var ui={
+            iframe:$('#ad-iframe')
+            ,a: $('.ad-head-menu a')
+            ,menu: $('.menu-one')
+        };
+        ui.a.click(function () {
+
+            vm.st.is_min_tab= true;
+            setTimeout(function () {
+                vm.st.is_min_tab= false;
+            },20000);
+
+            var that = $(this);
+            var url = that.data('url');
+            if( 'undefined'== typeof  url ) return false ;
+            ui.iframe.attr('src', url );
+            ui.a.removeClass('select' );
+            that.addClass('select');
+            return false ;
+            //alert( url );
+        });
+        ui.menu.click(function () {
+            var that = $(this);
+            var pli = that.parents( 'li');
+            var clname = pli.attr('class');
+
+            if('undefined' != typeof  clname && clname.indexOf( 'ad-head-open')>=0) pli.removeClass( 'ad-head-open');
+            else pli.addClass( 'ad-head-open');
+        });
+    });
+var vm = new Vue({
+    el: 'bobo',
+    data: {
+        st:{if_url:'',is_min_tab:false, is_click:false}
+    }
+    ,
+    created: function () {
+    },
+    mounted: function () {
+    },
+    methods: {}
+});
+
+window.goo2=function (obj) {
+    vm.st.if_url=  obj.url ;
+    //hvm.st.fee= str;
+}
+</script>
+
+</html>
+
+
+

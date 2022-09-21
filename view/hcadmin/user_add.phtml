@@ -1,0 +1,65 @@
+<form id="form-reg" class="sui-form form-horizontal" novalidate="novalidate" action="<?=R($_c.'/user/reg')?>">
+    <div class="control-group">
+        <label   class="control-label"></label>
+        <div class="controls"><h1>创建账号</h1></div>
+    </div>
+    <div class="control-group ">
+        <label class="control-label "  >账号：</label>
+        <div class="controls input-append">
+            <input type="text"   id="openid"   name="openid" placeholder="手机或邮箱" data-rules="required"data-empty-msg="别忘账号" >
+
+        </div>
+    </div>
+    <div class="control-group">
+        <label for="inputPassword" class="control-label  ">密码：</label>
+        <div class="controls">
+            <input type="text"   name="password" placeholder="密码设置6到12位"  data-rules="required|minlength=6|maxlength=12">
+        </div>
+    </div>
+    <div class="control-group">
+        <label for="inputNick" class="control-label  ">真实姓名：</label>
+        <div class="controls">
+            <input type="text"    name="name" placeholder="请填写真实姓名" data-rules="required|minlength=2|maxlength=12" data-error-msg="昵称必须是2-12位" data-empty-msg="亲，姓名别忘记填了">
+        </div>
+    </div>
+
+
+    <div class="control-group">
+        <label   class="control-label  ">角色：</label>
+        <div class="controls">
+            <label data-toggle="radio" class="radio-pretty inline">
+                <input type="radio" name="ts" value="3" data-rules="required"><span>认证老师</span>
+            </label>
+            <label data-toggle="radio" class="radio-pretty inline">
+                <input type="radio" name="ts" value="2" data-rules="required"><span>学生</span>
+            </label>
+        </div>
+    </div>
+
+    <div class="control-group ">
+        <label class="control-label "  >学号：</label>
+        <div class="controls">
+            <input type="text"   id="number"   name="number" placeholder="仅对学生"  >
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label  class="control-label  ">学校：</label>
+        <div class="controls">
+            <input type="text"    name="school" placeholder="请填写真实学校" data-rules="required|minlength=2|maxlength=12" data-error-msg="学校必须是2-12字" data-empty-msg="亲，学校别忘记填了">
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label for="sanwei" class="control-label"></label>
+        <div class="controls">
+            <button type="submit" class="sui-btn btn-primary ">创建</button>
+        </div>
+    </div>
+</form>
+
+<script>
+    $(function () {
+        DR.ajaxAndValidate( 'form-reg');
+    });
+</script>

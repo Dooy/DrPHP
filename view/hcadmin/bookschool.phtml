@@ -1,0 +1,96 @@
+
+<div style="padding: 8px 5px 5px 0px;">
+    <form id="user-search" action="<?=R('hcadmin/bookSchool')?>"  class="sui-form pull-left">
+        <input type="text" placeholder="学校名称" class="input-medium" name="school" value="<?=$get['school']?>">
+        <button type="submit" class="sui-btn ">查找</button>
+    </form>
+    <div class=" pull-right" style="padding: 3px 0 0 3px;">
+        <div class="sui-btn-group">
+            <?php foreach ($type as $k2=>$v2): ?>
+                <a class="sui-btn <?=($_GET['is_show']==$k2)?'btn-primary':'btn-bordered'?> " href="<?=R($_c.'/bookSchool?is_show='. $k2)?>"><?=$v2['n']?></a>
+            <?php endforeach; ?>
+        </div>
+
+        <a class="sui-btn btn-primary " href="<?=R('hcadmin/bookSchool/add')?>">新增</a>
+    </div>
+    <div style="clear: both"></div>
+</div>
+
+<table class="sui-table table-bordered">
+    <thead>
+    <tr>
+        <th width="90px;">LOGO</th>
+        <th>校域名/校名/校训</th>
+        <th>学生/认证/一般<br>状态<br>首页模板</th>
+
+        <th>本学期设置</th>
+
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php foreach ($bookSchool['list'] as $v ) :  $sk=$v['school']; ?>
+        <tr>
+            <td><img src="<?=$v['logo']?>" style="width: 80px;height:80px; "> </td>
+            <td><a href="<?=R('book/s/'. $v['school_ename'])?>" target="_blank"><?=$v['school_ename']?></a><br><?=$v['school']?><br><?=$v['school_slogan']?></td>
+            <td><?=intval($userCount[$sk][2][0]['cnt'])?>/<?=intval($userCount[$sk][3][0]['cnt'])?>/<?=intval($userCount[$sk][1][0]['cnt'])?>
+                <br>
+                <span class="sui-dropdown"><span class="dropdown-inner"><a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle"><span class="dropdown-value"><?=$type[$v['is_show']]['n']?></span> <i class="caret"></i></a>
+                    <ul id="menu1" role="menu" aria-labelledby="drop1" class="sui-dropdown-menu">
+                        <?php foreach ($type as $k2=>$v2): ?>
+                            <li role="presentation" class="booktype" data-url="<?=R($_c.'/bookSchool/edit_show/'.$v['id'].'/'.$k2)?>"><a role="menuitem" tabindex="-1" href="javascript:;"><?=$v2['n']?></a></li>
+                        <?php  endforeach; ?>
+                    </ul></span>
+                </span>
+                <br>
+                <span class="sui-dropdown"><span class="dropdown-inner"><a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle"><span class="dropdown-value"><?=$tpye_tpl[$v['tpl']]['n']?></span> <i class="caret"></i></a>
+                    <ul id="menu1" role="menu" aria-labelledby="drop1" class="sui-dropdown-menu">
+                        <?php foreach ($tpye_tpl as $k2=>$v2): ?>
+                            <li role="presentation" class="booktype" data-url="<?=R($_c.'/bookSchool/edit_tpl/'.$v['id'].'/'.$k2)?>"><a role="menuitem" tabindex="-1" href="javascript:;"><?=$v2['n']?></a></li>
+                        <?php  endforeach; ?>
+                    </ul></span>
+                </span>
+            </td>
+            <td>
+                <?php $sconf=[]; if($term[ $v['id']]): $sconf=$term[ $v['id']] ; ?>
+                    选课开始：<?=date("Y-m-d H:i",$sconf['s_start_time'] )?>
+                    <br>选课截止：<?=date("Y-m-d H:i",$sconf['s_end_time'] )?>
+                    <br>提交截止：<?=date("Y-m-d H:i",$sconf['end'] )?>
+                    <br>至多/少选：<?=$sconf['book_limit']?>/<?=$sconf['book_limit_min']?>
+                    <br><?php if($sconf['is_school_user']):?><span style="color: red">白名单</span><?php endif;?>
+                <?php else:   ?>
+                    随系统
+                <?php endif;?>
+            </td>
+
+            <td>
+                [<a href="<?=R('hcadmin/bookSchool/edit/'. $v['id'])?>">编辑</a>]
+                [<a href="<?=R($_c.'/userlist/search?school='.urlencode($v['school']) )?>">用户</a>]
+                <br>
+                [<a href="<?=R($_c.'/userlist/search?school_id='. $v['id'].'&max=2000&start=0&export=excel&start_uid=10&school='.urlencode($v['school']) .'&is_school_user='.$sconf['is_school_user']  )?>">导出用户</a>]
+                [<a href="<?=R($_c.'/userlist/search?school_id='. $v['id'].'&max=2000&start=0&export=excel&start_uid=10&school='.urlencode($v['school']) .'&is_school_user='.$sconf['is_school_user'].'&term_key='.($v['now_term_key']?$v['now_term_key']:$term_now  )  )?>" title="仅统计本学期">导出用户本学期</a>]
+                <br>
+                [<a href="<?=R('hcadmin/bookList/search?school='.urlencode($v['school']) )?>">查看书单</a>]
+                [<a href="javascript:;" data-url="<?=R('hcadmin/bookSchool/initSchool/'.  $v['id'])?>" class="ajaxUrl">初始化</a>]
+                [<a data-url="<?=R('school/main?_school='.urlencode($v['school'] ))?>" class="dr-iframe" href="javascript:;">统计</a>]
+                [<a data-url="<?=R('school/main?tpl=baogao&_school='.urlencode($v['school'] ))?>" class="dr-iframe" href="javascript:;">文字统计</a>]
+            </td>
+        </tr>
+    <?php endforeach;?>
+    </tbody>
+</table>
+<div class="dr-page"><?=$bookSchool['page']?></div>
+
+<script>
+    $(function () {
+        $('.booktype').click(function () {
+            var that = $(this);
+            var p= that.parents('.dropdown-inner');
+            DR.ajax( that.data('url') );
+            p.find('.dropdown-value').html( that.text()  );
+        });
+        $('.ajaxUrl'  ).click( DR.ajaxUrl  );
+        $('.dr-iframe').click( DR.iframe_fun );
+
+    });
+</script>

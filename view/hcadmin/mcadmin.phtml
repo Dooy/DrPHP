@@ -1,0 +1,254 @@
+<bobo>
+    <form id="user-search" action="<?=R( $_c.'/'.$_a.'/search')?>"  class="sui-form pull-left" style="margin-top: 5px; " method="get">
+        <input type="text" placeholder="商户号" class="input-medium" name="q" value="<?=$get['q']?>">
+        <button type="submit" class="sui-btn ">查找</button>
+    </form>
+    <div class="pull-right" style="padding-top: 7px;">
+        <div class="sui-btn-group">
+            <!--<a href="javascript:;" class="sui-btn " title="重新上线的 得重置下" @click="checkMu()">账目检查</a>-->
+            <a href="javascript:void(0);" class="sui-btn " @click="showFrom()">新建商户</a>
+        </div>
+
+    </div>
+    <div style="clear: both"></div>
+
+    <div style="padding: 8px 5px 5px 0px;">
+        <form id="form-showerror" class="sui-form form-horizontal" v-if="st.tab=='create' || 'modify'==st.tab ">
+            <div class="control-group">
+                <label for="inputEmail" class="control-label"> </label>
+                <div class="controls">
+                    <h2 v-if="st.tab=='create' && f.pid>0" v-html="st.pobj.merchant +'新子账号（'+st.pobj.merchant_id+')'">  </h2>
+                    <h2 v-else-if="st.tab=='create'">新建商户  </h2>
+                    <h2 v-else>修改商户</h2>
+                </div>
+            </div>
+            <div class="control-group"  >
+                <label for="inputEmail" class="control-label">商户ID：</label>
+                <div class="controls">
+                    <input type="text"  v-model="f.merchant_id" placeholder="4位数字，如8080"  >
+                </div>
+            </div>
+            <div class="control-group"  >
+                <label for="inputEmail" class="control-label">商户名称：</label>
+                <div class="controls">
+                    <input type="text"  v-model="f.merchant" placeholder="商户名称"  >
+                </div>
+            </div>
+            <div class="control-group"  >
+                <label for="inputEmail" class="control-label">属主UID：</label>
+                <div class="controls">
+                    <input type="text"  v-model="f.user_id" placeholder="user_id"  >
+                </div>
+            </div>
+            <div class="control-group"  >
+                <label for="inputEmail" class="control-label">费率：</label>
+                <div class="controls">
+                    <input type="text"  v-model="f.rate" placeholder="单位：万分之"  >
+                </div>
+            </div>
+            <div class="control-group"  >
+                <label for="inputEmail" class="control-label">下发手续费：</label>
+                <div class="controls">
+                    <input type="text"  v-model="f.fa_fee" placeholder="单位：元"  >
+                </div>
+            </div>
+            <div class="control-group"  >
+                <label for="inputEmail" class="control-label">所属工作室：</label>
+                <div class="controls">
+                    <select v-model="f.c_user_id">
+                        <option value="0">请选择工作室</option>
+                        <option v-for="v in cuser" :value="v.user_id" v-html="v.name"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="control-group"  >
+                <label for="inputEmail" class="control-label">付款方式：</label>
+                <div class="controls">
+                    <select v-model="f.pay_type">
+                        <option v-for="(v,k) in type.pay" :value="k" v-html="v"></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="sanwei" class="control-label"></label>
+                <div class="controls">
+                    <button type="button" class="sui-btn btn-primary" @click="modifyPost()" v-if="st.tab=='modify'">修改</button>
+                    <button type="button" class="sui-btn btn-primary" @click="create()" v-else>申请</button>
+                </div>
+            </div>
+        </form>
+
+
+        <table class="sui-table table-bordered">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>商户号<br>名称</th>
+                <th>所属人UID<br>所属人名字</th>
+                <th>
+                    工作室UID<br>工作室
+                </th>
+                <th>费率<br>提现手续费</th>
+
+                <th>
+                    付款方式<br>
+                    收款模式
+                </th>
+                <th>
+                    父亲商户<br>
+                    子商户数
+                </th>
+                <th>创建时间</th>
+                <th>操作</th>
+
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(v,k) in mlist">
+                <td><span v-html="k+1"></span></td>
+                <td >
+                    <span v-html="v.merchant_id"></span>
+                    <br><span v-html="v.merchant"></span>
+
+                <td ><span v-html="v.user_id"></span> <br>
+                    <span v-html="v.user_id_merge.name" v-if="v.user_id_merge"></span>
+                </td>
+                <td >
+
+                    <span v-if="type.mid2cuid[v.merchant_id]" v-html="type.mid2cuid[v.merchant_id][0]+'<br>来之配置'"  style="color: #999"> </span>
+                    <template v-else-if="v.cuser">
+                        <span v-html="v.cuser.user_id"></span><br>
+                        <span v-html="v.cuser.name"></span>
+                    </template>
+                </td>
+                <td> <span  v-html="v.rate/100+'%'"></span><br><span v-html="v.fa_fee/100"></span>元 </td>
+                <td  >
+                    <span v-html="type.pay[v.pay_type]" v-if="type.pay[v.pay_type]"></span>
+                    <span v-else>-</span>
+                    <br>
+                    <span v-if="type.mid2cuid[v.merchant_id] && type.cuid2version[type.mid2cuid[v.merchant_id][0]] && type.version[type.cuid2version[type.mid2cuid[v.merchant_id][0]]]" v-html="type.version[type.cuid2version[type.mid2cuid[v.merchant_id][0]]]" > </span>
+                    <span v-else-if="v.c_user_id>0 && type.cuid2version[v.c_user_id] &&  type.version[type.cuid2version[v.c_user_id]]" v-html="type.version[type.cuid2version[v.c_user_id]]" > </span>
+                    <span v-else>-</span>
+                </td>
+                <td>
+                    <a v-if="v.pid>0" v-html="v.pid" :href="'/hcadmin/merchant/search?q='+v.pid"></a><span v-else>-</span>
+                    <br><a v-if="v.pid==0 & v.child_len>0" v-html="v.child_len" :href="'/hcadmin/merchant/search?q='+v.merchant_id"></a> <span v-else>-</span>
+                </td>
+                <td>
+                    <span v-if="v.ctime>0"  v-html="DR.timeFormat(v.ctime,'yyyy-MM-dd hh:mm:ss')"></span>
+                    <span v-else>-</span>
+                </td>
+
+                <td>
+                    <!--
+                    <ul role="menu" aria-labelledby="drop1" class="sui-dropdown-menu">
+                        <li role="presentation"  ><a role="menuitem" tabindex="-1"  @click="modify(v)">修改</a></li>
+                        <li role="presentation"  ><a role="menuitem" tabindex="-1" :href="'/console/ma2cw/vTi?uid='+v.user_id">查提现</a></li>
+                    </ul>
+                    -->
+                    <div class="sui-btn-group">
+                        <button class="sui-btn btn-bordered btn-primary  btn-small" @click="modify(v)">修改</button>
+                        <button class="sui-btn btn-bordered btn-primary  btn-small" title="新增子商户" v-if="v.pid==0"  @click="addSum(v)">新增子</button>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div><?=$mlist['page']?></div>
+    </div>
+</bobo>
+<script>
+    new Vue({
+        el: 'bobo',
+        data: {
+            st:{tab:'',modify_id: 0,pobj:{'merchant_id':'',merchant:''} }
+            ,f:{}
+            ,mlist:<?=json_encode($mlist['list'])?>
+            ,type:<?=json_encode($type)?>
+            ,cuser:[]
+        }
+        ,
+        created: function () {
+            this.f= this.initF();
+        },
+        mounted: function () {
+        },
+        methods: {
+            create:function () {
+                DR.ajax('/hcadmin/merchant/create',{data:this.f },{success:function (rep) {
+                    console.log(rep);
+                        var html='<div style="width:400px;">';
+                        html+='商户：'+rep.data.merchant.merchant;
+                        html+='<br>商户ID：'+rep.data.merchant.merchant_id;
+                        html+='<br>app_id：'+rep.data.merchant.app_id;
+                        html+='<br>app_secret：'+rep.data.merchant.app_secret;
+                        html+='</div>';
+                        var d = dialog({
+                            title: '新建成功,请复内容仅显示一次',
+                            content:html
+                            ,cancelValue: '关闭'
+
+                            ,cancel: function () {
+                                location.reload();
+                            }
+
+                        });
+                        d.showModal();
+
+                    }});
+            }
+            ,initF:function () {
+                var f = {'merchant_id':'',merchant:'' ,user_id:'',fa_fee:6,rate:360,pid:0,pay_type:1,c_user_id: 0 };
+                return f;
+            }
+            ,loadCuser:function () {
+                if( this.cuser.length>0 ) return;
+                var that = this;
+                DR.ajax('/hcadmin/merchant/cuser',{ },{success:function (rep) {
+                        console.log(rep );
+                        that.cuser= rep.data.cuser;
+                    }});
+            }
+            ,showFrom:function () {
+                this.f= this.initF();
+                this.st.tab='create';
+                if( this.cuser.length<=0 ){
+                    this.loadCuser();
+                }
+            }
+            ,addSum:function (v) {
+                if(v.pay_type<=0 ){
+                    DR.tip("请先修改付款方式");
+                    return;
+                }
+                this.f= this.initF();
+                this.f.merchant = v.merchant ;
+                this.f.pid= v.merchant_id;
+                this.f.user_id = v.user_id;
+                this.f.fa_fee = v.fa_fee/100;
+                this.st.pobj = v;
+                this.st.tab='create';
+                this.loadCuser();
+            }
+            ,modify:function (v) {
+                //this.f= v;
+                this.st.modify_id = v.merchant_id;
+                $.extend( this.f, v );
+                this.f.fa_fee= this.f.fa_fee/100;
+                //DR.extend(this.f, v );
+                this.st.tab='modify';
+                if( this.cuser.length<=0 )   this.loadCuser();
+            }
+            ,modifyPost:function () {
+                console.log(this.f );
+                var that = this;
+                DR.ajax('/hcadmin/merchant/modify/'+ this.st.modify_id ,{data:this.f },{success:function (rep) {
+                        DR.tipSuccess("修改成功, 刷新可看修改结果");
+                        that.st.tab='';
+                    }});
+            }
+
+        }
+    });
+</script>

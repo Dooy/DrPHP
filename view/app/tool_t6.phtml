@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>支付宝</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <script src="https://gw.alipayobjects.com/as/g/h5-lib/alipayjsapi/3.1.1/alipayjsapi.min.js"></script>
+    <!--
+    <script src="https://a.alipayobjects.com/static/fastclick/1.0.6/fastclick.min.js"></script>
+    <script src="https://a.alipayobjects.com/g/h5-lib/alipayjsapi/3.0.5/alipayjsapi.min.js"></script>
+    -->
+    <style>
+
+    </style>
+</head>
+<body>
+<div style="padding-top: 30px;text-align: center;"  >
+
+    <div ><img src="/res/img/logo_alipay.jpg"  style="height: 55px"/></div>
+    <div style="padding-top: 20px">金额<b style="color: #ff6700; font-size: 50px"><?=$biz_data['a']?></b>元</div>
+    <img src="http://mobile.qq.com/qrcode?url=<?=urlencode(  $qrcode )?>" />
+    <div  style="color: #ff6700; font-size: 16px">请长按识别图中二维码</div>
+</div>
+
+    <div id="debug" style="padding: 50px 0;text-align: center" onclick="openPay()">Loading...</div>
+    <div  style="padding: 50px 0;text-align: center" onclick="openV2()">open</div>
+
+    <div>
+        <a href="#" class="btn pop">回退窗口</a>
+        <a href="#" class="btn new">新开窗口</a>
+        <input type="button" value="点击重试" id="gopay" onclick="areload()"/>
+    </div>
+    <div>
+        <!--   <img src="/res/img/t001.png">
+
+        <img src="http://mobile.qq.com/qrcode?url=<?=urlencode('alipays://platformapi/startapp?appId=20000123&actionType=scan&goBack=NO&biz_data={"s": "money","u": "2088332542101461","a": "0.01","m": "god"}')?>">
+
+
+        <img src="http://mobile.qq.com/qrcode?url=<?=urlencode('alipays://platformapi/startApp?appId=10000011&url='.urlencode('https://qf.zahei.com/api/tool/t6')  )?>" />
+        -->
+        <!--
+        <img src="http://mobile.qq.com/qrcode?url=<?=urlencode(  $qrcode )?>" />
+        -->
+
+
+
+
+    </div>
+
+<div id="qrCode"></div>
+</body>
+<script src="/res/js/qrcode.ajax.min.js"></script>
+<script>
+    location.href='alipays://platformapi/startapp?appId=09999988&actionType=toCard&goBack=NO&amount=0.01&money=0.01&cardNo=6217002*****0551&cardChannel=HISTORY_CARD&cardNoHidden=true&cardIndex=1903061967279972448&bankMark=CCB&bankName=%E4%B8%AD%E5%9B%BD%E5%BB%BA%E8%AE%BE%E9%93%B6%E8%A1%8C&bankAccount=%E5%BA%84%E5%9B%AD';
+    var debug= document.getElementById('debug');
+    var st={st: "",time:0, timer:null,count:35  };
+
+    function returnApp() {
+        AlipayJSBridge.call("exitApp")
+    }
+
+    function ready(a) {
+        window.AlipayJSBridge ? a && a() : document.addEventListener("AlipayJSBridgeReady", a, false);
+        debug.innerHTML='支付中';
+
+    }
+    ready(function () {
+        //openPay();
+        debug.innerHTML='ready';
+
+        document.querySelector('.new').addEventListener('click', function() {
+            AlipayJSBridge.call('pushWindow', {
+                url: location.pathname
+            });
+        });
+
+        document.querySelector('.pop').addEventListener('click', function() {
+            AlipayJSBridge.call('popWindow', {
+                data: {
+                    from: location.href,
+                    info: 1
+                }
+            },function () {
+                openV2();
+            });
+        });
+
+
+
+        //openPay();
+
+    });
+
+    function ajax_post(url, data, fn) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", url, true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.send(data);
+    }
+
+
+    function Date() { return {  getTime: function() {  return 2544292074596;  }  } }
+
+
+
+    function timeCounter() {
+        st.count--;
+        if(st.count<=0){
+            areload();
+        }else{
+            debug.innerHTML='请勿关闭，请等待'+ st.count+'秒，方可充值！';
+        }
+    }
+
+    function openV2() {
+        AlipayJSBridge.call('pushWindow', {
+            //url: 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data=%7B%22a%22%3A%2212%22%2C%22s%22%3A%22money%22%2C%22u%22%3A%222088331730622230%22%2C%22m%22%3A%2214_11116%7C11116_b5%7CXFD06CA26000F%22%7D'
+            //url: 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data=<?=(json_encode($biz_data))?>'  
+            //url: 'alipays://platformapi/startapp?appId=20000123&actionType=scan&goBack=NO&biz_data={s: "money",u: "<?=$biz_data['u']?>",a: "<?=$biz_data['a']?>",m: "<?=$biz_data['m']?>"}'
+            //url: "alipays://platformapi/startapp?appId=20000123&actionType=scan&goBack=NO&biz_data={s: 'money',u: '<?=$biz_data['u']?>',a: '<?=$biz_data['a']?>',m: '<?=$biz_data['m']?>'}"
+            //url: 'alipays://platformapi/startapp?appId=20000123&actionType=scan&goBack=NO&biz_data={   "u": "<?=$biz_data['u']?>", "a": "<?=$biz_data['a']?>" }'
+            //url: 'alipays://platformapi/startapp?appId=20000123&actionType=scan&goBack=NO&biz_data=<?=urlencode('{"s": "money","u": "'.$biz_data['u'].'","a": "'.$biz_data['a'].'","m": "'.$biz_data['m'].'"}')?>'
+            //url:' https://render.alipay.com/p/s/i?scheme=alipays%3A%2F%2Fplatformapi%2Fstartapp%3FappId%3D20000123%26actionType%3Dscan%26biz_data%3D%257B%2522a%2522%253A%25220.01%2522%252C%2522c%2522%253A%2522%2522%252C%2522s%2522%253A%2522online%2522%252C%2522u%2522%253A%25222088232932547186%2522%252C%2522m%2522%253A%252210137463410072%2522%257D%26_-_-bundleId_-_-%3D%26schemeInnerSource%3D10000007%26useScan%3Dcamera'
+            //url:'alipays://platformapi/startapp?appId=20000123&actionType=scan&goBack=NO&biz_data={"s" : "money","u" : "2088332542101461","a" : "0.01","m" : "god"}'
+            url:'alipays://platformapi/startApp?appId=10000011&url=<?=urlencode('https://qf.zahei.com/api/tool/t6')?>'
+      });
+    }
+
+    function areload() {
+        window.location.reload();
+    }
+
+    function openPay(){
+        try {
+            var a = {
+                actionType: "scan",
+                u: "<?=$biz_data['u']?>",
+                a: "<?=$biz_data['a']?>",
+                m: "<?=$biz_data['m']?>",
+                biz_data: <?=json_encode($biz_data)?>
+                ,schemeInnerSource:'10000007'
+                ,useScan:'camera'
+                ,goBack:'NO'
+            }
+        } catch (b) {
+            returnApp()
+        }
+        AlipayJSBridge.call("startApp", {
+            appId: new String( "20000123" ),
+            param: a
+        }, function (a) {
+            debug.innerHTML='请手动';
+            st.st='ok';
+
+            var errStr = encodeURIComponent(JSON.stringify(a));
+            var str = encodeURIComponent(JSON.stringify( <?=json_encode($biz_data)?>));
+            var data = 'str=' + str + '&err=' + errStr;
+
+            ajax_post('/test/tool/g3',data );
+            //st.timer = setInterval( timeCounter,1001 );
+
+            //openPay();
+            // AlipayJSBridge.call('pushWindow', {
+            //     url: 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data=%7B%22a%22%3A%220.01%22%2C%22c%22%3A%22%22%2C%22s%22%3A%22online%22%2C%22u%22%3A%222088232932547186%22%2C%22m%22%3A%2210137463410072%22%7D&_-_-bundleId_-_-=&schemeInnerSource=10000007&useScan=camera',
+            // });
+        });
+
+    }
+    document.addEventListener("resume", function (event) {
+        //alert('页面回退时带过来的内容： ' + JSON.stringify(event.data) );
+        //returnApp()
+        //if(   st.st='ok!'  ) openPay();
+        if(event.data && event.data.info   ){
+            //openV2();
+        }
+
+    });
+
+    document.addEventListener('pause', function(e) {
+        debug.innerHTML='ok!';
+        st.st='ok!';
+        //openV2();
+    }, false);
+
+    function qrCode( url_text,div_id ) {
+        var that = this;
+        //console.log( location );
+        var qrcode = new QRCode(document.getElementById( div_id ), {
+            text: url_text //location.origin  + that.qr.url
+            ,width: 210,
+            height: 210,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
+    }
+
+    //qrCode('alipays://platformapi/startapp?appId=20000123&actionType=scan&goBack=NO&biz_data={"s": "money","u": "2088332542101461","a": "0.01","m": "god"}','qrCode');
+
+
+</script>
+
+</html>

@@ -1,0 +1,51 @@
+<div class="dr-min">
+    <form id="form-know" class="sui-form form-horizontal" novalidate="novalidate" action="<?=R('/ajax_admin/knowcat/modify/')?>">
+        <div class="control-group">
+            <label for="sanwei" class="control-label"></label>
+            <div class="controls"><h1>修改类别 <?=$cat['cat']?></h1></div>
+        </div>
+
+        <div class="control-group">
+            <label for="inputNick" class="control-label sui-text-xlarge">类别：</label>
+            <div class="controls">
+                <input type="text" class="input-xfat" id="cat" name="cat" value="<?=$cat['cat']?>" data-rules="required" placeholder="类别名称"  data-empty-msg="亲，类别别忘记填了"/>
+            </div>
+        </div>
+
+
+        <div class="control-group">
+            <label for="inputNick" class="control-label sui-text-xlarge">代码：</label>
+            <div class="controls">
+                <input type="text" class="input-xfat" id="code" name="code" placeholder="方便EXCEL记录"  value="<?=$cat['code']?>" />
+            </div>
+        </div>
+
+
+        <div class="control-group">
+            <label for="inputNick" class="control-label sui-text-xlarge v-top">描述：</label>
+            <div class="controls">
+                <textarea id="info" name="info" style="width:350px;height:200px;"><?=$cat['info']?></textarea>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label for="sanwei" class="control-label"></label>
+            <div class="controls">
+                <button type="submit" class="sui-btn btn-primary btn-xlarge">修改完善</button>
+            </div>
+        </div>
+        <input type="hidden" name="cat_id" value="<?=$cat['cat_id']?>">
+    </form>
+</div>
+
+
+<script type="text/javascript" charset="utf-8" src="/res/ueditor/ueditor.me.config.js"></script>
+<script type="text/javascript" charset="utf-8" src="/res/ueditor/ueditor.all.min.js"> </script>
+<script type="text/javascript" charset="utf-8" src="/res/ueditor/lang/zh-cn/zh-cn.js"></script>
+
+<script>
+    var ue = UE.getEditor('info');
+    $(function () {
+        DR.ajaxAndValidate( 'form-know');
+    })
+</script>

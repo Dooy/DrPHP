@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <title >Look</title>
+    <script type="text/javascript" src="/res/js/vue.min.js"></script>
+
+    <style>
+        body{margin: 0 auto;padding: 0; }
+        .ifrm{ float: left; width: 50%;  height: 430px;border-bottom:2px solid #e0e9ee}
+        @media screen and (max-width: 1000px) {
+            .ifrm{ clear: both;float: none; width: 100%;  }
+        }
+    </style>
+</head>
+<body>
+<bobo>
+    <div v-for="v in list" class="ifrm" style="-webkit-overflow-scrolling: touch; ">
+
+        <iframe :src="v" style="width: 100%; height: 100%;border: 0px;overflow:auto "  ></iframe>
+
+    </div>
+</bobo>
+</body>
+<script>
+var vm=  new Vue({
+        el: 'bobo',
+        data: {
+            list:['https://c1.yuetaohui.cn/console/main','https://c2.yuetaohui.cn/console/main'
+                ,'https://c3.yuetaohui.cn/console/main','https://c4.yuetaohui.cn/console/main']
+        }
+        ,
+        created: function () {
+        },
+        mounted: function () {
+        },
+        methods: {}
+    });
+</script>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>支付宝</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <script src="/res/js/clipboard.min.js"></script>
+    <!--
+    <meta http-equiv="Refresh" content="0;url=alipays://platformapi/startapp?appId=20000067&__open_alipay__=YES&url=<?=urlencode($url)?>" />
+    -->
+    <style>
+        .p-info{ max-width: 600px; padding: 11px; text-align: left;   margin: 0 auto}
+        ul,li{padding: 0;margin: 0; color: #333333; list-style: none}
+        .p-info li{padding-top: 5px;  }
+
+        .pay-btn{ background-color:#4cb9fc ; border: 1px solid #33affc; color: #fff;text-decoration:none;
+            display: inline-block; padding: 5px 14px;box-sizing: border-box; margin-bottom: 0;    font-size: 14px;            line-height: 18px;
+            text-align: center;    vertical-align: middle;    cursor: pointer;  border-radius: 2px;
+            user-select: none;width: 220px;
+        }
+        .pay-btn-back{ padding-top: 2px;  padding-bottom: 2px; font-size: 12px; width: 100px;     background-color: transparent;
+            border: 1px solid #33affc;          color: #33affc;   }
+        body{  background-color:#efeff4 }
+
+        .toast-container {     line-height: 17px;  position: fixed; z-index: 9999; bottom: 0px;
+            left: 50%;   -webkit-transition:  .3s;   transition: .3s;  -webkit-transform: translate(-50%,0);   transform: translate(-50%,0);
+            max-width: 300px; opacity:0;
+        }
+        .toast-message{  font-size: 14px;padding: 10px 25px;  text-align: center; color: #fff; border-radius: 6px; background-color: #323232;}
+        .toast-active{ opacity:0.9; bottom: 50px; }
+
+        .pay-btn2{ background-color:#108ee9 ; border: 1px solid #108ee9; color: #fff;text-decoration:none;
+            display: inline-block; padding: 0 4px;box-sizing: border-box; margin-bottom: 0;    font-size: 17px;            line-height: 18px;
+            text-align: center;    vertical-align: middle;    cursor: pointer;  border-radius: 2px;
+            user-select: none;width: 100%; position:relative; height: 47px;    line-height: 47px;
+        }
+
+    </style>
+</head>
+<body>
+    <button class="pay-btn2"    id="pay_sb"  data-clipboard-target="#linkUrl">强烈推荐：复制付款链接</button>
+    <div id="linkUrl" style="color: #FFFFFF;position: fixed;left: -10020px">若提示风险或跳转至首页，请关闭支付宝后重新点击支付连接。 付款链接:<?=$url?></div>
+</body>
+<script>
+    var clipboard ;
+    window.onload=function () {
+        //setTimeout(pay, 20 );
+        //st.timer = setInterval(timeCount, 999 );
+        clipboard = new ClipboardJS('#pay_sb');
+        //clipboard = new ClipboardJS('#pay_sb');
+        clipboard.on('success', function(e) {
+            console.info('Action:', e.action);
+            console.info('Text:', e.text);
+            console.info('Trigger:', e.trigger);
+            e.clearSelection();
+            //toast("付款链接复制成功");
+        });
+
+    }
+</script>
+
+
+</html>

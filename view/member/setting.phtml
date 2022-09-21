@@ -1,0 +1,366 @@
+
+<link rel="stylesheet" href="<?=$_cdn?><?=$WWW_RES?>headedit/style/reset.css" type="text/css">
+
+<!--头像上传css文件-->
+<link rel="stylesheet" href="<?=$_cdn?><?=$WWW_RES?>headedit/style/jquery.Jcrop.css" type="text/css">
+<link rel="stylesheet" href="<?=$_cdn?><?=$WWW_RES?>headedit/style/headImgUpload.css?d=good" type="text/css">
+<!--依赖css弹出层-->
+<link rel="stylesheet" href="<?=$_cdn?><?=$WWW_RES?>headedit/style/popup.css?d=good" type="text/css">
+
+
+<div class="dr-container">
+    <ul class="sui-nav nav-tabs nav-large">
+        <li class="active"><a href="#index" data-toggle="tab">修改信息</a></li>
+        <li><a href="#profile" data-toggle="tab">修改密码</a></li>
+        <li><a href="#accout" data-toggle="tab">账号</a></li>
+
+    </ul>
+    <div class="tab-content">
+
+        <div id="index" class="tab-pane active">
+            <div class="head-img-show" id="headImgShow" style="height: 200px;margin-left: 50px; width: 200px; text-align: center">
+                <div class="head"><img src="<?=H($me['user']['head'])?>" alt="" class="click-block" reveal-model-id="popup-head-upload"></div>
+                <a href="#" class="head-img-add-btn click-block " id="headAddBtn" reveal-model-id="popup-head-upload">头像上传</a>
+            </div>
+
+            <form id="form-index" class="sui-form form-horizontal" novalidate="novalidate" action="<?=R($_c.'/'.$_a.'/info')?>">
+
+                <div class="control-group">
+                    <label for="inputNick" class="control-label  ">姓名：</label>
+                    <div class="controls">
+                        <input type="text" class=" " value="<?=$me['user']['name']?>"   name="name" placeholder="请填写真实名称" data-rules="required|minlength=2|maxlength=12" data-error-msg="昵称必须是2-12位" data-empty-msg="亲，姓名别忘记填了">
+                    </div>
+                </div>
+                <?php if($me['user']['ts']==2):?>
+                <div class="control-group">
+                    <label for="inputNick" class="control-label  ">学号：</label>
+                    <div class="controls">
+                        <input type="text" class=" " value="<?=$me['user']['number']?>"   name="number" placeholder="请填写真实学号"  >
+                    </div>
+                </div>
+                <?php endif;?>
+
+                <div class="control-group">
+                    <label   class="control-label ">性别：</label>
+                    <div class="controls">
+                        <label data-toggle="radio" class="radio-pretty inline <?=($me['user']['sex']==1?'checked':'')?>">
+                            <input type="radio" name="sex" value="1" data-rules="required" <?=($me['user']['sex']==1?'checked':'')?>><span>男</span>
+                        </label>
+                        <label data-toggle="radio" class="radio-pretty inline  <?=($me['user']['sex']==2?'checked':'')?>">
+                            <input type="radio" name="sex" value="2" data-rules="required"  <?=($me['user']['sex']==2?'checked':'')?>><span>女</span>
+                        </label>
+                    </div>
+                </div>
+                <!--
+                <div class="control-group">
+                    <label  class="control-label sui-text-xlarge">学校：</label>
+                    <div class="controls">
+                        <input type="text" class="input-xfat"  value="<?=$me['user']['school']?>"  name="school" placeholder="请填写你的真实学校" data-rules="required|minlength=2|maxlength=12" data-error-msg="学校必须是2-12字" data-empty-msg="亲，学校别忘记填了">
+                    </div>
+                </div>
+                -->
+                <?php if( $term_conf['is_school_user'] && $me['user']['ts']==2):?>
+                    <div class="control-group ">
+                        <label for="sanwei" class="control-label v-top">绑定：</label>
+                        <div class="controls sui-text-disabled">
+                            <?php if( $schoolUser &&  $schoolUser['user_id']== $me['user']['user_id']):?>
+                                姓名：<?=$schoolUser['name']?><br>
+                                学号：<?=$schoolUser['number']?><br>
+                                班级：<?=$schoolUser['class']?><br>
+                                老师：<?=$schoolUser['teacher']?><br>
+                            <?php else:?>
+                                未绑定，可以修改姓名、学号绑定
+                            <?php endif;?>
+                        </div>
+                    </div>
+                <?php endif;?>
+
+                <div class="control-group">
+                    <label for="sanwei" class="control-label"></label>
+                    <div class="controls">
+                        <button type="submit" class="sui-btn btn-primary btn-xlarge">修改信息</button>
+                    </div>
+                </div>
+            </form>
+            <hr>
+            <form id="form-school" class="sui-form form-horizontal" novalidate="novalidate" action="<?=R($_c.'/'.$_a.'/school')?>">
+
+                <div class="control-group">
+                    <label  class="control-label v-top">学校：</label>
+                    <div class="controls">
+                        <input type="text"   value="<?=$me['user']['school']?>"  name="school" placeholder="请填写你的真实学校" data-rules="required|minlength=2|maxlength=12" data-error-msg="学校必须是2-12字" data-empty-msg="亲，学校别忘记填了">
+                        <div class="sui-msg msg-tips msg-naked">
+                            <div class="msg-con">提示:学校30天内仅能修改一次！</div>
+                            <s class="msg-icon"></s>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="control-group">
+                    <label for="sanwei" class="control-label"></label>
+                    <div class="controls">
+                        <button type="submit" class="sui-btn btn-primary btn-xlarge">修改学校</button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+
+
+        <div id="profile" class="tab-pane">
+
+            <form id="form-profile" class="sui-form form-horizontal " novalidate="novalidate" action="<?=R($_c.'/'.$_a.'/psw')?>">
+
+                <div class="control-group">
+                    <label for="inputPassword" class="control-label sui-text-xlarge">旧密码：</label>
+                    <div class="controls">
+                        <input type="password"class="input-xfat" id="inputPassword" name="password" placeholder="密码设置6到12位"  data-rules="required|minlength=6|maxlength=12">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label for="inputPsw" class="control-label sui-text-xlarge">新密码：</label>
+                    <div class="controls">
+                        <input type="password"class="input-xfat" id="inputPsw" name="psw" placeholder="密码设置6到12位"  data-rules="required|minlength=6|maxlength=12">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="repassword" class="control-label sui-text-xlarge">重复密码：</label>
+                    <div class="controls">
+                        <input type="password" class="input-xfat" id="repassword" placeholder="与新密码一致" data-rules="required|match=psw" name="repassword">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="sanwei" class="control-label"></label>
+                    <div class="controls">
+                        <button type="submit" class="sui-btn btn-primary btn-xlarge">修改密码</button>
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+
+        <div id="accout" class="tab-pane">
+            <div class="sui-form form-horizontal">
+                <div class="control-group">
+                    <label for="inputPassword" class="control-label sui-text-xlarge">邮箱：</label>
+
+                    <div class="controls">
+                        <?php if(isset($me['oauth'][1])): ?>
+                        <span class="sui-text-xlarge"><?=$me['oauth'][1][0]['openid']?> </span>
+                        <?php else: ?>
+                        <a class="sui-text-large iframe" data-url="<?=R('member/bindemail')?>">无，点击这里绑定 </a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="inputPassword" class="control-label sui-text-xlarge">手机：</label>
+                    <div class="controls">
+                        <?php if(isset($me['oauth'][2])): ?>
+                            <span class="sui-text-xlarge"><?=$me['oauth'][2][0]['openid']?> </span>
+                        <?php else: ?>
+                            <a class="sui-text-large iframe" data-url="<?=R('member/bindemail/tel')?>">无，点击这里绑定 </a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <!--
+                <div class="control-group">
+                    <label for="inputPassword" class="control-label sui-text-xlarge">微信：</label>
+                    <div class="controls">
+                        <span class="sui-text-xlarge">15010133819 </span>
+                    </div>
+                </div>
+                -->
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!--头像上传弹出层-->
+<div class="head-img-layout">
+    <div class="box-content" id="popup-head-upload">
+        <h2>头像选择<a href="#" class="close-reveal-model">×</a></h2>
+        <div>
+            <div class="wrap">
+                <div class="head-img-tab">
+                    <ul class="clearfix" id="headimg_upload">
+                        <li class="on" content="1" style="display: none "><a href="#">自定义上传</a></li>
+                        <li id="fff-strt"  content="2"><a href="#">默认头像</a></li>
+                        <li   content="3" data-init="0"><a href="#">自定义上传</a></li>
+                    </ul>
+                </div>
+
+                <div class="mod-con flexbox">
+                    <div class="head-img-tab-con flex">
+
+                        <div id="head-img-upload_1" class="head-img-upload" style="display: block">
+                            <div>
+                                <div id="uploader" class="custom-upload" >
+                                    <div class="queueList">
+                                        <div id="dndArea" class="placeholder">
+                                            <div id="filePicker"></div>
+                                            <p>或者可以将图片拖到这里</p>
+                                        </div>
+                                    </div>
+                                    <div class="statusBar" >
+                                        <div class="btns">
+                                            <i class="png"></i>
+                                            <div id="filePicker2"></div>
+                                                                <!--<div class="uploadBtn">开始上传</div>-->
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--
+
+                                -->
+                            </div>
+                        </div>
+
+                        <div id="head-img-upload_2" class="head-img-upload" style="display: none">
+                            <div class="head-default" id="head-default"></div>
+                        </div>
+
+                        <div id="head-img-upload_3" class="head-img-upload" style="display: none; height: 413px;" data-init="0">
+                            <div style="padding: 0px 0 0 20px;   ">
+                                <div id="conWrap">
+                                    <!--拖动选择层-->
+                                    <div id="pictureUpload">
+                                        <div id="pictureUpload-bg"></div>
+                                        <div id="pictureUpload-mask"></div>
+                                    </div>
+
+                                    <!--操作按钮-->
+                                    <div id="button">
+                                        <div id="select" class="active">选择图片</div>
+                                        <div id="submit">确定上传</div>
+                                        <div id="preview" style="display: none">预览</div>
+                                        <div id="createLocalImg" style="display: none" >生成</div>
+                                    </div>
+
+                                    <!--文件域-->
+                                    <input type="file" id="fileElem" multiple accept="image/*" style="display:none">
+
+                                    <!-- 操作提示 -->
+                                    <div id="pictureUpload-help">
+                                        <p>提示:单指拖动，双指缩放</p>
+                                        <p id="debugs"></p>
+                                    </div>
+
+                                    <!--用于生成和预览-->
+                                    <div id="canvasWrap" style=" opacity: 0" >
+                                        <canvas id="canvas3"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- end head-img-upload_3 -->
+
+
+                    </div>
+                    <div class="head-img-preview ">
+                        <div class="preview-con" id="preview-pane">
+                            <div class="title">效果预览</div>
+                            <div class="crop-img-60 " id="crop-img-60">
+                                <div class="crop-img-container">
+                                    <img src="<?=$_cdn?><?=$WWW_RES?>headedit/images/default.png" alt="">
+                                </div>
+                                <span class="hide-min">60*60px</span>
+                            </div>
+                            <div class="crop-img-120 hide-min" id="crop-img-120">
+                                <div class="crop-img-container">
+                                    <img src="<?=$_cdn?><?=$WWW_RES?>headedit/images/default.png" alt="">
+                                </div>
+                                <span>120*120px</span>
+                            </div>
+                            <div class="title hide-min">历史头像</div>
+                            <div class="history-head-img hide-min">
+                                <ul class="clearfix">
+                                    <li><img src="<?=$_cdn?><?=$WWW_RES?>headedit/images/default.png" alt=""></li>
+                                    <li><img src="<?=$_cdn?><?=$WWW_RES?>headedit/images/default.png" alt=""></li>
+                                    <li><img src="<?=$_cdn?><?=$WWW_RES?>headedit/images/default.png" alt=""></li>
+                                    <li><img src="<?=$_cdn?><?=$WWW_RES?>headedit/images/default.png" alt=""></li>
+                                    <li><img src="<?=$_cdn?><?=$WWW_RES?>headedit/images/default.png" alt=""></li>
+                                    <li><img src="<?=$_cdn?><?=$WWW_RES?>headedit/images/default.png" alt=""></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="btn-grop clearfix" id="btn-grop_2">
+                    <a class="close-reveal-model button defaultBtnSure btn-radius" id="defaultBtnSure">确定</a>
+                    <a class="close-reveal-model margin-l10 button btn-secondary btn-radius">取消</a>
+                </div>
+                <div class="btn-grop clearfix" id="btn-grop_1">
+                    <a class="close-reveal-model button uploaderBtnSure btn-radius" id="uploaderBtnSure">确定</a>
+                    <a class="close-reveal-model margin-l10 button btn-secondary btn-radius">取消</a>
+                </div>
+
+                <div class="btn-grop  " id="btn-grop_3">
+                    <!--
+                    <a href="javascript:void(0);" class="sui-btn btn-large close-reveal-model btn-primary">确定</a>
+                    <a class="close-reveal-model  sui-btn btn-large">取消</a>
+                    -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end头像上传弹出层-->
+
+<!--依赖js文件-->
+
+<script src="<?=$_cdn?><?=$WWW_RES?>headedit/javascript/reveal-model.js" type="text/javascript"></script>
+
+<!--头像上传组件1-->
+<script src="<?=$_cdn?><?=$WWW_RES?>headedit/javascript/webuploader.js" type="text/javascript"></script>
+<script src="<?=$_cdn?><?=$WWW_RES?>headedit/javascript/jquery.Jcrop.js" type="text/javascript"></script>
+
+<script src="<?=$_cdn?><?=$WWW_RES?>headedit/javascript/headImgUpload.js?d=0927" type="text/javascript"></script>
+
+<!--头像上传组件3-->
+<!-- <script src="<?=$WWW_RES?>headedit/avatarUpload/js/jquery3.1.1-min.js"></script> -->
+
+<script src="<?=$_cdn?><?=$WWW_RES?>headedit/canvas-to-blob.min.js"></script>
+<script src="<?=$_cdn?><?=$WWW_RES?>headedit/avatarUpload/js/hammer.min.js"></script>
+<script src="<?=$_cdn?><?=$WWW_RES?>headedit/avatarUpload/js/avatarUpload.js?d=0907"></script>
+<script src="<?=$_cdn?><?=$WWW_RES?>headedit/avatarUpload/js/haoce.avatar.js?d=0927"></script>
+
+
+<script> 
+    $("#form-profile").validate({
+        messages: {
+            password: ["别忘记填旧密码","亲，密码必须是6-12位哦"]
+            ,psw: ["别忘记填新密码","亲，密码必须是6-12位哦"]
+            ,repassword:["亲，密码别忘记了","必须与新密码一致"]
+        }
+        , success: function() {
+            DR.ajaxForm( 'form-profile');
+            return false;
+        }
+    });
+
+    $("#form-index").validate({
+        messages: {
+            sex:"你到底是男还是女啊？"
+        }
+        , success: function() {
+            DR.ajaxForm( 'form-index');
+            return false;
+        }
+    });
+
+    $(function () {
+        $('.iframe').click( DR.iframe_fun );
+        DR.ajaxAndValidate( 'form-school');
+        //haoCeAvatar();
+
+    });
+
+</script>

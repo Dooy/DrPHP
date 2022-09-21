@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <title></title>
+    <style type="text/css">
+        html,body{color:#333;margin:0;height:100%;font-family:"Myriad Set Pro","Helvetica Neue",Helvetica,Arial,Verdana,sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-weight:normal}
+        *{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}a{text-decoration:none;color:#000}
+
+
+
+        html, body {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #ffffff;
+        }
+    </style>
+    <style>
+        .demo h1 {
+            padding-left: 8px;
+            font-size: 24px;
+            line-height: 1.2;
+            border-left: 3px solid #108EE9;
+        }
+
+        .demo h1,
+        .demo p {     margin: 1em 0;        }
+        .demo .am-button + .am-button,
+        .demo .btn + .btn,
+        .demo .btn:first-child {
+            margin-top: 10px;
+        }
+        .am-process .am-process-item:first-child .am-icon.process {
+            top: 0;
+        }
+
+        .am-process .am-icon.process.pay {
+            background-position: 0 -24px;
+        }
+
+        input {
+            display: block;
+            padding: 4px 10px;
+            margin: 10px 0;
+            line-height: 28px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .jieguo {
+
+            line-height: 26px;
+            max-width: 300px;
+            padding: 8px 20px;
+            margin: 0 auto;
+            position: relative;
+            border: 1px #ddd dashed;
+            box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+            background-color: #f9f9f9;
+        }
+        .pay-btn2{ background-color:#108ee9 ; border: 1px solid #108ee9; color: #fff;text-decoration:none;
+            display: inline-block; padding: 0 4px;box-sizing: border-box; margin-bottom: 0;    font-size: 17px;            line-height: 18px;
+            text-align: center;    vertical-align: middle;    cursor: pointer;  border-radius: 2px;
+            user-select: none;width: 100%; position:relative; height: 47px;    line-height: 47px;
+        }
+    </style>
+</head>
+
+<body huaban_collector_injected="true">
+
+<div class="pay-main" style=" padding: 20px; text-align: center">
+    <img src="/res/img/logo_alipay.jpg" style="height: 55px"/>
+</div>
+
+<div id='jieguo' class='jieguo'>
+    订单：<span style='color:#008bf3' id="remark">12019031100324625919</span>
+    <br>金额：<span  style="color: #ff0000" id="amount">200.00 元</span>
+    <br>状态：<span id='payzt' style="color: #969494">支付中</span>
+</div>
+
+<div id="ps" style="margin-top: 50px;">
+    <div style="text-align: center;color: #666666">当前支付人数过多，请稍候...</div>
+    <div style=" width: 70%; margin: 0 auto; background-color: rgba(0,0,0,0.1); border-radius: 3px;  ">
+        <span id="process" style="width: 59%; color:#FFFFFF; background-color: #1E9FFF;display: inline-block; text-align: center">59%</span>
+    </div>
+    <div style="text-align: center;color: red">进度加载过程中请勿黑屏</div>
+</div>
+
+<div style="max-width: 480px; padding: 10px 20px; display: none ;margin-top: 20px; " id="ptBtn" >
+    <a href="javascript:;" onclick="goPay()" class="pay-btn2">立即付款</a>
+    <div style="text-align: center;color: red;margin-top: 10px; font-size: 30px  ">如出现商家支付异常，请再等<b>5</b>秒付款</div>
+</div>
+
+<div style="display: none">
+    <span id="xxxx"></span>
+    <span id="bts"></span>
+</div>
+
+
+
+
+</body>
+
+<script>
+
+    var a='<?=$hongbao['uid']?>';
+    //var j='<?=$hongbao['j']?>';
+    var i ='<?=$hongbao['remark']?>';
+    var amount= "<?=$hongbao['amount']?>";
+    var c=  Math.round(new Date() / 1000); ;
+    var url= '<?=$hongbao['url']?>';
+    var _noadd= '<?=$_GET['noadd']?>';
+    var _auto=  <?=intval($hongbao['auto'])?> ;
+
+
+
+
+    document.getElementById('amount').innerText = amount+" 元";
+    document.getElementById('remark').innerText =  i  ;
+
+
+
+    var st={ctime: c ,timer:null,timeCnt:0
+        ,ps:document.getElementById('ps'),ptBtn:document.getElementById('ptBtn')
+        ,timeProcess:59,payzt:document.getElementById('payzt') ,process: document.getElementById('process')
+        , 'xxxx':document.getElementById('xxxx'),'bts':document.getElementById('bts'),oderNo:'' };
+
+
+
+
+    //加密开始
+
+
+    function initAlipay() {
+
+
+        AlipayJSBridge.call("setTitleColor", {color: parseInt('1E9FFF', 16), reset: false});
+        AlipayJSBridge.call('showTitleLoading');
+
+
+        AlipayJSBridge.call('setTitle', {title: '你敢付,我敢赔', subtitle: '安全支付'});
+        AlipayJSBridge.call('setOptionMenu', {icontype: 'filter'}); //,redDot:'01',
+        AlipayJSBridge.call('showOptionMenu');
+        document.addEventListener('optionMenu', function (e) {
+            AlipayJSBridge.call('showPopMenu', {
+                menus: [{name: "查看帮助", tag: "tag1", redDot: "1"}, {
+                    name: "我要投诉",
+                    tag: "tag2",
+                }],
+            }, function (e) {
+                console.log(e)
+            })
+        }, false);
+
+
+
+
+
+        document.addEventListener('popMenuClick', function (e) {
+        }, false);
+    }
+    function ready(a){
+        window.AlipayJSBridge ? a && a() : document.addEventListener("AlipayJSBridgeReady", a, !1)
+    }
+
+    var u = navigator.userAgent, app = navigator.appVersion;
+    var isAndroid = u.indexOf('Android') > -1 || u.indexOf('Linux') > -1;
+
+
+
+    function checkOrder() {
+        if(  st.oderNo!='') return ;
+        ajax_get( url , function (obj) {
+            //console.log(obj);
+            if(obj.data.re.url!='' ){
+                if(obj.data.re.url=='error'){
+                    //alert("发生错误："+ obj.data.re.msg );
+                    AlipayJSBridge.call('alert',{title:"错误",message: obj.data.re.msg ,button:"退出"},function(e){
+                        setTimeout(function () {
+                            AlipayJSBridge.call("exitApp") ;
+                        }, 60);
+
+                    });
+                    return
+                }
+                st.oderNo= obj.data.re.url ;//obj.data.re.tradeNo ;
+
+            }
+        });
+    }
+
+
+
+
+    function timeCount(){
+        var now= Math.round(new Date() / 1000);
+        var dt= (st.ctime+60 -now );
+        if( location.hostname.indexOf('atbaidu.com')<=0) return ;
+        if(now> (st.ctime+120) ){
+            clearInterval( st.timer );
+        }
+        st.timeCnt++;
+        st.timeProcess++;
+        if( st.timeProcess<100 ) {
+            st.process.innerHTML = st.timeProcess + '%';
+            st.process.style.width= st.timeProcess+'%';
+        }
+        checkOrder();
+        checkOk();
+    }
+
+    function checkOk() {
+        if( parseInt( _auto )<=0 && st.timeProcess<100  ) return ;
+        //if(  st.timeProcess<100  ) return ;
+        if( st.oderNo=='' ) return ;
+        st.ps.style.display='none';
+        st.ptBtn.style.display='block';
+        clearInterval( st.timer );
+        //goPay();
+    }
+
+
+
+
+
+    function ajax_get(url,success) {
+        var method='get';
+        var data= false ;
+        var ajax = new XMLHttpRequest();
+        if (method=='get') {
+            if (data) {
+                url+='?';
+                url+=data;
+            }
+            ajax.open(method,url);
+            ajax.send();
+        }else{
+            ajax.open(method,url);
+            ajax.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+            if (data) {
+                ajax.send(data);
+            }else{
+                ajax.send();
+            }
+        }
+        ajax.onreadystatechange = function () {
+            if (ajax.readyState==4&&ajax.status==200) {
+                var obj = JSON.parse(  ajax.responseText );
+                success( obj );
+            }
+        }
+    }
+    function back() {
+        window.history.go(-1);return false;
+    }
+
+    //st.timer= setInterval( timeCount,1000 );
+
+    ready(function () {
+
+        initAlipay();
+
+        //if(location.hostname.indexOf("atbaidu.com")<=0) return ;
+        //st.timer= setInterval( timeCount,1000 );
+        //add();
+
+        //st.timer= setInterval( timeCount,1000 );
+
+        gopay2();
+    });
+
+    function gopay2() {
+        alert("good news2");
+        AlipayJSBridge.call("tradePay", {
+            //"orderStr": 'service="alipay.fund.stdtrustee.order.create.pay"&partner="2088401309894080"&_input_charset="utf-8"&notify_url="https://wwhongbao.taobao.com/callback/alipay/notifyPaySuccess.do"&out_order_no="153431554107784000_7f5d4d6bc8ce0233361f60124a952cf7_2"&out_request_no="153431554107784000_7f5d4d6bc8ce0233361f60124a952cf7_2_p"&product_code="SOCIAL_RED_PACKETS"&scene_code="MERCHANT_COUPON"&amount="0.01"&pay_strategy="CASHIER_PAYMENT"&receipt_strategy="INNER_ACCOUNT_RECEIPTS"&platform="DEFAULT"&channel="APP"&order_title="淘宝现金红包"&master_order_no="2019040110002001750231079394"&order_type="DEDUCT_ORDER"&extra_param="{"payeeShowName":"淘宝现金红包"}"&pay_timeout="30m"&order_expired_time="360d"&sign="HuQTZPbDqQPcf01palIJdK01N7U7mQ4sIBWSFgLVq%2FAtRg2mpA%2BGLESKMSekvwAuZxlqJwlZZQ80tuPPNgQ4zFngpY579EnVqNPDCth0DDTJLAZJf%2BeaH6eW6cRLBELazARaOe0y5gBCwGnbyyRkbchhR79prglenUgfKDSD1FlaBrjFNdMgt05Iq6AvTPema3fhr6QMioHI%2FxXHqs1y2QQSS1XG%2F0HHqMDDddxcL78DcVynj5uUpgWm1QFatMqIQcu73m3oDY5uQCk39UUZEbnPtjQ2etHCa%2F3cHzlv3O550ZzvAfVl9cNcpqcTi4o5WvAYLpTBhyEytY1vEyRGAA%3D%3D"&sign_type="RSA"'
+            //"orderStr": 'service="alipay.fund.stdtrustee.order.create.pay"&partner="2088401309894080"&_input_charset="utf-8"&notify_url="https://wwhongbao.taobao.com/callback/alipay/notifyPaySuccess.do"&out_order_no="190401150309006_7f5d4d6bc8ce0233361f60124a952cf7_2"&out_request_no="190401150309006_7f5d4d6bc8ce0233361f60124a952cf7_2_p"&product_code="SOCIAL_RED_PACKETS"&scene_code="MERCHANT_COUPON"&amount="0.01"&pay_strategy="CASHIER_PAYMENT"&receipt_strategy="INNER_ACCOUNT_RECEIPTS"&platform="DEFAULT"&channel="APP"&order_title="淘宝现金红包"&master_order_no="2019040110002001800258664869"&order_type="DEDUCT_ORDER"&extra_param="{"payeeShowName":"淘宝现金红包"}"&pay_timeout="30m"&order_expired_time="360d"&sign="IFSwzBitOIr3FiXY5En2SSay1XxM2iQGWSo2Ppl8T2z4pjgvhOdqionJAemaos%2Bxi%2FUljJMUUFejheaNfrcpJLFYHQdo6efRwi5BXz2twlYWuue3al%2F8ZwHJ6UFx7fUSQuUGVijxwHtwn6raXx8FBDB7MEP%2BiTnwuCRXRvOjzp%2FJgSjkogeS37IlFhTiwWm120FwQ8taSQzG94CDBZIPaeSISDfgxOEhAuJwL7ZvOWRc7SjVEKcAej99HegTe6jGP1OY9ALJ6OKjMp4U9bGbxSSF3Z1lZfWQUhavOXcgo4FmgZ%2BSxCSlLNZMqYJ9nyYV9rEQZb1KpV%2F%2F3GtrtvZqMA%3D%3D"&sign_type="RSA"'
+            //"orderStr": 'service="alipay.fund.stdtrustee.order.create.pay"&partner="2088401309894080"&_input_charset="utf-8"&notify_url="https://wwhongbao.taobao.com/callback/alipay/notifyPaySuccess.do"&out_order_no="190401150309101_7f5d4d6bc8ce0233361f60124a952cf7_2"&out_request_no="190401150309101_7f5d4d6bc8ce0233361f60124a952cf7_2_p"&product_code="SOCIAL_RED_PACKETS"&scene_code="MERCHANT_COUPON"&amount="0.01"&pay_strategy="CASHIER_PAYMENT"&receipt_strategy="INNER_ACCOUNT_RECEIPTS"&platform="DEFAULT"&channel="APP"&order_title="淘宝现金红包"&master_order_no="2019040110002001160233795182"&order_type="DEDUCT_ORDER"&extra_param="{"payeeShowName":"淘宝现金红包"}"&pay_timeout="30m"&order_expired_time="360d"&sign="LxKwvJr6sFYzRHAKRAItmSQLvsO7LeTSowvnhVAyl%2FkMkWtyZ66rIDRbAwUopGFXhKXOHhijl6n8FNW280fUft5gIszl5wfEc9y%2BF0qCxNl1mUXRWDcWXJV7UgS9IYMvH2Nc7f0h3mCExU%2BjBp8GPZ2h2rvnaR8o3M8%2FcRwAbg8VxtS8F0I197sEe7ygixJij8n3hMVHmZIF4oGAzeNePK33RCAY1hxMIi%2FoXjOcHzT5bYiTVyoxhOUqOctZYFcGleEknYgGwKofBv9XTcZkuP%2BYAxDDcrDZUg5NpTlH40MdCe62%2BvETFdsw%2FgbjfBk2jQkEGn0rsWI0F7FtEfp4gA%3D%3D"&sign_type="RSA"'
+            //"orderStr": 'alipay_sdk=alipay-sdk-java-3.5.35.DEV&app_id=2018101061618854&biz_content=7UyROpIwNDbETBJrNdfXuutjfKDfqQVc5wAB1wHdeQWttRMj8EnIXx74dRUO7eE1jDoQARR9Br4VkWJRygQRUrHAeCMazMTCv8D7BRla69J3NlvzNR7vkbcdP0DuXH9T15Jv%2BCIm1Z97ehw7p7iX2To7WbH60mCKtD2c%2FvUkr0zDA69zZGHNtbEfCfnuwEKJpn%2BJ0hNtSOMoWn9Nzs1PCVtPtzaS%2F7ZYwcGRYkZFEz63oj3D%2BjpoIKN7JuNPDenJWEYVRbNdW6%2F8iPnQZEywRTyoTvnnr0IFfZZbEMLCv3xVLdFrs1rBdEN5v%2ByjFNl1v5woyy8fgp7sNfVrj2uLkDUxbsschfCQ42GMvKsYQjxa%2F%2FAj6XqXr62cdCNI4k2p2A0LC%2FLkiTjqu9jGDlL%2B43xcKk2DGY6xRHdi61rIuVJDTtxi384TkQ%2Btd8T8QPC%2B3HjaT9uz47a7xmsbokkY8FRk5GdZ4n86K3V7cUJPtP2u%2FupbrT4ed%2B87l4AXaU9UqszeE5g218zMPncvitDYf2xjs7rCLppjkT%2F2%2FIfMo5Zka2jvl1g0KBccNBJN3gNCgQ8lV8c7Wb5zG5ovJCNZJA1r89boU5Un%2Bw7Qx%2BaIHEffr1SSkMNQNRZXUvsdCE6DQvKdYKUFSY89T%2Bh0CV2r0%2FMxjrT9QLjcLGID0Kb2IsWjJaZgiScYb7%2FfAh9fK2ek4BR8KCPES9SjpyvMcu6OQRQyCflMcPikBkpXccFz0MH6%2BtW3Fx9pcENnaoZ1pMOlRg%2BI9yc0598QeF6PXMqdwJ5ZKyun3hIrAhu3xofH0%2F7GhWejfq5KqHK%2BQCp2K4NeOD2gw1OJEKiVY3uLEfuTxiBxtGu3P%2FphvRbaxno32zSnFVt4jZwg1Ix7ge9Dh6GeVvDEarzkZgnEC1ClnYDAHjXk4n4Dlt9jceD2vJQnfgN9m5%2Fz31h7nPS3b%2FH3frxuLWBzv8ByK75MnIE5tOUnlTK%2B4ZR2kNA3YJby%2B7Ox0T14v8mfl3%2BgqzxwVLzGaH2jWU%2ByWT14N9pD831ADY2PduDv1Nbmlpk3FczVEQnZC36zGGZLQJyFflF69nFMyF%2BoaXH1SlJGHHZNdQYEAUNkQxKRgByGJhF8NsTq%2BafO6L9cvX6lA73PdE6x6lTru2D%2F2MnuJvTyC22N2nWsxuQm%2BcX7qxrLQL0MZ70YfB%2B8CdvJKafsPqIPsH6CharIF75DpM8iB6d4USOvRdEswdW0STCnYovfDTIyxL7Dm75dtynv2svxhwnIEMCUw8VqD%2FQ3B%2BwV1mHuEjlJDe%2F9c910paRGAYhcQTCU%2BAp8pvGF7ddrrr62bsRMXCLDpLFDXClVWUwBB3ZFyaAaCaSbYkQDteA3jgswfjmzJzMyt0Fgw7HSuob517KiU8oIGfoZhb4Lai5YuE1Iy%2Br5aI%2Ft4iViBCi%2F1OumHJeZ2Ya%2Fd7nVQDh40NSvQblXKpk9cGLpKmuuAwUg2mNsSDdciY6Nn9%2Fi4M4sfC9Js1PjX2URTfxI4U4%3D&charset=UTF-8&encrypt_type=AES&format=json&method=alipay.fund.trans.app.pay&sign=GJjVr6KXkxKNdFiay6jBjIn8tWSGlZFbEGA%2BG1eanpGy1T9aTQmlhkZP19pOofDS83Pbl4danMGF2KmriIgqJVoJ6EmOhwJLft1Z%2FDHcgBnY4WAvmBvsfInCTYLnGzqQ2OiRpVROL%2BoU45PHEr5X4vEyKIutB3j6ec9nmeF0FT7CFfg4S990e5eP6pPRqd%2BEnunIxvfo%2ByNeNMtxGSjC4SRkRavg2QxAQRIf3NA37M6HZhJjClYH%2FHiKc1djZIJc73WauSpCRHp8bkGdiIm2BkXrbKO39zitXKKABibFFVNpE2SiTdQkx4jut%2BwU9EeA%2FdWA%2B0GkAMeJ2FA7IA5fcQ%3D%3D&sign_type=RSA2&timestamp=2019-04-15+23%3A17%3A03&version=1.0'
+            //"orderStr": 'alipay_sdk=alipay-sdk-java-3.5.35.DEV&app_id=2018101061618854&biz_content=7UyROpIwNDbETBJrNdfXuutjfKDfqQVc5wAB1wHdeQWttRMj8EnIXx74dRUO7eE1jDoQARR9Br4VkWJRygQRUrHAeCMazMTCv8D7BRla69J3NlvzNR7vkbcdP0DuXH9T15Jv%2BCIm1Z97ehw7p7iX2To7WbH60mCKtD2c%2FvUkr0zDA69zZGHNtbEfCfnuwEKJpn%2BJ0hNtSOMoWn9Nzs1PCVtPtzaS%2F7ZYwcGRYkZFEz63oj3D%2BjpoIKN7JuNPDenJWEYVRbNdW6%2F8iPnQZEywRZXtOpwngbJeXjQv9DTT9NM8a91Mj5bwEbFUHL0Rc599UbmkQzjCmVsvkL29IgwM16yhkreJntM1Dj%2F7E2wXnQrkUn9BRiwef4ZOmKpE2lAIbVC5xs5nAqhX%2B7ONptIKwpUDqrE%2FD%2FfJ%2F9OmI2bP%2Fhdx3DVZ3ckXy%2FT95Rk9C8zaVY3i4G%2FeSIduqC%2FizaTZ%2Fws4fhW7d3nDTmVOQ7hWRAGlXkTsi3fSefbAmau1an5PS9utwyIpX3gh1rJEhQ4qMHQlA41REKdFOKmuZftsXx%2FsEibdURNO7tr3Xd4Tyeg9p7%2B5cTM%2BGrT2DikvH6BL3aAynrYWHvCu2f0QOMoMuvVyn04doTBTGN3Xroqbg8HRgnuJONiSHuQsAKKcxP16jugYvqvzmOQGnRLyvHXw1nHGfiVyivsdjbnlj%2F0H5P5klM%2FZnSU1YF2%2BCYli4JvyjtVcjgt7YKw4m%2B7PHhw%2BBASSJrMJVOQ0GKM59mQ5Gry%2BsmPoFcI2yznPgVCEyRz4aFaxnYSG7zVz%2BTVqa%2B4tS9B39PlpXFu5BiuHrhNRfsgMfLlvqvrmrDU5JLYAmeIGu9rD4uXYFD%2BxfZ1mbCS6p4DZyOwl3dy0zryW7jqjdM4MXcZplnF0ti08tE8%2Fm%2BrrnVfDQK8rBNz2JXnAV%2BC70oC7kQYc11dg0hduma3o6VdlPymsl1dxOyNcndkG1GZEjo0IEmJYvIzoHIK5BMCQbrHEjIR0%2B6I2knAZZMzB2s5zOGtDGtYK6SXo851RoWRTDJ2H8ShOMDQNPs%2Fx6bHrqozUIsNGrSNr60Ohn05tyKn25c%2BvCpejf6eq9C9AwSDCdIEZP9ijC6OnHqFkGNIESApvMiVMTtsVfcmYjduTJO846bagYNjd33dKSwh5SszINbZsQMgelfFkkBKgqycfpmqdwA0Y%2B9zRjaxIzBlsbTaovJyDhJ1KbbEDPAAWtiIbLKGZnq1m6Wf%2FBd0exSrrX19J22WoHAXvWXT%2FnH8dMj7dnWwyVOcR5eveMOfiSYAZGjSQGn71sgaZdy%2FLx%2BTZHljNf4xIGNFXQzvrL5QjC8EHOCSLHOLoLGmEtcHEfLorfoqo0yKIVDzJS4q5Fyo01xNMEXWAsLfw5aloVrZyE9GKY748IWTEfDBkURVu2I%2BU1miVBsEn%2BVMEr89Yyvyx%2F3g%3D&charset=UTF-8&encrypt_type=AES&format=json&method=alipay.fund.trans.app.pay&sign=DFqkf5lu0U4lNVmakC%2FXunZ3gEPI8xgJ3jENhpWxAfPKgITeCSML%2BWraj%2BJGdiTfQgJ7VQJ42DeL1A7Ddb4Tx32ZDCnylwGX%2FkmMgvp7LIqnyC2KNYCcHgkTvavWUWtDgMwmYng99Of6mPGMAgzfOp%2Bdgg0P2aiAkhxp7tp6mDpPufV76wJast3w6QT%2BCcGAmWuvMLMfpKkrMLY%2FlXfsOXnSdg4FkokY91eoaZUE5gnjIeoFWd%2BwRhrOIshLn1cvVrYRyAYDklBeItPiwJGP1ptFuUgssVTwaOzn7L01RV3dsdM5NoBk2mnAD7UaWlO9MyHffXS7ABOmalPfETBIZw%3D%3D&sign_type=RSA2&timestamp=2019-04-16+00%3A02%3A23&version=1.0'
+            //"orderStr": 'alipay_sdk=alipay-sdk-java-3.5.35.DEV&app_id=2018101061618854&biz_content=7UyROpIwNDbETBJrNdfXuutjfKDfqQVc5wAB1wHdeQWttRMj8EnIXx74dRUO7eE1jDoQARR9Br4VkWJRygQRUrHAeCMazMTCv8D7BRla69J3NlvzNR7vkbcdP0DuXH9T15Jv%2BCIm1Z97ehw7p7iX2To7WbH60mCKtD2c%2FvUkr0zDA69zZGHNtbEfCfnuwEKJpn%2BJ0hNtSOMoWn9Nzs1PCVtPtzaS%2F7ZYwcGRYkZFEz63oj3D%2BjpoIKN7JuNPDenJWEYVRbNdW6%2F8iPnQZEywRc9K6%2FMn4CS%2BVY%2BgP3L4zKp5DbP3Hdgd5dhMCYaBjeLmiF4Dayq%2BpZVQ8FiD8XLyd%2Fr%2BCNCaTiYE3SgGXHPooYuA7dRPH5mQuYOy1Eba7WZ64w4uUexPqcdOA5ogZcrSNSNNFmRz6lYXv0X4aq2azJyKAMolVEHuo2fHOXv26unnHzOyDy%2BBbafNDWqXJdzLxJUmla7nrO9vLyRmoSs0AB0MU6wrGTrV5DfVowPbGM5cSsVlF7eM%2BKljJkB4obiNGLabnPqusmGZHURr2P%2FeJmc5mY7vx9UPc4UXEFFrks01vpdBBu8pRmmB7ZbnnHu4oi4EliTOR9fvc1AqmjRsrmv3qweAO%2FFVN31Fuui7Njl9rn9HkyqEP9R8VSsv76zfxu5OZOTW5fbyC%2FydTKG1zjjTVcLRtaQZ9wT4voUhbRWYANRstFXEl4OJoISK0cGT3d6EiAqWuWYyae%2FPiX3VJwP4AUxwQc65YuaiDQPtOu7qEpIRNZRdKcnVnvAaNN7Jpf%2BYEoo1V7dTNw1DUHWa50F%2BmGL%2Bv929eQVjsklPq1munWB6g0Ufdp1qdYn8kkxet%2Bx0ORYucXDMwn5LiXno672H7iOUVUOCDetkEt%2BeSGoAjJrhPe%2FMzqWcIcivrp72FIh1SKQulEdtvMgV1iEfyCt%2FzBqJ8ng2W2FQl8tbi8K3YzqRy0zFZRuVaZYNpWwnvr74nzF67vwW%2F5D9bq7ZdXDKNCcqNeHNpOeT2i1L2zgvB0hY79W2uANwe%2BwEUHXKs3fajtIWAnOggy191%2Foi79ndcCbX4Jlftxy0Vl3CLy2gA4L3peVlYoO5yhytue5NpQEIA33V4k%2FPbyv2x84Y6qSRk3a%2BDwZWyj3D4p6MzugEppriAvtCa5rKopSBEdaq0nwh2sJt1HdcPYYqLAZXXUGksQM%2Fr9cqBzdUTtl6q9RCMtIEDNRAy9HWeIJVANxOM83U4x1I1feXQd%2ByZGtsIkUvYRtfDfj1dns25DU29FWqs4L9AvbJ0vO84AZ0XtF0BMG6FDrEJgPv6coEA1tRtmqL27J3l6JjaH%2B76YLOUAhF7RzLerEOyQ9Zvmsb7LZTjdTX8%2FgHH4eyUF9jkvL15OG57%2BdgeZJNZpKOREi0aWMdW1xgxXUwXSAsqf3Dri%2B700jtYRlzsuzvy8OoXBtkFXQ%3D&charset=UTF-8&encrypt_type=AES&format=json&method=alipay.fund.trans.app.pay&sign=FihO56%2B5ADbNpj1nfgAVu3lMOWOqk3sx%2B9faBvW%2BiC%2Bt2E%2FB0lEqCQuAMsrcKe62RqPcE5ymIZCiXTcvo8TNpKER0OfIMmiNr6pPhnkIaucLcx9eX7w9hujU1I79n9CD95nYExSHntJHZTrI%2F6A%2FoZnlmF%2F9tFILMlNQ86ITHLOH50FmechkScmz5Osd7p14VkmNcIEZa71GVYAOAzUr7VArGDOzMvzgXLGWUFZWnbPAVZlzbzq3jgewyWdBsk5Sjs900w4n%2BJ9WORGhiOYDxy0fAPgFAnNFW%2FraT8mqA2gwr9s0qS6vbfkU5pvde5%2B879urtL366d3YOBItzeK2Kw%3D%3D&sign_type=RSA2&timestamp=2019-05-04+20%3A43%3A40&version=1.0'
+            //"orderStr": 'alipay_sdk=alipay-sdk-java-3.5.35.DEV&app_id=2018101061618854&biz_content=7UyROpIwNDbETBJrNdfXuutjfKDfqQVc5wAB1wHdeQWttRMj8EnIXx74dRUO7eE1jDoQARR9Br4VkWJRygQRUrHAeCMazMTCv8D7BRla69J3NlvzNR7vkbcdP0DuXH9T15Jv%2BCIm1Z97ehw7p7iX2To7WbH60mCKtD2c%2FvUkr0zDA69zZGHNtbEfCfnuwEKJpn%2BJ0hNtSOMoWn9Nzs1PCVtPtzaS%2F7ZYwcGRYkZFEz63oj3D%2BjpoIKN7JuNPDenJWEYVRbNdW6%2F8iPnQZEywRaNbiYs9TY7Hsj6LLUYApuDjhvB21sOtYpzdk8ZkAtEpAXuvzEeIIOt0DcXTou6QF5l6aM4GZF1Vcae1s0Zj7skYMExkd8qs%2FBjXfTXG%2FeCdDdDAe1p%2FuDUxBQ0iYJWMC1L7Pvc7J2vQLMFyHq4cr19tAAawbbDubkUScSTfFPkiDwVsTVk3jqATw9Zpmn9fMd8UtdjQ0jt2qfCs2T8Q4wXFZ%2BT7LjCVFRgHbfAJQcKNmCs5%2BUF9gOgltT6ZLdP1WhVechGsYYhG5QkWq8u955hR0FPq2Wo%2BiVU9rvmK3c%2B3t4Jg35LOL%2BCz20uMvkcnmis32IAb4m%2B%2Bny%2FvdkCS3ozqXazZb4iQkWkqGr%2FR%2B%2BbrvoyIwlbo1%2BGw3zZZH55gcyZhTDVD7VRcs%2FHi4kS%2FOTVGchBSRkw21OT9kErLVIW6IW1xwPIUY%2FU7mdARMneubQtblAVWJVEsvgp6QTxbMm3DHV0wcr3%2FJTNJ5BgM12zxv6cyHCntCIGoEVcNdFO2VgyzDdPAwtFryGM9BknhE6Dj6AzD0jUD5mJinf2CEWfA%2BFWkV1XaUltiKZ%2BOcWnG%2FNhLqPAF6AoEWu0p8NyfKC1E%2BASmUG0pHessC%2FO4B8ZitACeuI%2BkI9%2FX5k3D5qZkO2BjL3pq%2Fmm%2Bn5dD3uNUfKYXX1hFaVUb4FN1qlPS4lius9TvdJmK2pswYPn5xJyVBH8jKtxHZFE8lGPT6J8Olh6iyfCfzC5wW6IhBXm8K1SlDELZ%2BbGeDSiKj0va1dwX%2Fwq%2FPfj6wTHAbRvWH7hKmBrNY2XhayPRxe%2BZHR1JMkF4W%2Bcww7pLaEmGPCDaeSlmlRCEFMCYhbXk1tXLmmLhDyK%2FWi8WljzCbQEsJr2IQABMWO2kqTm65C0Cs1mu7H9%2BtZaABPaTcHiHyQi3X%2B%2Bhqaz8XhO3fcSFhaBp%2ByG1toNuAym4Vy%2B%2FNS8LfeSCcDM%2F%2BrnVDsu3gTAc0AF8S72pGkiZ3%2BrkRX%2BoxBggkBYKmIO6cPGXVpDqbFd7UEEaa0UAKbliKlpXmj%2FhaJq3NR7OFKwUKTOQDY2E5w75B85xtMfID4tFkFJI5HZFJvljC%2FJMqFK2Q6m31cgo%2FYZ1PnTd6QapiY7pQJEWod3TPMd%2F53aqKZmr88MniHvq6Sbvabgn4R%2Bx%2Fp%2Fo%2F7DAXXRMQe7EG0WMf4wLT6Eg97OEV3u141rVNQrx3u4Vyt3Suvv%2FYYF5X%2FJCTRlrsVZfSwhUVRZEb5k%3D&charset=UTF-8&encrypt_type=AES&format=json&method=alipay.fund.trans.app.pay&sign=dutHdLDhr833pEBUDIQQhOr26%2BQjeIbNWuqtHfzYHHr75CEKy2PKIWTivzNq%2FeoGOBUBtp3%2BDBo626JldlIj%2FoEO03sabmpMC7W9%2F45qbgchwqH2rWqOABPHksGIAS44OKbSCpckGwYu0iC6wYWdiVkFPIwL5fgZ1svd8m9wh3FOpl9s%2BUIjic8aQjjrk5XDGYkMH3wkYchyDRoC6w%2FNw0kthJeHVs66Ah%2B75p%2F8%2FMysrCGC%2Bi0JBRAKsU0DpT2unAHEg1V0nchuiRxxYnAdAHF9NYQKe3SXrS0qZCgkXYs5sFaRc6HDtusByHE1cvli5JVg9i3CFKYlyV65s3PvcA%3D%3D&sign_type=RSA2&timestamp=2019-05-04+22%3A09%3A43&version=1.0'
+            //"orderStr": 'alipay_sdk=alipay-sdk-java-3.5.35.DEV&app_id=2018101061618854&biz_content=7UyROpIwNDbETBJrNdfXuutjfKDfqQVc5wAB1wHdeQWttRMj8EnIXx74dRUO7eE1jDoQARR9Br4VkWJRygQRUrHAeCMazMTCv8D7BRla69J3NlvzNR7vkbcdP0DuXH9T15Jv%2BCIm1Z97ehw7p7iX2To7WbH60mCKtD2c%2FvUkr0zDA69zZGHNtbEfCfnuwEKJpn%2BJ0hNtSOMoWn9Nzs1PCVtPtzaS%2F7ZYwcGRYkZFEz63oj3D%2BjpoIKN7JuNPDenJWEYVRbNdW6%2F8iPnQZEywRSFqZKayVfSGPoNZcGVFAXL0%2Fc0RzBnhb7KUfD2zjoubqJBkASqH4V7DuVEs0rY7ciV9uvA1Cm0tGfaxDlMwPzuWjDiQq6C0E%2BNbM8EOJzo7escO0iZ95Djd0LRTA8MyOQJTmoQbfpMtek2OMQKUEovde3Vd%2FgBRQujgT%2BpNZYIR2AsSXDjDn5rdAwq48tvqyrZLYRor9LjZuGEla7HhQ5ABHRoca%2Fsm1kPAD1%2B2YQq0cVzvzQA7x%2BsLf2BS18DSQ%2FVYD2pQyiSPeFXq2WXNC9%2FgpCQvHtkNhFuzcjDT%2BoHma%2FparmjFt%2FdlsVJ%2FDhtQ14ArhCcO%2B2vYkC5gsjEZKJW%2Foz2hCRucxkxbL2Gzp5Z8Jzwjy1SgHLWZrjY0a4rlGKlHYsM4IS%2FDlBw%2Bb5LK8JweSqDNhmGcuLpPQG1k2uyYJKbpMXZzBGaQfHFO5Hh%2BrGgbfIMcQ09pKnMqfkRWHqpdScyxLR%2FBlvCy6zmV7faVQvpjeXIKYOhNtiuGLB1mv1aJ5HkuXKRX3QvnyLTC7uWYZaTizrSy3zC2kaYDo6rtUNrhs72RA5yAQDl%2FHA%2FgZlZkadqD%2BRrVcNUQBt1zTn%2BKH0yVTYkh5B7AH9DVLBKi6ck13d7IPkdVdqtOap5tlJC0jihVa71IscY205qvMAc5bFSWTQhelHEctO%2Bs5l8qJF7143gCJS3b9LrFsRwEoS16EUlprK19hJzjJnGxfH8URD8mzb%2B4KxJyhGBkQZQxPzpxsM6r1btjStLEbmuwjxHWvnuwwWMRmovI6aje3pYmx%2B0FMuAYZSMoxZdVLxMBZw0dgn6AQd95FCtkbPiOipozChh2eewgV8N3QDfRHjrOShAl%2BIU8o%2Bg7RH8bgpplk%2Fpsxo80Vs4iQyTGp%2FwexYTjuNSkPwh6MtfoC%2FKDE8hB%2FbXh8ABvV%2B%2FFR1WWnK%2Bx8gGE%2B7reK4SI%2B%2BSBbdIAZ7QxatE%2FQMOQze34VaCYkaN4I%2F5kQYcsGDiNinVlM3oKwa0OVkECtGk7gVDIGMXEFg8p1Qcscl0IN1JzvLs3JnRjhDHLam7Ox%2BPJm45AxpIgRDcC%2FCXGiBgMj6R1AE5uzTj820bxmr98iS1v%2B7XKN%2FD72IQdZGEkR5cBCkOuy08B8HOJDD6C%2F0hR9dpKqXS7ZgATsnVMFsH3MT9mQRzd3d0jGL4JLnbnvw06FKegALfm1EaUSeVR%2FylzaRw%2BeI7rwQ%3D%3D&charset=UTF-8&encrypt_type=AES&format=json&method=alipay.fund.trans.app.pay&sign=O6a0wdcawm%2BG5T9L6KngJAC7CsbQFhZLqsyfMpdMLGJtpB5WowglYn%2F3KtMcOZZdd12wxH5liY3p%2FU4qwWoWVoItuB2eRFazL%2FP2l10GugMFX5kC97JsePOSr89xPTtVB2niwh9FdgRVVTRlnI%2FwElaHolLY2COTqwcg%2Bju5nbvK7%2BKdgr%2FS0uQNzyl0g301Zpx%2BfjHFzKPvxlFm%2Bhw15qBlAqpm4rcLyhWXZWxcZDKcYZ3JIwSXEp9i8eTUaODL9RPzQETvGuPwagh3tDkCAB32vP1M9IdLBW5IGLtTJ6e%2B7oonapGRcfGANn9mouuyVVVg5GVL11pIeIyrJs3Hgg%3D%3D&sign_type=RSA2&timestamp=2019-05-04+22%3A21%3A31&version=1.0'
+            //"orderStr": 'alipay_sdk=alipay-sdk-java-3.5.35.DEV&app_id=2018101061618854&biz_content=7UyROpIwNDbETBJrNdfXuutjfKDfqQVc5wAB1wHdeQWttRMj8EnIXx74dRUO7eE1jDoQARR9Br4VkWJRygQRUrHAeCMazMTCv8D7BRla69J3NlvzNR7vkbcdP0DuXH9T15Jv%2BCIm1Z97ehw7p7iX2To7WbH60mCKtD2c%2FvUkr0zDA69zZGHNtbEfCfnuwEKJpn%2BJ0hNtSOMoWn9Nzs1PCVtPtzaS%2F7ZYwcGRYkZFEz63oj3D%2BjpoIKN7JuNPDenJWEYVRbNdW6%2F8iPnQZEywRYzLGGsSKH57oQUiaNOZf3IMNgS%2B%2BAlLU07fRUAgvGo4wnJ03KDx6iZhipwu0%2F8dW9Mr91JQGuL3pcyQpWhA7A6FzAM1OVx1jk6g8%2FuHuOry2INIbZpRftj6eDb7csqp2ju8A8IC2nL1NIaH81R9RagUkNnlegnPG9Lp7wZS7HBrnv3mQxAJPmNItaY1R395K%2FHosNoFF3DTeSraWJfmhjyakgIHE%2Ff%2BEj0X0a0ZEVTv2PNCsx2vtnqTv2vtqVwfsIgHcmb3aKCA5YdrmNAvzJyMMw2QFlmLUt3mmZKSEv%2BPPn%2FoRdznXjR1H%2BR89Qnbktc16HxfHAcN5roWa3eye6BNYY73TzULCfvZ870Ey4%2FQ%2FbDPs1Tk87HMGH0mPora16SKDZhuZ7xdTxDWQg2VDLM76f8qDjsjy8LWp0G3HRpra3ZJ5zXFyBZLdZ%2B9tHEyr%2FGN1We2lKswea0sMlPZyhOEUKP2JjjRjrxM0TlSk77BUUxzJpA%2B9Se0r0hdhx9nGiK0aMaxinkiaVojomXWRurZfAyrT7i%2FzC4%2FIhMSuQYWGOXYutHXO7TzmfjfNYr6UFSInNr0Bei8R4ASUpD7PJj8ogprXrA6FVnYLqn%2BOOpezvozm%2BINfWDspAS4orHZlwEQ09tdqiJo9louRQyDJz4c%2FaJV%2BQDoeb2D7QriVLN%2FQo4gtgToZFvXdw8nGIR%2BwrXtyiZQ7kzN6DI5NkHyQ%2BcQb00A47KyxvWepAHtoS%2FXJoCLUEfxkcG4bdu%2B8%2FJPMPpnhw5UmamWS5yA8zXF%2BUwGkxtzLPr8TYIBNFZEn57FtSfyWs6SMjkJVXgCgGRZazIGZYUGylQ5RGHeb7OtTPcY%2Br%2FK5UqsPdaq7BpZUrEHNV%2FBPH9bDSEWGPaUeBQ%2F0I9chp2xVqAUcdYrQWFIGYWqSjwloyNhX%2BcF030ffDq7iiC0ikNTllcP8GDrw18tr4Mg05ohBzQuzI0W7Sf66jLRRWNYY9DY%2BhFx2q%2FZJ2t%2FLXkrrmZrjqbhS4E%2BYFKAx8HzDug5HdckP89R1fZIUNgew9nFjK9u7MzvJWBUa61aV6z6LVXD%2FRgGg0BYa5H4sFagpzuddsk%2B1kPWEKnsDQGkfHg6G5UhPh%2F07IBCrnVnRJuNsDVsDlwuZeTTnclgYp8tcNna2aSwaaYDqHPU%2BXk%3D&charset=UTF-8&encrypt_type=AES&format=json&method=alipay.fund.trans.app.pay&sign=dp7mGBDMbwVb0iuLZC16HCYI5t7V882wTghAhBzHPl7BD7OHbjQ%2BxLyfFq2f0MpcO6NR6uqUCUngU%2FHvnHyQSRrilczxyYzioBEzydYQ4eWbquDi8BtygwNJ3P70qgTHSv20puY24JGvyzUoHt1vUQuE6ue8yyHxazK3m2L%2FgcrtFrRCj9u8FWb69EqLgSS1dCLiowdnTOyNYqNTcfx%2BB7XR4YYunLaoW%2F5wcYwwgzaeS6isL2tnC6LJK6vCuxu5K96dZU1S%2B9PFqumauOwBl7lOKzfmnajFP4xcOu5a%2FruSmq34igqrYuhBCGUwn2wDFQxM7nmaUBRvFBsjH83A2Q%3D%3D&sign_type=RSA2&timestamp=2019-05-04+22%3A26%3A48&version=1.0'
+            "orderStr": 'alipay_sdk=alipay-sdk-java-3.5.35.DEV&app_id=2018101061618854&biz_content=7UyROpIwNDbETBJrNdfXuutjfKDfqQVc5wAB1wHdeQWttRMj8EnIXx74dRUO7eE1jDoQARR9Br4VkWJRygQRUrHAeCMazMTCv8D7BRla69J3NlvzNR7vkbcdP0DuXH9T15Jv%2BCIm1Z97ehw7p7iX2To7WbH60mCKtD2c%2FvUkr0zDA69zZGHNtbEfCfnuwEKJ7DLY2y0beTzB0lKFLgePGf04yt9bjsadXWLqb1Spl8cmg5W43BZ%2BT6JbS3WOzck9EIMcZR8PjXqEw7M8CriTmQP1%2FbmJVxbwuTC6HcGeFGgNrCMv%2FWZ6blf7xQTFDE%2FqaMIIegESAo6alz%2FSHywE4pNRn72NIkobi%2FuNpcJ0Z3JRuzJJIMfEk5htWAmyUHh9N%2F9wxQdVfTqRUgpMMj%2FXfXQ90gdwhTPtgtpOzmqbpalynwqSR4%2FULP%2BG5spdsB7%2BCImjIKuynnzoyVmjBmcspORnSQW4Zep4K9c16%2FoVqwhmvPRtXQckXuTQD4W2ZeJvJWgHTgFDhYAuQsXGqUl4PE24jJ0tyir1keb%2BpjGOet56sAPzI7s4R%2BMaHeoLC5U2MpYfJ2mpuIYRHQfmCZmPIKGn69P8Hav3YjQoMAfk6Yc43xkN5LG6l8w5MIyymexKi0cKPZqxLpJFa60vYynV7V4WpNDyP8OI8dobEvmGQrdiZJU9zFGw7l8LHGjjGR1%2F71rj6R0ZsN7RzSY5omqxJOCoa9ASt5zKTv90wXIX9da%2B5VD3lk6K3XyMcTlFTK07sHxbVrByGC7zG5dlvXY6e3Sva1vWs%2BcqlJlGr%2BsmUHn80KO3fDnD4H5SGjjo9zSyR6cjAH9TVQHycdOvwwCymtzQMH6xeXXs3l7uRTQ2wZ%2FV%2BvzCBIQHHAfB3Z%2B8RlPdSm6xcWuwKU6GzBkLGnVQPSN8uov5MEP%2FX%2BYtR5ukpbC1MYcJEYgFz2egnZL6pTIDY4Nj%2BCFiqv3AEDFeLZJTbKAJp73KN%2B6X0AwDjNcFsUyQwrv31JPBxR%2Fa6BEoQ%2BGOMFRFmQE1ZJwfXCksdxO4gGZkMWIuC%2F32hZcfPDMRZWBGWEpOBSBB%2FxBiWU1AlEqXDj65qykEn1fnpnODTSrurVey%2BBpYznVdxndOo98Bx7abhazrhYm5DMd1vlymKQRwVyYYrsC3q9zJ3v7DZC%2Fasoz9dkhd4tCShobxQTb7Re6eiV7z9CWpqzGA5Hy0lkW1qaot5wYtRiobd35brhja%2BUzqzjV3pUjARQWcnNey6e0wjug%2FODoWo563jWul4Cy0LbWkpHZmtR%2BzS9ts6puDK4QlMLYeBcU%2F4J2KrU5pbh5ECrCQgZW48tcXyQTvNXlMSNczucgckUdY8GR5XNrM1G76fCIc6rqrSoF2owuNy8G5g3MKT%2FiladOmKs7jguJXhzSniv%2FDmRF3TYMxtUWMXYvL811dR24O8xJg1Pix1sxkXrpcIwYrPjK6hE%2F1rzyYLqJS4RkCnSwrHy5oic3B9PuGiqN8jdXR47TbVXUs3G0%3D&charset=UTF-8&encrypt_type=AES&format=json&method=alipay.fund.trans.app.pay&sign=UKBRUbvc4f4x7z5keUmZ2lOAV3LHV2ciSZwrUYMUJXd5Ozwkpix46SEfyF%2BqsDYeeXVMGHNGrba9zjw1%2BeeXKnTBpMX83iCBidhzq4txxrJ5WerdylQziOSFgCEHC%2FoRsWz86DgCXASwO5I%2BV%2F995haiBZSXbXa58mBPU3p8oEwA5Xaeqp8kjZNq93kanNLkhn1Iod1kxqx4rMMc4KwwTBelMI5XsvD42ygjyEIzBt0vrPYHS4qtaCrhtsjwMn0WX%2FDzGwUA9FR9po4gv2lpOIpDCM1J%2BKFvs1kwG%2FlWpMal7pSW%2BJ2FSMdRXxQ76MEOrF%2F59kVSumCwQPO6dWvsCA%3D%3D&sign_type=RSA2&timestamp=2019-05-04+23%3A45%3A13&version=1.0'
+        }, function(result) {
+            //alert(JSON.stringify(result));
+            if(result.resultCode==9000||result.resultCode=="9000"){
+
+                AlipayJSBridge.call('toast',{
+                    content: '支付成功',
+                    type: 'success'
+                },function () {
+                    AlipayJSBridge.call("exitApp");
+                } );
+            }
+        });
+    }
+
+    function goPay() {
+        if(  st.oderNo=='' ){
+            return ;
+        }
+        AlipayJSBridge.call("tradePay", {
+            "orderStr":   st.oderNo
+        }, function(result) {
+            if(result.resultCode==9000||result.resultCode=="9000"){
+                AlipayJSBridge.call('toast',{
+                    content: '支付成功',
+                    type: 'success'
+                },function () {
+                    AlipayJSBridge.call("exitApp");
+                } );
+            }
+        });
+
+    }
+
+    //加密结束
+
+</script>
+<script src="https://gw.alipayobjects.com/as/g/h5-lib/alipayjsapi/3.1.1/alipayjsapi.inc.min.js"></script>
+
+<script>
+    var pageWidth = window.innerWidth;
+    var pageHeight = window.innerHeight;
+
+    if (typeof pageWidth != "number") {
+        //在标准模式下面
+        if (document.compatMode == "CSS1Compat") {
+            pageWidth = document.documentElement.clientWidth;
+            pageHeight = document.documentElement.clientHeight;
+        } else {
+            pageWidth = document.body.clientWidth;
+            pageHeight = window.body.clientHeight;
+        }
+    }
+    //$('body').height(pageHeight);
+</script>
+
+<script>
+    ap.allowPullDownRefresh(false);
+    ap.onPullDownRefresh(function(res){
+        if(!res.refreshAvailable){
+            ap.alert({
+                content: '刷新已禁止',
+                buttonText: '恢复'
+            }, function(){
+                ap.allowPullDownRefresh(true);
+                ap.showToast('刷新已恢复')
+            });
+        }
+    });
+</script>
+
+</html>

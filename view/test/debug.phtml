@@ -1,0 +1,180 @@
+<div>
+    <bobo>
+    <h3>调试</h3>
+    <div>
+        <ul class="sui-nav nav-tabs nav-primary">
+            <li :class="{active:st.key==k}" v-for="(v,k) in tab"><a v-html="v" @click="tabCheck( k )"></a></li>
+        </ul>
+
+        <div   class="sui-form form-horizontal" novalidate="novalidate" v-show="st.key=='pay'">
+            <div class="control-group" v-for="(v,k) in f.pay">
+                <label for="inputEmail" class="control-label" v-html="k+'：'"></label>
+                <div class="controls">
+                    <input type="text"   placeholder="" data-rules="required" v-model="f.pay[k]" style="width: 250px">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label"></label>
+                <div class="controls">
+                    <button type="submit" class="sui-btn btn-primary btn-large" @click="post( st.key )">Debug</button>
+                    <button type="submit" class="sui-btn btn-primary btn-large" @click="postTest( )" v-if="rz.post!=''">立马试一试</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div v-show="st.key=='ex'">
+            <div  class="sui-form form-horizontal">
+                <div class="control-group" v-for="(v,k) in f.ex">
+                    <label for="inputEmail" class="control-label" v-html="k+'：'"></label>
+                    <div class="controls">
+                        <input type="text"   placeholder="" data-rules="required" v-model="f.ex[k]" style="width: 250px">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label"></label>
+                    <div class="controls">
+                        <button type="submit" class="sui-btn btn-primary btn-large" @click="debugEx()">Debug</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div v-show="st.key=='exConfirm' || st.key=='yue' ||'orderCheck'==st.key ||'huafei'==st.key||'huafeiCheck'==st.key ">
+            <div  class="sui-form form-horizontal">
+                <div class="control-group" v-for="(v,k) in f[st.key]">
+                    <label for="inputEmail" class="control-label" v-html="k+'：'"></label>
+                    <div class="controls">
+                        <input type="text"   placeholder="" data-rules="required" v-model="f[st.key][k]" style="width: 250px">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label"></label>
+                    <div class="controls">
+                        <button type="submit" class="sui-btn btn-primary btn-large" @click="post( st.key )">Debug</button>
+                        <button type="submit" class="sui-btn btn-primary btn-large" @click="postTest( )" v-if="rz.post!=''">立马试一试</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+
+        <div>
+            <p id="good_new">
+            <div>调试 sign：</div>
+            <textarea id="debug_sign" style="width: 500px; height: 30px;"  v-model="rz.sign"></textarea>
+
+            <div>调试 post raw：</div>
+            <textarea id="debug_post" style="width: 500px; height:100px;" v-model="rz.post"></textarea>
+            <div>调试 curl：</div>
+            <textarea id="debug_txt" style="width: 500px; height: 150px;" v-model="rz.curl"></textarea>
+            <div>生成sign的 md5 原值与排序（注意编码UTF8 <a href="https://md5jiami.51240.com/" target="_blank">在线验证</a> ）：</div>
+            <textarea id="debug_md5" style="width: 500px; height: 150px;" v-model="rz.md5"></textarea>
+
+
+        </div>
+
+    </div>
+    </bobo>
+</div>
+
+<script>
+    var order_no='<?='TX'.date("Ymdhis").rand(1000,9999)?>';
+    new Vue({
+        el: 'bobo',
+        data: {
+            tab:{pay:'下单',ex:'提现发起',yue:'提现查询余额',orderCheck:'提现订单状态查询','exConfirm':'提现确认到账'
+            ,huafei:'话费下单',huafeiCheck:'话费订单查询'
+            }
+            ,st:{key:'ex'},rz:{'sign':'','post':'','curl':'',md5:''}
+            ,f:{pay:{money:1999,app_id:'ac6pfuvs',app_secret:'t2k36lywpmgvulxebuff3clelwrygkkd',format:'json'
+                    ,goods_name:'shangpin', order_no:'<?="test".date("Ymd").rand(1000,9999)?>'
+                    ,notify_url:'http://q1.atbaidu.com/test/pay/notify'
+                    ,return_url:'http://q1.atbaidu.com/test/pay/return'
+                    ,pay_type:1,order_user_id:'123',attach:'id=789&arg=2'
+                },
+                ex:{
+                    money:1999,app_id:'ac6pfuvs',app_secret:'t2k36lywpmgvulxebuff3clelwrygkkd'
+                    ,order_no:order_no
+                    ,card_id:'6224123412341234',card_name:'马晓彤',card_bank:'招商银行',card_address:'招商合肥分行大罗支行'
+                    ,notify_url:'http://q1.atbaidu.com/test/pay/notify'
+                    ,attach:''
+                }
+                ,exConfirm:{
+                   app_id:'ac6pfuvs',app_secret:'t2k36lywpmgvulxebuff3clelwrygkkd'
+                    ,order_no: order_no ,ex_id:'123456',type:'21'
+                }
+                ,'yue':{
+                    app_id:'ac6pfuvs',app_secret:'t2k36lywpmgvulxebuff3clelwrygkkd'
+                    ,time:'<?=time()?>'
+                }
+                ,orderCheck:{
+                    app_id:'ac6pfuvs',app_secret:'t2k36lywpmgvulxebuff3clelwrygkkd'
+                    ,order_no: order_no
+                }
+                ,huafei:{
+                    app_id:'ac6pfuvs',app_secret:'t2k36lywpmgvulxebuff3clelwrygkkd'
+                    ,order_no: order_no,fee:3000,tel:'',fee_type:'320',endtime:<?=time()+30*60?>
+                    ,notify_url:'http://<?=\model\drFun::getHost()?>/test/pay/notify'
+                }
+                ,huafeiCheck:{
+                    app_id:'ac6pfuvs',app_secret:'t2k36lywpmgvulxebuff3clelwrygkkd'
+                    ,order_no: order_no,time:'<?=time()?>'
+                }
+            }
+        }
+
+        ,
+        created: function () {
+        },
+        mounted: function () {
+            <?php if($_GET['tab']): ?>this.tabCheck('<?=$_GET['tab']?>') <?php endif;?>
+        },
+        methods: {
+            debugPay:function () {
+                alert('整在完善');
+            }
+            ,tabCheck:function (k) {
+                this.st.key=k;
+                if( k=='yue' ) this.f.yue.time = Math.round(new Date() / 1000) ;
+                this.rz =  {'sign':'','post':'','curl':'',md5:''};
+            }
+            ,debugEx:function () {
+
+
+                this.post('ex');
+
+            }
+            ,post:function (type) {
+                var data = this.f[type];
+                console.log( data  );
+                var that = this;
+                DR.ajax('/test/debug/'+type  ,{data:data },{success:function (rep) {
+                        that.rz= rep.data.rz;
+
+                    }});
+            }
+            ,postTest:function () {
+                console.log( '====提交的资料=====');
+                console.log( this.rz.post );
+                var data= this.rz.post;
+
+                var app= this.st.key;
+                if( this.st.key=='yue' || this.st.key=='orderCheck' ) app= 'ex/'+ this.st.key;
+                if( this.st.key=='huafei' || this.st.key=='huafeiCheck' ) app= 'huafei/'+ this.st.key;
+
+                DR.ajax('/api/'+ app  ,{data:data },{success:function (rep) {
+                        //that.rz= rep.data.rz;
+                        console.log( '------结果请看大屏幕------' );
+                        console.log(   rep );
+                        DR.tipSuccess("成功！<br>请按F12打开调试控制面板，信息都在Console");
+                }});
+            }
+        }
+    });
+</script>

@@ -1,0 +1,291 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>群富</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <?php include "bk_head.phtml";?>
+    <script src="<?=$hc_app?>/js/dc.js<?=$local_version?>"></script>
+    <style>
+        .title{
+            margin: 20px 15px 7px;
+            color: #6d6d72;
+            font-size: 15px;
+        }
+        #info .mui-btn-outlined{padding: 3px 6px;}
+
+    </style>
+</head>
+<body>
+<bobo>
+    <header class="mui-bar mui-bar-nav" v-if="st.tab!=''">
+        <button class="mui-btn mui-btn-blue mui-btn-link mui-btn-nav mui-pull-left" @click="st.tab=''"><span class="mui-icon mui-icon-left-nav"></span>返回</button>
+        <h1 class="mui-title" >代理</h1>
+    </header>
+    <header class="mui-bar mui-bar-nav" v-else-if="st.tree==0">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+        <h1 class="mui-title" >代理</h1>
+        <button class="mui-btn mui-btn-blue mui-btn-link mui-pull-right" @tap="openKai()">开户</button>
+    </header>
+    <header class="mui-bar mui-bar-nav" v-else>
+        <button class="mui-btn mui-btn-blue mui-btn-link mui-btn-nav mui-pull-left" @click="changTab(st.tree-1)"><span class="mui-icon mui-icon-left-nav"></span>{{st.lu[st.tree-1].n}}</button>
+        <h1 class="mui-title" v-html="st.lu[st.tree].n">代理</h1>
+
+    </header>
+
+    <div class="mui-content" v-if="st.tab=='hu'">
+        <div  style="text-align: center;padding: 10px 0;" ><h3>开户</h3> </div>
+        <form class="mui-input-group">
+            <div class="mui-input-row">
+                <label>登录名</label>
+                <input type="text"  v-model="hf.openid" placeholder="必须是字母跟数字组成" >
+            </div>
+            <div class="mui-input-row">
+                <label>密码</label>
+                <input type="text"  v-model="hf.password" placeholder="至少6位">
+            </div>
+            <div class="mui-input-row">
+                <label>昵称</label>
+                <input type="text"   v-model="hf.name" placeholder="显示网站上的昵称">
+            </div>
+            <div class="mui-input-row">
+                <label>费率</label>
+                <input type="text"   v-model="hf.fee" placeholder="单位：万分之，无小数点" >
+            </div>
+            <div class="mui-button-row">
+                <button type="button" class="mui-btn mui-btn-primary" @click="kaihuDo()"  >确定开户</button>
+
+                <button type="button" class="mui-btn " @click="st.tab=''">取消</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="mui-content" v-if="st.tab=='fee'">
+        <div  style="text-align: center;padding: 10px 0;" ><h3>调整费率</h3> </div>
+        <div class="title"  ><span v-html="st.nowUser.user_id_merge.name"></span>的费率 单位万分之</div>
+        <form class="mui-input-group">
+            <div class="mui-input-row">
+                <label>费率</label>
+                <input type="text"   v-model="st.nowUser.fee" placeholder="单位：万分之，无小数点" >
+            </div>
+            <div class="mui-button-row">
+                <button type="button" class="mui-btn mui-btn-primary" @click="changFee()"  >确定调整</button>
+
+                <button type="button" class="mui-btn " @click="st.tab=''">取消</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="mui-content" v-if="st.tab=='zhuan'">
+        <div  style="text-align: center;padding: 10px 0;" ><h3>拨分汇出</h3> </div>
+        <div class="title"  >转账给<span v-html="st.nowUser.user_id_merge.name"></span>  单位元</div>
+        <form class="mui-input-group">
+            <div class="mui-input-row">
+                <label>金额</label>
+                <input type="text"   v-model="st.zprice" placeholder="汇出金额 单位：元" >
+            </div>
+            <div class="mui-button-row">
+                <button type="button" class="mui-btn mui-btn-primary" @click="Transfer()"  >确定拨分</button>
+
+                <button type="button" class="mui-btn " @click="st.tab=''">取消</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="mui-content" v-if="st.tab=='hui'">
+        <div  style="text-align: center;padding: 10px 0;" ><h3>回分转入</h3> </div>
+        <div class="title"  >转账给<span v-html="st.nowUser.user_id_merge.name"></span>  单位元</div>
+        <form class="mui-input-group">
+            <div class="mui-input-row">
+                <label>金额</label>
+                <input type="text"   v-model="st.zprice" placeholder="汇入金额 单位：元" >
+            </div>
+            <div class="mui-button-row">
+                <button type="button" class="mui-btn mui-btn-primary" @click="Transfer2()"  >确定回分</button>
+
+                <button type="button" class="mui-btn " @click="st.tab=''">取消</button>
+            </div>
+        </form>
+    </div>
+
+
+    <div class="mui-content" v-if="st.tab==''">
+
+        <div class="title"  v-if="st.tree>0" v-html="st.lu[st.tree].n+'的基本信息'"> </div>
+        <ul class="mui-table-view" v-if="st.tree>0">
+            <li class="mui-table-view-cell" >
+                码商：<span v-html="st.nowUser.user_id_merge.name"></span>
+            </li>
+            <li class="mui-table-view-cell" >
+                姓名：<span v-html="st.nowUser.realname"></span>
+            </li>
+
+            <li class="mui-table-view-cell" >
+                余额：<span v-html="st.nowUser.amount/100+'元'"></span>
+                <span   style="float: right; " class="mui-badge mui-badge-purple" @click="st.tab='zhuan'" v-if="st.ma.config.zx>0">拨分</span>
+                <span   style="float: right; right: 60px;  " class="mui-badge mui-badge-purple" @click="st.tab='hui'" v-if="st.ma.config.zx>1">回分</span>
+            </li>
+
+            <li class="mui-table-view-cell" >
+                费率：<span v-html="st.nowUser.fee/100+'%'"></span>
+                <span   style="float: right; " class="mui-badge mui-badge-purple" @click="st.tab='fee'">调整</span>
+            </li>
+            <li class="mui-table-view-cell" >
+                最后在线：<span v-html="HC.dateUtils.format_time(st.nowUser.live_time)" v-if="st.nowUser.live_time>0"></span>
+                <span v-else>从未上线</span>
+            </li>
+        </ul>
+
+        <div class="title" v-if="st.tree==0">我的下级代理</div>
+        <div class="title" v-else-if="userTree.length>0" v-html="st.lu[st.tree].n+'的下级代理'"> </div>
+        <!--
+        <ul class="mui-table-view" >
+            <template  v-if="list.list.length>0">
+            <li class="mui-table-view-cell" v-for="(v,k) in list.list">
+                <a   >
+                    <h4 class="mui-ellipsis" v-html="'['+user[v.user_id].name+'] '+ v.realname"></h4>
+                    <p class="mui-h6 mui-ellipsis">
+
+                        状态：<span v-html="type.ma[v.type]"></span>
+                        ，费率：<span v-html=" v.fee/100+'%'"></span>
+                    </p>
+
+                    <span class="mui-h5" v-html="'余额:'+v.amount/100+'元'" style="position: absolute;right: 8px;  top:10px;"></span>
+
+                </a>
+            </li>
+            </template>
+            <template v-else>
+                <div style="text-align: center;padding: 20px 0; ">您暂无下级代理，请先<a href="javascript:;"  @tap="openKai()">开户</a> </div>
+            </template>
+        </ul>
+        -->
+
+        <ul class="mui-table-view" v-if="userTree.length>0">
+
+                <li class="mui-table-view-cell" v-for="(v,k) in userTree">
+                    <a  href="javascript:;" @click="goto(v)" class="mui-navigate-right" >
+                        <h4 class="mui-ellipsis" v-html="'['+v.user_id_merge.name+'] '+ v.realname" style="font-size: 14px;"></h4>
+                        <p class="mui-h6 mui-ellipsis">
+
+                            状态：<span v-html="type.ma[v.type]"></span>
+                            ，费率：<span v-html=" v.fee/100+'%'"></span>
+                            ，下级：<span v-html=" v.c_cnt"></span>
+                        </p>
+
+                        <span class="mui-h5" v-html="'余额:'+v.amount/100+'元'" style="position: absolute;right: 8px;  top:10px;"></span>
+
+                    </a>
+                </li>
+
+
+        </ul>
+        <ul class="mui-table-view" v-else-if="st.tree==0">
+            <div style="text-align: center;padding: 20px 0; ">您暂无下级代理，请先<a href="javascript:;"  @tap="openKai()">开户</a> </div>
+        </ul>
+
+    </div>
+</bobo>
+</body>
+<script>
+    new Vue({
+        el: 'bobo',
+        data: {
+            st:{ tab:'', lu: [{k:'me',n:'代理',pkey:''}],tree:0 ,nowUser:{}, ma:{config:{zx:"0"}} ,zprice:""},
+            hf:{'name':'','openid':'','password':'',fee:''}
+            ,list:{list:[], page_total:0}
+            ,user:{}
+            ,type:{}
+            ,userTree:[]
+        }
+        ,
+        created: function () {
+            this.load();
+            this.loadTree();
+        },
+        mounted: function () {
+        },
+        methods: {
+            load:function () {
+                var that =this;
+                HC.ajax('/vip/ma2'  ,{success:function (rep) {
+                    console.log(rep );
+                    that.list= rep.list;
+                    that.user= rep.user;
+                    that.type= rep.type;
+                    that.st.ma = rep._ma ;
+                        console.log("ma cnofig", that.st.ma.config  );
+                        //that.sv= rep.server;
+                        //that.bill= rep.bill;
+                }});
+            }
+            ,changFee:function ( ) {
+                //console.log(v );
+                //  '/vip/ma2/changFee/'+ v.user_id,{data:{fee:v_str  }}
+                var that= this;
+                HC.ajax('/vip/ma2/changFee/'+ this.st.nowUser.user_id ,{data:{fee: this.st.nowUser.fee } ,success:function (rep) {
+                        //that.load();
+                        that.st.tab='';
+                        //HC.msg('调整成功！')
+
+                    } });
+
+            }
+            ,Transfer:function () {
+                var that= this;
+                HC.ajax('/vip/ma2/Transfer/'+ this.st.nowUser.user_id ,{data:{price: this.st.zprice } ,success:function (rep) {
+                        that.st.tab='';
+                    } });
+                
+            }
+            ,Transfer2:function () {
+                var that= this;
+                HC.ajax('/vip/ma2/Transfer2/'+ this.st.nowUser.user_id ,{data:{price: this.st.zprice } ,success:function (rep) {
+                        that.st.tab='';
+                    } });
+
+            }
+            ,openKai:function () {
+                this.st.tab='hu';
+            }
+            ,kaihuDo:function () {
+                var that = this;
+                HC.ajax('/vip/ma2/reg',{data:this.hf ,success:function (rep) {
+                    that.loadTree();
+                    that.st.tab='';
+                        
+                    } });
+
+            }
+            ,loadTree:function () {
+                var sk=  this.st.lu[ this.st.tree];
+                var url='/vip/account/tree/'+sk.k +'/'+ sk.pkey ;
+                var that = this;
+                HC.ajax(url ,{success:function (rep) {
+                        console.log( rep );
+                        that.userTree= rep.ma;
+                    }} );
+            }
+            ,goto:function (v) {
+                console.log( v );
+                this.st.lu.push( { k:v.user_id, n: v.user_id_merge.name, pkey: v.key });
+                this.st.tree=  this.st.lu.length-1;
+                if( this.st.tree>0 ) this.st.nowUser= v;
+                this.loadTree();
+            }
+            ,changTab:function (k) {
+                if( k== this.st.tree ) return ;
+                var lu= new Array();
+                for(var i=0; i<this.st.lu.length; i++ ){
+                    lu.push( this.st.lu[i]);
+                    if(i==k) break;
+                }
+                this.st.lu = lu ;
+                this.st.tree = k;
+                //console.log( lu );
+                this.loadTree();
+            }
+        }
+    });
+</script>
+</html>

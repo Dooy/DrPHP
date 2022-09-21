@@ -1,0 +1,108 @@
+<div class="dr-box-padding">
+    <div class="dr-box-title">
+        <div class="flexbox">
+            <?php if( isset($college)):?>
+                <div  class="flex">
+                    <div class="flexbox">
+                        <div class="flex"><div style=" padding-left: 3px;line-height: 25px;">学院: <?=$college?></div> </div>
+                    </div>
+                </div>
+                <div><a href="<?=R('book/index/collegeList')?>"  style="color: #6dc7f4">全校学院</a>   </div>
+
+            <?php elseif($switch=='teacher'):?>
+                <div  class="flex">
+                    <div class="flexbox">
+                        <div class="head-small-s2 "><img src="<?=H($teacher['head'])?>"></div> <div class="flex"><div style=" padding-left: 3px;line-height: 25px;">老师: <?=$teacher['name']?></div> </div>
+                    </div>
+                </div>
+                <div><a href="<?=R('book/index/teacherList')?>"  style="color: #6dc7f4">全校老师</a>   </div>
+            <?php elseif($books ):?>
+            <div class="flex">书刊</div>
+            <div class="dr-font" style="padding: 3px 10px 0 0">
+                <span class="sui-dropdown"><span class="dropdown-inner"><a role="button" data-toggle="dropdown" href="javascript:void(0);" class="dropdown-toggle">难度 <i class="caret"></i></a>
+                <ul role="menu" aria-labelledby="drop1" class="sui-dropdown-menu">
+                    <?php for($i=10;$i>1;$i-=2):?>
+                  <li role="presentation"  <?php if($get['nd']==$i ):?>class="active"<?php endif;?>><a role="menuitem" tabindex="-1" href="<?=R($DR_SELF ,['nd'=>$i] )?>">
+                          <div class="flex dr-book-rate-w" title="语言难度" style="height: 22px;"> <div class="dr-book-rate rate-<?=$i?>" style="left: 0px; "></div> </div>
+                      </a>
+                  </li>
+                    <?php endfor;?>
+
+
+                </ul></span></span>
+            </div>
+
+            <div>
+                <form class="sui-form form-dark" style="margin: 0;padding: 0;" action="<?=R($DR_SELF)?>" method="get">
+                    <div class="input-control control-right">
+                        <input type="text"  placeholder="搜索书关键字" name="q" value="<?=$get['q']?>" ><i class="sui-icon icon-touch-magnifier"></i>
+                    </div>
+                </form>
+            </div>
+            <?php endif; ?>
+
+        </div>
+    </div>
+    <?php if($books):?>
+        <div class="dr-box-content book-item-w clearfix">
+        <?php foreach ($books as $book): ?>
+            <?php if(isset($book['new_url'])): ?>
+                <a class="book-item"  href="<?=$book['new_url']?>">
+                    <div class="book-img2 book-img-add dr-box-hover" ></div>
+                    <b class="book-hover" data-title="新增书单" data-content="引用好策书库，新增本校书单" >好策书库，新增书单</b>
+                    <div class="des flexbox"></div>
+                </a>
+
+            <?php elseif($is_copy): ?>
+                <div class="book-item" >
+                    <div class="book-img2 "  >
+                        <a    href="<?=R('book/detail/'. $book['book_id'])?>"><img src="<?=$_cdn?><?=$book['book_img']?>"></a>
+                        <a href="<?=R('book/book/copy/'. $book['book_id'])?>" class="book-ying">引用</a>
+
+                        <div class="book-ying-tag">
+                            <?php if(isset($book_ying[ $book['book_id']])): ?><a class="sui-label" target="_blank" style="color: #f0f0f0" href="<?=R('book/detail/'. $book_ying[ $book['book_id']]['n_book_id'])?>">已引用</a><?php endif; ?>
+                        </div>
+
+                    </div>
+                    <?php include "i_book_item.phtml"; ?>
+                </div>
+            <?php elseif( $book['task']['cls_cnt']>0 ):?>
+                <div class="book-item" >
+                    <div class="book-img2 "  >
+                        <a    href="<?=R('book/detail/'. $book['book_id'])?>"><img src="<?=$_cdn?><?=$book['book_img']?>"></a>
+                        <a href="<?=R('book/detail/'. $book['book_id'])?>" class="book-ying2">已选：<?=$book['task']['cnt']?>人，<?=$book['task']['cls_cnt']?>班</a>
+
+                        <div class="book-ying-tag">
+                            <?php if(isset($book_ying[ $book['book_id']])): ?><a class="sui-label" target="_blank" style="color: #f0f0f0" href="<?=R('book/detail/'. $book_ying[ $book['book_id']]['n_book_id'])?>">已引用</a><?php endif; ?>
+                        </div>
+
+                    </div>
+                    <?php include "i_book_item.phtml"; ?>
+                </div>
+            <?php elseif( $book['is_myself']>0 ):?>
+                <div class="book-item" >
+                    <div class="book-img2 "  >
+                        <a    href="<?=R('book/detail/'. $book['book_id'])?>"><img src="<?=$_cdn?><?=$book['book_img']?>"></a>
+                        <div  class="book-ying2">已选</div>
+                    </div>
+                    <?php include "i_book_item.phtml"; ?>
+                </div>
+
+            <?php else:?>
+                <a class="book-item"  href="<?=R('book/detail/'. $book['book_id'])?>">
+                    <div class="book-img dr-box-hover"  >
+                        <img src="<?=$_cdn?><?=$book['book_img']?>">
+                    </div>
+                    <?php include "i_book_item.phtml"; ?>
+                </a>
+            <?php endif; ?>
+        <?php endforeach;  ?>
+        <?php if($page):?><div class="page" style="clear: both;padding-top: 15px;"><?=$page?></div><?php endif;?>
+    </div>
+    <?php else:?>
+        <div  class="sui-msg msg-large msg-tips msg-block  msg-naked"   style="margin-bottom: 5px;">
+            <div class="msg-con">本学期未布置可选书刊，请联系管理员！  <!--<button type="button" data-dismiss="msgs" class="sui-close">×</button>-->  </div>
+            <s class="msg-icon"></s>
+        </div>
+    <?php endif;?>
+</div>

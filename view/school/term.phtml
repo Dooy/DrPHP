@@ -1,0 +1,149 @@
+
+<link href="<?=$WWW_RES?>/sui/css/sui-append.min.css" rel="stylesheet">
+<form class="sui-form form-horizontal" id="form-term" action="<?=R($action)?>">
+    <div class="control-group">
+        <label class="control-label v-top">   </label>
+        <div class="controls">
+            <h1><?=$act_title?></h1>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label v-top">  学期名称：</label>
+        <div class="controls">
+            <input type="text" value="<?=$term['term']?>" name="term" class="input-large" data-rules="required"  placeholder="请填写学期名称" data-empty-msg="名称别忘记了">
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label">  学期时间：</label>
+        <div class="controls">
+            <input value="<?=isset($term['start_time'])?date("Y-m-d H:i",$term['start_time'] ):''?>" type="text" name="start_time" class="input-date" placeholder="开始时间" data-empty-msg="开始时间别忘记了"  data-rules="required|datetime" data-toggle="datepicker" data-date-timepicker="true" >
+            -
+            <input value="<?=isset($term['end_time'])?date("Y-m-d H:i",$term['end_time'] ):''?>" type="text" name="end_time" class=" input-date" placeholder="截止时间" data-empty-msg="截止时间别忘记了"  data-rules="required|datetime" data-toggle="datepicker" data-date-timepicker="true" >
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label">  选课时间：</label>
+        <div class="controls">
+            <input value="<?=isset($term['s_start_time'])?date("Y-m-d H:i",$term['s_start_time'] ):''?>" type="text" name="s_start_time" class="  input-date" placeholder="开始时间" data-empty-msg="开始时间别忘记了"  data-rules="required|datetime" data-toggle="datepicker" data-date-timepicker="true" >
+            -
+            <input value="<?=isset($term['s_end_time'])?date("Y-m-d H:i",$term['s_end_time'] ):''?>" type="text" name="s_end_time" class=" input-date" placeholder="截止时间" data-empty-msg="截止时间别忘记了"  data-rules="required|datetime" data-toggle="datepicker" data-date-timepicker="true" >
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label"  > 选书限制：</label>
+        <div class="controls">
+            <div class="input-append">
+                <input   type="text" class="span2 input-xfat input-small" name="book_limit_min" value="<?=isset($term['book_limit_min'])?$term['book_limit_min']:'1'?>"  data-rules="required|number|gt=-1"    ><span class="add-on">本</span>
+            </div>~
+            <div class="input-append">
+                <input   type="text" class="span2 input-xfat input-small" name="book_limit" value="<?=isset($term['book_limit'])?$term['book_limit']:'1'?>"  data-rules="required|number|gt=-1"    ><span class="add-on">本</span>
+            </div>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">  提交截止：</label>
+        <div class="controls">
+            <input value="<?=isset($term['end'])?date("Y-m-d H:i",$term['end'] ):''?>" type="text" name="end" class=" input-date" placeholder="答题截止" data-empty-msg="答题截止别忘记了"  data-rules="required|datetime" data-toggle="datepicker" data-date-timepicker="true" >
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label">补选：</label>
+        <div class="controls">
+            <label data-toggle="radio" class="radio-pretty inline <?php if($term['is_bu']!=2):?>checked<?php endif;?>">
+                <input type="radio" <?php if($term['is_bu']!=2):?>checked="checked"  <?php endif;?> name="is_bu"  value="1"><span>允许</span>
+            </label>
+            <label data-toggle="radio" class="radio-pretty inline  <?php if($term['is_bu']==2):?>checked<?php endif;?>">
+                <input type="radio" name="is_bu" <?php if($term['is_bu']==2):?>checked="checked"  <?php endif;?>  value="2"><span>禁止</span>
+            </label>
+        </div>
+    </div>
+
+
+    <div class="control-group">
+        <label class="control-label">重复选书：</label>
+        <div class="controls">
+            <label data-toggle="radio" class="radio-pretty inline <?php if($term['is_repeat']!=2):?>checked<?php endif;?>">
+                <input type="radio" <?php if($term['is_repeat']!=2):?>checked="checked"  <?php endif;?> name="is_repeat"  value="1"><span>允许</span>
+            </label>
+            <label data-toggle="radio" class="radio-pretty inline  <?php if($term['is_repeat']==2):?>checked<?php endif;?>">
+                <input type="radio" name="is_repeat" <?php if($term['is_repeat']==2):?>checked="checked"  <?php endif;?>  value="2"><span>禁止</span>
+            </label>
+            <div class="sui-msg msg-tips msg-naked">
+                <div class="msg-con">允许（禁止）学生跨学期选相同一本ISBN号的书</div>
+                <s class="msg-icon"></s>
+            </div>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label"  > 打分模板：</label>
+        <div class="controls">
+            <span class="sui-dropdown dropdown-bordered">
+                <span class="dropdown-inner"><a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle"><i class="caret"></i>
+                        <b class="dp-display"><?=$term['manfen']==100?'直接打分':implode('/',$dangTpl[$term['manfen'] ][$term['manfen_tpl']])?></b></a>
+                  <ul role="menu" aria-labelledby="drop1" class="sui-dropdown-menu">
+                      <?php foreach ( $dangTpl as $dkey=> $dvar): ?>
+                          <?php if($dkey==100):?>
+                              <li role="presentation" class="fen-last" data-manfen="100" data-tpl="100"><a role="menuitem" tabindex="-1" href="#">直接给分</li>
+                          <?php else:?>
+                              <li role="presentation" class="dropdown-submenu"><a role="menuitem" tabindex="-1" href="#">
+                                    <i class="sui-icon icon-angle-right pull-right"></i><?=$dkey?>分档</a>
+                              <ul class="sui-dropdown-menu">
+                                  <?php foreach ($dvar as $k2=>$v2 ) :?>
+                                      <li role="presentation " class="fen-last"  data-manfen="<?=$dkey?>" data-tpl="<?=$k2?>"><a role="menuitem" tabindex="-1" href="#"  ><?=implode('/',$v2)?></a></li>
+                                  <?php endforeach;?>
+                              </ul>
+                            </li>
+                          <?php endif;?>
+                      <?php endforeach;?>
+                  </ul>
+             </span></span>
+        </div>
+     </div>
+
+    <div class="control-group">
+        <label class="control-label v-top">  终分权重：</label>
+        <div class="controls">
+            <table class="sui-table">
+                <thead>
+                <tr><th>项目</th> <th>权重</th>  </tr>
+                </thead>
+                <tbody>
+                <?php foreach ( $book_tags as $k=> $v): ?>
+                <tr>
+                    <td><?=$v['n']?></td> <td><input   type="text" class="span2 input-xfat input-small" name="dafen[<?=$k?>]" value="<?=$term['dafen'][$k]?>"  data-rules="required|number|gt=-1"    ></td>
+                </tr>
+                <?php endforeach;?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <div class="control-group">
+        <label class="control-label"  > </label>
+        <div class="controls">
+            <button type="submit" class="sui-btn btn-primary">提交</button>
+        </div>
+    </div>
+    <input type="hidden" value="<?=$term['term_key']?>" name="term_key">
+    <input type="hidden" value="<?=$term['manfen']?>" name="manfen" id="manfen">
+    <input type="hidden" value="<?=$term['manfen_tpl']?>" name="manfen_tpl" id="manfen_tpl">
+</form>
+
+<script>
+    $(function () {
+        DR.ajaxAndValidate( 'form-term');
+
+        $('.fen-last').click(function () {
+            var that = $(this);
+            $('#manfen').val( that.data('manfen'));
+            $('#manfen_tpl').val( that.data('tpl'));
+            $('.dp-display').text( that.text());
+        });
+    });
+</script>

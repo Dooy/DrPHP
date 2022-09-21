@@ -1,0 +1,22 @@
+<h3>未更新书isbn</h3>
+
+<table class="sui-table table-bordered">
+    <thead>
+    <tr>
+        <th style="width: 33%;">书1</th>
+        <th style="width: 33%;">书2</th>
+        <th style="width: 33%;">书3</th>
+
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <?php    foreach ( $isbn['no'] as $k=>$book ) : ?>
+    <?php if($k>0 && $k%3==0):?></tr><tr><?php endif;?>
+        <td><?=count($book['id'])?>本 <a href="<?=R('/hcadmin/bookList/s?type=book&q='.urlencode($book['name']))?>" target="_blank"> <?=$book['name']?></a></td>
+    <?php    endforeach;?>
+    <?php for( $i= count( $isbn['no'])%3  ; $i>0&& $i<3;$i++) :?><td>-</td><?php endfor;?>
+
+    </tr>
+    </tbody>
+</table>

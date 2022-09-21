@@ -1,0 +1,76 @@
+<?php  $is_display=  $_GET['ying']||($_cu['uid']>0  and $_cu['uid']!=$topic_list['list'][0]['user_id'] ) ?'block':'none' ;?>
+<div class=" flexbox">
+    <div class="book-topic-tip flex">
+        <?php if($book_opt['tag_3']):?><?=nl2br($book_opt['tag_3'])?><?php else:?>
+        任务：请选择你认为比较合适的段落朗读并上传对应的文字和语音。坚持朗读能够提高发音的准确性，培养语言的韵律感，进一步完善你的各项语言技能。
+        <?php endif; ?>
+    </div>
+    <?php if($is_display=='none'):?><div class="book-topic-tip"><a  class="sui-btn btn-bordered  btn-info btn-small" onclick="javascript:$('#topic-from').slideToggle(); "  id="upload_ying_show" title="仅支持mp3、mp4">新建<i class="sui-icon icon-tb-unfold"></i></a></div><?php endif;  ?>
+
+</div>
+
+
+<?php include "op_new3.phtml"; ?>
+
+
+
+<?php if ($topic_list['list']) : ?>
+<div class="book-list book-list-tag3">
+    <?php foreach ($topic_list['list'] as $topic): ?>
+    <div class="book-list-item flexbox hover-show">
+        <div class="head-div"><img src="<?= H($user[$topic['user_id']]['head'] )?>"></div>
+        <div class="flex tag3-content">
+            <div class="pg-msg-content mp3play" data-file="<?=$topic['yin2']['file']?>" ><i  class="sui-icon icon-tb-notification"></i> <span>试听</span></div>
+            <div class="pull-right">
+                <?php if( $topic['user_id']==$_cu['uid']):?>
+                <span class="sui-label label-warning">本人</span>
+                <?php endif;?>
+                <?php if($checkUser['bookAdmin']|| $checkUser['create'] || $checkUser['schoolAdmin']): ?>
+                    <div class="sui-form book-list-dt-item" style="margin: 0" ><!-- 打分:-->
+
+                        <?php foreach ($topic_attr[41]['keys'] as $k5=>$v5  ) :?>
+                            <label class="checkbox-pretty inline <?=($topic['attr'][41][$_cu['uid']][0]['attr']== $k5)?'checked':''?>">
+                                <input  type="radio" <?=($topic['attr'][41][$_cu['uid']][0]['attr']== $k5 )?'checked="checked"':''?> name="r41" class=" ajax-url"  data-url="<?=R('book/attr/41/'.$topic['topic_id'].'/'.$k5 )?>"><span><?=$v5?></span>
+                            </label>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif;?>
+            </div>
+            <div class="flexbox" style="clear: both;">
+                <div class="tag3-info flex" >
+                   <span><i  class="sui-icon icon-tb-my"></i> <?= $user[$topic['user_id']]['name'] ?></span>
+                   <span><i  class="sui-icon icon-tb-time"></i> <?=date("Y-m-d H:i", $topic['ctime'])?></span>
+                </div>
+                <?php if( $_cu): ?>
+                <div class="sui-text-right topic-href" data-topic_id="<?=$topic['topic_id']?>"    data-book_id="<?=$book['book_id']?>">
+                    <span class="hover-show-hide"><a href="javascript:;" class="topic-bao" data-url="11/<?=$topic['topic_id']?>">举报</a>  |  </span>
+                    <?php if( $checkUser['bookAdmin']|| $checkUser['create'] || $checkUser['schoolAdmin']): ?>
+                        <span  class="hover-show-hide"><a href="javascript:;" class="ajax-url" data-url="<?=R('book/attr/31/'.$topic['topic_id'])?>"><?php if(isset($topic['attr'][31])): ?>取消<?php else:?>设置<?php endif; ?>置顶</a>  |  </span> <?php endif;?>
+                    <?php if($checkUser['bookAdmin']|| $checkUser['create'] || $checkUser['schoolAdmin']):?>
+                        <span  class="hover-show-hide"><a href="javascript:;" class="ajax-url" data-url="<?=R('book/attr/32/'.$topic['topic_id'])?>"><?php if(isset($topic['attr'][32])): ?>取消<?php else:?>设置<?php endif; ?>精华</a>  |  </span><?php endif;?>
+                    <?php if( $topic['user_id']== $_cu['uid']): ?>
+                        <span><a href="javascript:;"  class="ajax-url" data-url="<?=R('book/topicDel/'.$topic['topic_id'])?>">删除</a>  |  </span><?php  endif; ?>
+                    <span><a href="<?=R($_c.'/topic/'. $topic['topic_id'] )?>">查看详情</a>  |  </span>
+                    <span><a href="javascript:;" class="topic-good" data-good="<?=$topic['good_cnt']?>" data-url="1/<?=$topic['topic_id']?>">赞(<?=$topic['good_cnt']?>)</a></span>
+                </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+
+     <?php endforeach; ?>
+</div>
+    <div class="dr-page" style="margin-top: 10px; "><?= $topic_list['page'] ?></div>
+<?php endif;?>
+
+<div id="jquery_jplayer"></div>
+<script src="<?=$_cdn?><?=$WWW_RES?>/js/plupload/plupload.full.min.js"></script>
+<script src="<?=$_cdn?><?=$WWW_RES?>/js/jplayer/jquery.jplayer.min.js"></script>
+<script>
+    $(function () {
+        var	my_jPlayer = $("#jquery_jplayer");
+        DR.play(my_jPlayer,'.mp3play' );
+
+    });
+</script>
+

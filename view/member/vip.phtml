@@ -1,0 +1,160 @@
+
+<bobo>
+
+    <form id="form-showerror" class="sui-form form-horizontal" v-if="server.ma.type==0 || st.tab=='modify'">
+        <div class="control-group">
+            <label for="inputEmail" class="control-label"> </label>
+            <div class="controls">
+                <h2 >资料完善</h2>
+
+            </div>
+        </div>
+        <div class="control-group" v-if="server.ma.type>=10">
+            <label for="inputEmail" class="control-label"><span style="color: red">*</span>姓名：</label>
+            <div class="controls">
+                 <span v-html="f.realname"></span>
+            </div>
+        </div>
+        <div class="control-group" v-else>
+            <label for="inputEmail" class="control-label"><span style="color: red">*</span>姓名：</label>
+            <div class="controls">
+                <input type="text"  v-model="f.realname" placeholder="提现至该名字下，不可修改"  >
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label for="inputEmail" class="control-label"><span style="color: red">*</span>电话：</label>
+            <div class="controls">
+                <input type="text"  v-model="f.tel" placeholder="工作电话"  >
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label for="inputEmail" class="control-label"><span style="color: red">*</span>qq：</label>
+            <div class="controls">
+                <input type="text"  v-model="f.qq" placeholder="工作qq"  >
+            </div>
+        </div>
+
+
+        <div class="control-group">
+            <label for="inputEmail" class="control-label">银行卡号：</label>
+            <div class="controls">
+                <input type="text"  v-model="f.card_id" placeholder="收款人得真实姓名一样"  >
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label for="inputEmail" class="control-label">银行名称：</label>
+            <div class="controls">
+                <input type="text"  v-model="f.card_bank" placeholder="招商银行"  >
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label for="inputEmail" class="control-label">开户行地址：</label>
+            <div class="controls">
+                <input type="text"  v-model="f.card_address" placeholder="招商银行大理xx支行"  >
+            </div>
+        </div>
+
+
+
+        <div class="control-group">
+            <label for="sanwei" class="control-label"></label>
+            <div class="controls">
+                <button type="button" class="sui-btn btn-primary" @click="wansan()">提交完善</button>
+            </div>
+        </div>
+
+    </form>
+
+    <form id="form-showerror" class="sui-form form-horizontal" v-else>
+        <div class="control-group">
+            <label for="inputEmail" class="control-label">状态：</label>
+            <div class="controls">
+                <h2 v-html=" server.maType[server.ma.type]">资料完善</h2>
+
+            </div>
+        </div>
+        <div class="control-group"  >
+            <label for="inputEmail" class="control-label"><span style="color: red">*</span>姓名：</label>
+            <div class="controls">
+                <span v-html="f.realname"></span>
+            </div>
+        </div>
+
+
+        <div class="control-group">
+            <label for="inputEmail" class="control-label"><span style="color: red">*</span>电话：</label>
+            <div class="controls">
+                <span v-html="f.tel"></span>
+
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label for="inputEmail" class="control-label"><span style="color: red">*</span>qq：</label>
+            <div class="controls">
+                <span v-html="f.qq"></span>
+
+            </div>
+        </div>
+
+
+        <div class="control-group">
+            <label for="inputEmail" class="control-label">银行卡号：</label>
+            <div class="controls">
+                <span v-html="f.card_id"></span>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label for="inputEmail" class="control-label">银行名称：</label>
+            <div class="controls">
+                <span v-html="f.card_bank"></span>
+
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label for="inputEmail" class="control-label">开户行地址：</label>
+            <div class="controls">
+                <span v-html="f.card_address"></span>
+            </div>
+        </div>
+
+
+
+        <div class="control-group" v-if="server.ma.type>-10">
+            <label for="sanwei" class="control-label"></label>
+            <div class="controls">
+                <button type="button" class="sui-btn btn-primary" @click="st.tab='modify'" >去完善</button>
+
+            </div>
+        </div>
+        <div   style="text-align: center" v-else> <span  style="color: red"   >您已经被禁用，请联系你的上级代理</span> </div>
+
+    </form>
+</bobo>
+
+<script>
+    new Vue({
+        el: 'bobo',
+        data: {
+            st:{tab:''}
+            ,f:<?=json_encode($f)?>
+            ,server:<?=json_encode($server)?>
+        }
+        ,
+        created: function () {
+        },
+        mounted: function () {
+        },
+        methods: {
+            wansan:function () {
+                DR.ajax('/member/vip/wansan',{data: this.f });
+            }
+        }
+    });
+</script>

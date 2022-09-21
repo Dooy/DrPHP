@@ -1,0 +1,63 @@
+
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>老湿</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <?php include "bk_head.phtml";  ?>
+
+</head>
+<body>
+    <haoce>
+        <p style="padding-top: 40px;text-align: center; color: #999">正在载入...</p>
+        <!--
+    <h1>god</h1>
+    <a href="https://www.baidu.com">去外网！</a>
+    -->
+    </haoce>
+</body>
+<script type="text/javascript">
+    mui.init();
+    var vm = new Vue({
+        el: 'haoce',
+        data: function () {
+            return {
+               ui:{sub:null  ,self:null}
+               //,url:'https://www.wjx.cn/jq/19521243.aspx?udsid=369681'
+                ,url:'https://www.baidu.com'
+            }
+        }
+        ,methods: {
+            plusReady:function () {
+                var obj =  HC.getWinExtras();
+                if( obj.detail.href   )  vm.dr_load(obj );
+            }
+            ,dr_load:function ( event ) {
+                if( !vm.ui.self){
+                    vm.ui.self= plus.webview.currentWebview();
+                    var style={top: '0px',bottom: '0px',bounce:'vertical'};
+
+                    if( mui.os.android )  style.top='44px';//{top: '44px',bottom: '0px'};
+                    vm.ui.sub = plus.webview.create( event.detail.href,'http_sub', style );
+                    vm.ui.self.append( vm.ui.sub );
+                    vm.ui.sub.onloaded= vm.loaded;
+                }else{
+                    vm.ui.sub.loadURL( event.detail.href );
+                }
+            }
+            ,loaded:function () {
+                this.setTitle(  vm.ui.sub.getTitle() );
+            }
+            ,test:function () {
+                vm.ui.sub.loadURL('https://www.baidu.com');
+            }
+            ,setTitle:function ( str ) {
+                vm.ui.self.setStyle(  {titleNView:{titleText: str }} );
+            }
+        }
+    });
+    mui.plusReady( vm.plusReady );
+    document.addEventListener('dr_load', vm.dr_load );
+</script>
+</html>

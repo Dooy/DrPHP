@@ -1,0 +1,141 @@
+<div style="padding: 10px; ">
+    <h3>用户</h3>
+    <ul class="total"   >
+        <li>
+            <b><?=intShow($tj_user['total'])?></b>
+            <span>注册</span>
+        </li>
+        <li>
+            <b><?=intShow($tj_user['detail'][1])?></b>
+            <span>一般教师</span>
+        </li>
+        <li>
+            <b><?=intShow($tj_user['detail'][3])?></b>
+            <span>认证教师</span>
+        </li>
+        <li>
+            <b><?=intShow($tj_user['detail'][2])?></b>
+            <span>学生</span>
+        </li>
+    </ul>
+    <div style="clear: both;"></div>
+    <h3>历史读书数据</h3>
+    <ul class="total"   >
+        <li>
+            <b><?=$tj_book['books_cnt']?></b>
+            <span>图书</span>
+        </li>
+        <li title="加入人次，前台显示为 成员">
+            <b><?=intShow($tj_book['user_cnt'])?></b>
+            <span>选书人次</span>
+        </li>
+
+        <li>
+            <b><?=intShow($tj_book['select_cnt'])?></b>
+            <span>选书人数</span>
+        </li>
+
+
+        <li>
+            <b><?=intShow($tj_book['topic_cnt'])?></b>
+            <span>主题</span>
+        </li>
+        <li>
+            <b><?=intShow($tj_book['comment_cnt'])?></b>
+            <span>回复</span>
+        </li>
+        <?php foreach ($tagName as $k => $v ) : if($k<=0) continue;  ?>
+            <li>
+                <b><?=intShow($tj_book['tag_'.$k.'_cnt'])?></b>
+                <span><?=$v['n']?></span>
+            </li>
+        <?php endforeach;?>
+    </ul>
+
+
+    <div style="clear: both;"></div>
+    <h3>本学期读书数据</h3>
+    <ul class="total"   >
+        <li>
+            <b><?=$tj_book_term['books_cnt']?></b>
+            <span>图书</span>
+        </li>
+        <li title="加入人次，前台显示为 成员">
+            <b><?=intShow($tj_book_term['user_cnt'])?></b>
+            <span>选书人次</span>
+        </li>
+
+        <li>
+            <b><?=intShow($tj_book_term['select_cnt'])?></b>
+            <span>选书人数</span>
+        </li>
+
+
+        <li>
+            <b><?=intShow($tj_book_term['topic_cnt'])?></b>
+            <span>主题</span>
+        </li>
+        <li>
+            <b><?=intShow($tj_book_term['comment_cnt'])?></b>
+            <span>回复</span>
+        </li>
+        <?php foreach ($tagName as $k => $v ) : if($k<=0) continue;  ?>
+            <li title="<?=$k?>">
+                <b><?=intShow($tj_book_term['tag_'.$k.'_cnt'])?></b>
+                <span><?=$v['n']?></span>
+            </li>
+        <?php endforeach;?>
+    </ul>
+
+    <div style="clear: both;"></div>
+    <h3>阅读过程统计</h3>
+    <ul class="total"   >
+        <li>
+            <b><?=intShow( $tj_view['novel'])?></b>
+            <span>图书</span>
+        </li>
+        <li>
+            <b><?=$tj_view['user']?></b>
+            <span>用户</span>
+        </li>
+        <li title="读了多少本书，未去重">
+            <b><?=intShow( $tj_view['novel_cnt'])?></b>
+            <span>读本</span>
+        </li>
+        <li>
+            <b><?=intShow($tj_view['cp'])?></b>
+            <span>章节</span>
+        </li>
+        <li>
+            <b><?=$tj_view['time']>7200? (intval($tj_view['time']/3600).'小时'):( $tj_view['time']>180?intval($tj_view['time']/60).'分钟':$tj_view['time'].'秒'  )?> </b>
+            <span>耗时</span>
+        </li>
+        <li>
+            <b><?=intShow($tj_view['word'])?>字 </b>
+            <span>字数</span>
+        </li>
+    </ul>
+
+    <div style="clear: both;"></div>
+    <h3>阅读查词</h3>
+    <ul class="total"   >
+        <li>
+            <b><?=$tj_dict['user']?></b>
+            <span>用户</span>
+        </li>
+        <li>
+            <b><?=intShow( $tj_dict['novel'])?></b>
+            <span>图书</span>
+        </li>
+        <li>
+            <b><?=intShow( $tj_dict['cp'])?></b>
+            <span>次数</span>
+        </li>
+        <!--
+        <li>
+            <b><?=intShow($tj_dict['word'])?> </b>
+            <span>单词</span>
+        </li>
+        -->
+    </ul>
+</div>

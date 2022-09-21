@@ -1,0 +1,71 @@
+
+<div class=" flexbox">
+    <div class="book-topic-tip flex">
+        <?php ob_start(); if( 4==$tag_id):  $bname='去提交'; $cName='期中读书测验'; ?>            任务：提交一篇期中读书概要
+        <?php elseif( 5== $tag_id ): $bname='去提交';  $cName='期末读书报告';  ?>            任务：提交一篇期末读书报告
+        <?php else:  $bname='发布主题'; $cName='讨论';  ?>
+            任务：请针对本书内容发起<?= $book['user_topic'] ?>个主题，如果你的主题足够有趣，一定会吸引更多同学来参与讨论。同时你也需要积极参与讨论其他同学发起的主题至少<?= $book['user_comment'] ?>次。
+        <?php endif;?>
+
+        <?php $tag_id= intval( $tag_id); $str=ob_get_contents(); ob_end_clean();
+        if($book_opt['tag_'.$tag_id]) echo nl2br($book_opt['tag_'.$tag_id]); else echo  $str ;?>
+    </div>
+    <div class="book-topic-tip"><a href="<?= R('book/topicForm/new/' . $book['book_id'] . '/' . $p[2]) ?>"   class="sui-btn   btn-success book-new-add"><?=$bname?></a></div>
+</div>
+
+
+<?php if ($topic_list['list']) : ?>
+    <div class="flexbox">
+        <div class="sui-btn-group flex">
+
+        </div>
+        <div>
+                <span class="sui-dropdown">
+                    <span class="dropdown-inner"><a role="button" data-toggle="dropdown"
+                                                    href="javascript:void(0);"
+                                                    class="dropdown-toggle"><?= $order[$p[1]] ?> <i
+                                    class="caret"></i></a>
+                        <ul role="menu" aria-labelledby="drop1" class="sui-dropdown-menu">
+                             <?php foreach ($order as $k => $v): ?>
+                                 <li role="presentation"><a role="menuitem" tabindex="-1"
+                                                            href="<?= R('book/detail/' . $book['book_id'] . '/' . $k . '/' . $p[2] . '/' . $p[3]) ?>"><?= $v ?></a></li>
+                             <?php endforeach; ?>
+                        </ul>
+                    </span>
+                </span>
+        </div>
+    </div>
+    <div class="book-list">
+        <?php foreach ($topic_list['list'] as $topic): ?>
+            <?php if( !($topic['type']&& $topic['user_id']!=$_cu['uid'] && $_is_teacher!=3) ):?>
+            <div class="book-list-item flexbox">
+                <div class="book-list-num"><?= $topic['comment_cnt'] ?></div>
+                <div class="flex sui-text-large  book-list-item-content">
+                    <a class="title" href="<?= R('book/topic/' . $topic['topic_id']) ?>">
+                        <?php if (isset($topic['attr'][31])): ?><span class="sui-label label-success">置顶</span> <?php endif; ?>
+                        <?php if (isset($topic['attr'][32])): ?><span class="sui-label label-warning">精华</span> <?php endif; ?>
+                        <?php if(  in_array( $tag_id, $tag_p ) and $_cu['uid']== $topic['user_id'] ): ?><span class="sui-label ">本人</span> <?php endif; ?>
+                        <?=    $topic['topic'] ?>
+                    </a>
+                    <a class="des" href="<?= R('book/topic/' . $topic['topic_id']) ?>"><?= $topic['topic_info'] ?> </a>
+                    <a class="des_href"  href="<?= R('book/topic/' . $topic['topic_id']) ?>" >查看详情</a>
+                </div>
+                <div class="book-list-dt">
+                    <div class="book-list-dt-item "><b><i
+                                    class="sui-icon icon-tb-my"></i> <?= $user[$topic['user_id']]['name'] ?></b></div>
+                    <?php if ($topic['comment_cnt'] > 0 && $topic['comment_user_id'] > 0): ?>
+                        <div class="book-list-dt-item"><b><i
+                                        class="sui-icon icon-tb-message"></i> <?= $user[$topic['comment_user_id']]['name'] ?>
+                            </b> <span><?= date("m-d", $topic['comment_time']) ?></span></div>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <?php endif;?>
+        <?php endforeach; ?>
+    </div>
+    <div class="dr-page" style="margin-top: 10px; "><?= $topic_list['page'] ?></div>
+<?php else :?>
+    <div style="margin: 43px auto; width: 400px;text-align: center;" class="sui-text-large">
+        <?=$cName ?> 无人发表或者公开
+    </div>
+<?php endif; ?>

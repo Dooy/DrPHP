@@ -1,0 +1,144 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>下发</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <?php include "bk_head.phtml";?>
+    <style>
+        .title{
+            margin: 20px 15px 7px;
+            color: #6d6d72;
+            font-size: 15px;
+        }
+        .fade-enter-active, .fade-leave-active {
+            transition: opacity .5s;
+        }
+        .fade-enter, .fade-leave-to  {
+            opacity: 0;
+        }
+        #tabs, #tabs *{ touch-action: none; }
+        html{  touch-action: none;}
+
+        .mui-bar-tab .mui-tab-item2 .mui-icon~.mui-tab-label {
+            font-size: 11px;
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .mui-bar-tab .mui-tab-item2 .mui-icon {
+            top: 3px;
+            width: 24px;
+            height: 24px;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+        .mui-bar-tab .mui-tab-item2 {
+            display: table-cell;
+            overflow: hidden;
+            width: 1%;
+            height: 50px;
+            text-align: center;
+            vertical-align: middle;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            color: #929292;
+        }
+        .mui-bar-tab .mui-tab-item2.mui-active {
+            color: #007aff;
+        }
+        .buttons{
+            color:aquamarine;
+            font-family:'微软雅黑';
+            width:80%;
+            line-height:2em;
+            border-radius:20px;
+            background:linear-gradient(45deg,BLUE,purple);
+            border:0px solid;
+            top:25%;
+            left: 10%;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+<bobo>
+    <header class="mui-bar mui-bar-nav">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"  ></a>
+        <h1 class="mui-title">下发服务</h1>
+    </header>
+    <div class="mui-content">
+        <template v-if="doingList.length>0">
+            <div class="title">我的订单</div>
+            <ul class="mui-table-view mui-table-view-chevron" v-if="doingList.length>0">
+                <li class="mui-table-view-cell mui-media"  v-for="(v,k) in doingList">
+                    <a class="mui-navigate-right" :href="'/member/mcbill/info/'+v.export_id+'?head=1'">
+                        <img class="mui-media-object mui-pull-left" :src="'https://cdn.nekoraw.com/res/head/classics/'+(k+1)+'.jpg'">
+                        <div class="mui-media-body">
+                            下发金额:{{v.money/100}} 元
+                            <p class='mui-ellipsis'>{{v.card_bank}} {{v.card_name}} {{v.card_id}}</p>
+                        </div>
+                        <button class="mui-btn mui-btn-primary">去处理</button>
+                    </a>
+                </li>
+            </ul>
+        </template>
+
+        <div style="padding-top: 20px;" v-if="qiangList.length>0">
+            <div class="title">当前有<span v-html="qiangList.length"></span> 可抢</div>
+            <ul class="mui-table-view mui-table-view-chevron" v-if="qiangList.length>0">
+                <li class="mui-table-view-cell mui-media"  v-for="(v,k) in qiangList">
+                    <a class="mui-navigate-right" @tap="qiang(v)">
+                        <img class="mui-media-object mui-pull-left" :src="'https://cdn.nekoraw.com/res/head/classics/'+(k+1)+'.jpg'">
+                        <div class="mui-media-body">
+                             下发金额:{{v.money/100}} 元
+                            <p class='mui-ellipsis'>{{v.card_bank}} {{v.card_name}} {{v.card_id}}</p>
+                        </div>
+                        <button class="mui-btn mui-btn-primary">抢单</button>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div v-else class="mui-content-padded" style="text-align: center;padding-top: 50px">
+             当前无需要下发的订单，等待系统派发
+        </div>
+    </div>
+</bobo>
+</body>
+<script>
+new Vue({
+    el: 'bobo',
+    data: {
+        st:{tab:''}
+        ,doingList:[] //需要处理的
+        ,qiangList:[] //可抢单
+    }
+    ,
+    created: function () {
+        this.load();
+    },
+    mounted: function () {
+        setInterval( this.load, 10*1000);
+    },
+    methods: {
+        load:function () {
+            var that = this;
+
+            HC.ajax('/fw/xia/load' ,{ success:function (res) {
+                    console.log('live',res );
+                    that.qiangList=res.qiang;
+                    that.doingList=res.doing;
+                    //that.sv= res.sv;
+                    //that.yesListCheck();
+                }});
+        }
+        ,qiang:function (v) {
+            var that = this;
+            HC.ajax('/fw/xia/qiang/'+v.export_id ,{ success:function (res) {
+                     that.load();
+                }});
+        }
+    }
+ });
+</script>
+</html>

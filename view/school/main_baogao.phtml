@@ -1,0 +1,21 @@
+<div style="padding: 10px; ">
+    <h3><?=$_GET['_school']?$_GET['_school']:$_cu['school']?></h3>
+    <div>
+        【数据报告】各位老师下午好！现简要向各位老师汇报截止至<?=date("m月d日")?>，
+        我校的好策读书数据情况：目前我们学校已经有<?=intShow($tj_book_term['select_cnt'])?>名同学已经选书成功，
+        <?php if($tj_book_term['topic_cnt']<=0 &&$tj_book_term['comment_cnt']<=0 && $tj_book_term['tag_3_cnt']<=0&&$tj_book_term['tag_5_cnt']<=0  ):?>
+            同学们暂未开始提交任务。
+        <?php else:?>
+            并且学生们已经开始完成任务！
+        目前学生们发帖数达<?=intShow($tj_book_term['topic_cnt'])?>次、回帖数<?=intShow($tj_book_term['comment_cnt'])?>次，
+        且学生们共完成<?=intShow($tj_book_term['tag_3_cnt'])?>个朗读任务以及<?=intShow($tj_book_term['tag_5_cnt'])?>篇期末报告！
+        <?php endif;?>
+    </div>
+
+    <div style="margin-top: 30px">
+        【读书打卡统计】在此过程中，共有<?=$tj_view['user']?>名学生在手机APP内进行阅读，共计阅读<?=intShow( $tj_view['novel'])?>本图书中的<?=intShow($tj_view['cp'])?>个章节，
+        阅读时长达<?=$tj_view['time']>7200? (intval($tj_view['time']/3600).'小时'):( $tj_view['time']>180?intval($tj_view['time']/60).'分钟':$tj_view['time'].'秒'  )?> ，
+        共计阅读字数<?=intShow($tj_view['word'])?>字。过程中查词次数<?=intShow( $tj_dict['cp'])?>次 <!-- ，查阅生词7883个 -->。
+        感谢老师和同学们的大力支持！
+    </div>
+</div>

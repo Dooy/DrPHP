@@ -1,0 +1,142 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>HI PAY</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <?php include "bk_head.phtml";?>
+    <style>
+        .title{
+            margin: 20px 15px 7px;
+            color: #6d6d72;
+            font-size: 15px;
+        }
+        .fade-enter-active, .fade-leave-active {
+            transition: opacity .5s;
+        }
+        .fade-enter, .fade-leave-to  {
+            opacity: 0;
+        }
+        .q_warng{  margin: 10px 15px 7px;  color: #ff7300; font-size: 15px;  }
+
+        .q_time{position: absolute; right: 83px; top: 11px;}
+        .q_btn{ position: absolute; right: 10px;top: 13px; }
+        .mui-popup-input input{ height: 40px; font-size: 20px;  font-weight:bolder; }
+    </style>
+</head>
+<body>
+<bobo>
+    <header class="mui-bar mui-bar-nav">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+        <h1 class="mui-title">谷歌身份验证器</h1>
+
+    </header>
+    <div class="mui-content">
+        <div class="title">
+            请在谷歌身份验证器APP使用复制或者条线扫码
+            <br>也可在微信小程序中搜索：身份验证器
+        </div>
+        <div class="mui-input-group">
+
+
+            <div class="mui-input-row mui-password">
+                <label>登录密码</label>
+                <input type="password" class="mui-input-password" placeholder="登录密码" v-model="f.psw">
+            </div>
+            <template v-if="st.isGoogle">
+                <div class="mui-input-row"  >
+                    <label>新验证码</label>
+                    <input type="text" class="mui-input-clear" placeholder="6位数字的谷歌验证码" v-model="f.code">
+                </div>
+                <div class="mui-input-row" >
+                    <label>旧验证码</label>
+                    <input type="text" class="mui-input-clear" placeholder="原有谷歌验证码" v-model="f.old">
+                </div>
+            </template>
+            <div class="mui-input-row" v-else>
+                <label>谷歌验证码</label>
+                <input type="text" class="mui-input-clear" placeholder="6位数字的谷歌验证码" v-model="f.code">
+            </div>
+
+            <div class="mui-input-row">
+                <label>谷歌秘钥</label>
+                <div style="padding-top: 10px; color: #666666"><span v-html="f.google"></span>  <a  :data-clipboard-text="f.google" id="copyYes">复制</a></div>
+            </div>
+
+            <div class="mui-input-row" style="height: 190px;margin-top: 10px">
+                <div id="qrCode" style="position: absolute; left: 50%; margin-left: -90px;"></div>
+            </div>
+            <div class="mui-button-row">
+                <button type="button" class="mui-btn mui-btn-primary" @click="post()" v-if="st.isGoogle">重置绑定</button>&nbsp;&nbsp;
+                <button type="button" class="mui-btn mui-btn-primary" @click="post()" v-else>验证并绑定</button>&nbsp;&nbsp;
+            </div>
+        </div>
+    </div>
+</bobo>
+</body>
+<script src="/res/js/qrcode.ajax.min.js"></script>
+<script src="/res/js/clipboard.min.js"></script>
+
+<script>
+    new Vue({
+        el: 'bobo',
+        data: {
+            f:{psw:'', code:'', google:'loading....',old:'' }
+            ,st:{isGoogle:false }
+            }
+        ,
+        created: function () {
+            this.load();
+        },
+        mounted: function () {
+            this.init();
+        },
+        methods: {
+            load:function () {
+                var  that = this;
+                HC.ajax('/member/google', { success:function (rep) {
+                        //that.st.tab='login';
+                        //console.log(rep);
+                        that.f.google= rep.google.secret;
+                        if(  rep.google.isOld ) that.st.isGoogle= true;
+                        setTimeout(function () {
+                            that.qrCode(  rep.google.url ,'qrCode' );
+                        },300);
+                    }});
+            }
+            ,init:function () {
+
+                var clipboard = new ClipboardJS('#copyYes');
+                clipboard.on('success', function(e) {
+                    console.info('Action:', e.action);
+                    console.info('Text:', e.text);
+                    console.info('Trigger:', e.trigger);
+                    e.clearSelection();
+                    //toast("付款链接复制成功");
+                    HC.msg("复制成功！");
+                });
+            }
+            ,post:function () {
+                var that = this;
+                HC.ajax('/member/google/change', {data: this.f , success:function (rep) {
+                    HC.msg("绑定成功！");
+                    }});
+
+            }
+            ,qrCode: function( url_text,div_id ) {
+                var that = this;
+                //console.log( location );
+                var qrcode = new QRCode(document.getElementById( div_id ), {
+                    text: url_text //location.origin  + that.qr.url
+                    ,width: 180,
+                    height: 180,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+            }
+
+        }
+    });
+</script>
+</html>

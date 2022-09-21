@@ -1,0 +1,98 @@
+
+
+<div style="padding: 8px 5px 5px 0px;">
+    <!--<form id="user-search" action="<?=R( $_c.'/userlist/search')?>"  class="sui-form pull-left">
+        <select name="sq">
+            <?php foreach ($sq as $k=>$v): ?>
+                <option value="<?=$k?>" <?php if($k==$get['sq']):?>selected<?php endif;?> ><?=$v?></option>
+            <?php endforeach; ?>
+        </select>
+        <input type="text" placeholder="姓名、邮箱、手机号码" class="input-medium" name="q" value="<?=$get['q']?>">
+
+        <button type="submit" class="sui-btn ">查找</button>
+    </form>
+    <div class="sui-btn-group pull-right" style="padding: 3px 0 0 3px;">
+        <a class="sui-btn btn-primary" href="<?=R($_c.'/term')?>"  >新增</a>
+    </div>
+    -->
+    <div style="clear: both"></div>
+</div>
+<?php if($error) :?>
+<div class="sui-msg msg-large msg-block msg-error">
+    <div class="msg-con">
+    <?php foreach ($error as $k=> $v ) : ?> <?php if($k>0) echo'<br>'; ?><?=$v?>  <?php endforeach;  ?>
+    </div>
+    <s class="msg-icon"></s>
+</div>
+<?php endif; ?>
+
+<?php if ( $term['list']  ) : ?>
+    <table class="sui-table table-bordered">
+        <thead>
+        <tr>
+
+            <th>学期名称</th>
+            <th>学期时间</th>
+            <th>选课时间</th>
+            <th>选书限制<br>提交截止</th>
+            <th>创建</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ( $term['list'] as $k=> $v ) : ?>
+            <tr>
+
+                <td><?=$v['term']?><?php if( $k== $term_now ):?><span class="sui-label label-warning">当前</span><?php endif; ?></td>
+                <td><span <?php if( isset($v['start_time_error'])) echo 'style="color:red"'; ?>><?=date("Y-m-d H:i:s",$v['start_time'])?></span><br>
+                    <span <?php if( isset($v['end_time_error'])) echo 'style="color:red"'; ?>><?=date("Y-m-d H:i:s",$v['end_time'])?></span></td>
+                <td><?=date("Y-m-d H:i:s",$v['s_start_time'])?><br><?=date("Y-m-d H:i:s",$v['s_end_time'])?></td>
+                <td>至少:<?=$v['book_limit_min']?>~至多:<?=$v['book_limit']?><br><?=date("Y-m-d H:i:s",$v['end'])?></td>
+
+                <td>
+                    <?php if( $v['term_id']>0): ?><?=$users[$v['user_id']]['name']?><br><?=date("Y-m-d H:i:s",$v['ctime'])?>
+                    <?php else:?>
+                        系统
+                    <?php endif;?>
+                </td>
+
+                <td>
+                    [<a href=" <?php if( $v['term_id']>0): ?><?=R($_c.'/term/edit/'. $v['term_id'])?><?php else:?><?=R($_c.'/term/copy/'.  $k)?><?php endif;?>">编辑</a>]
+                    [<a href="<?=R($_c.'/classList/school/'. $v['term_key'])?>" id="upload">班级管理</a>]
+
+                    <br>
+                    <?php if( $k== $term_now ):?>
+                       [<a  href="javascript:;" class="ajax-url" data-url="<?=R($_c.'/term/save_now/0' )?>" title="学期随系统">随系统</a>]
+                        [<a href="<?=R($_c.'/schoolUserList')?>">选书白名单</a>]
+                    <?php else:?>
+                      [<a href="javascript:;" class="ajax-url" data-url="<?=R($_c.'/term/save_now/'. $k )?>"  >设置为当前学期</a>]
+                    <?php endif; ?>
+
+                </td>
+            </tr>
+        <?php endforeach;?>
+        </tbody>
+    </table>
+    <div class="dr-page"><?=$term['page']?></div>
+<?php else: ?>
+    <div class="sui-msg msg-large msg-block msg-error">
+        <div class="msg-con">该条件下 无匹配结果 <button type="button" data-dismiss="msgs" class="sui-close">×</button> </div>
+        <s class="msg-icon"></s>
+    </div>
+<?php endif; ?>
+
+<div>
+    <ul>
+    说明：
+        <li>1.尽量不要修改<span  style="color: red">学期时间</span>，与系统保持同步</li>
+        <li  >2.导入班级 只能针对本学期, 导入班级的模板在这里<a href="/res/clsimplode.xlxs">下载</a></li>
+        <li  >3.班级名称	年级（可选）	教师账号（可选）	教师姓名（可选） </li>
+    </ul>
+</div>
+
+
+<script>
+    $(function () {
+        $('.ajax-url').click( BOOK.ajaxUrl    );
+    });
+</script>

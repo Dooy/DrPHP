@@ -1,0 +1,229 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>火币</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <?php include "bk_head.phtml";?>
+    <script src="https://cdn.bootcss.com/pako/1.0.10/pako.min.js"></script>
+
+</head>
+
+<body>
+<bobo>
+    <div><h3 v-html="st.title"></h3></div>
+
+</bobo>
+<!-- TradingView Widget BEGIN -->
+<div class="tradingview-widget-container">
+    <div class="tradingview-widget-container__widget"></div>
+    <div class="tradingview-widget-copyright"><a href="https://cn.tradingview.com" rel="noopener" target="_blank"><span class="blue-text">市场数据</span></a>由TradingView提供</div>
+    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
+        {
+            "colorTheme": "dark",
+            "dateRange": "12m",
+            "showChart": false,
+            "locale": "zh_CN",
+            "largeChartUrl": "",
+            "isTransparent": false,
+            "width": "400",
+            "height": "465",
+            "tabs": [
+            {
+                "title": "指数",
+                "symbols": [
+                    {
+                        "s": "OANDA:SPX500USD",
+                        "d": "S&P 500"
+                    },
+                    {
+                        "s": "OANDA:NAS100USD",
+                        "d": "Nasdaq 100"
+                    },
+                    {
+                        "s": "FOREXCOM:DJI",
+                        "d": "Dow 30"
+                    },
+                    {
+                        "s": "INDEX:NKY",
+                        "d": "Nikkei 225"
+                    },
+                    {
+                        "s": "INDEX:DEU30",
+                        "d": "DAX Index"
+                    },
+                    {
+                        "s": "OANDA:UK100GBP",
+                        "d": "FTSE 100"
+                    }
+                ],
+                "originalTitle": "Indices"
+            },
+            {
+                "title": "商品",
+                "symbols": [
+                    {
+                        "s": "CME_MINI:ES1!",
+                        "d": "E-Mini S&P"
+                    },
+                    {
+                        "s": "CME:6E1!",
+                        "d": "Euro"
+                    },
+                    {
+                        "s": "COMEX:GC1!",
+                        "d": "Gold"
+                    },
+                    {
+                        "s": "NYMEX:CL1!",
+                        "d": "Crude Oil"
+                    },
+                    {
+                        "s": "NYMEX:NG1!",
+                        "d": "Natural Gas"
+                    },
+                    {
+                        "s": "CBOT:ZC1!",
+                        "d": "Corn"
+                    }
+                ],
+                "originalTitle": "Commodities"
+            },
+            {
+                "title": "债券",
+                "symbols": [
+                    {
+                        "s": "CME:GE1!",
+                        "d": "Eurodollar"
+                    },
+                    {
+                        "s": "CBOT:ZB1!",
+                        "d": "T-Bond"
+                    },
+                    {
+                        "s": "CBOT:UB1!",
+                        "d": "Ultra T-Bond"
+                    },
+                    {
+                        "s": "EUREX:FGBL1!",
+                        "d": "Euro Bund"
+                    },
+                    {
+                        "s": "EUREX:FBTP1!",
+                        "d": "Euro BTP"
+                    },
+                    {
+                        "s": "EUREX:FGBM1!",
+                        "d": "Euro BOBL"
+                    }
+                ],
+                "originalTitle": "Bonds"
+            },
+            {
+                "title": "外汇",
+                "symbols": [
+                    {
+                        "s": "FX:EURUSD"
+                    },
+                    {
+                        "s": "FX:GBPUSD"
+                    },
+                    {
+                        "s": "FX:USDJPY"
+                    },
+                    {
+                        "s": "FX:USDCHF"
+                    },
+                    {
+                        "s": "FX:AUDUSD"
+                    },
+                    {
+                        "s": "FX:USDCAD"
+                    }
+                ],
+                "originalTitle": "Forex"
+            }
+        ]
+        }
+    </script>
+</div>
+<!-- TradingView Widget END -->
+</body>
+<script>
+    new Vue({
+        el: 'bobo',
+        data: {
+            st: {title:'good news',ws:null }
+
+        }
+        ,
+        created: function () {
+            //this.load();
+        },
+        mounted: function () {
+            //this.initCopy();
+            //this.initUploadV2();
+
+            //this.init();
+        },
+        methods: {
+            init:function () {
+                var haurl = 'wss://api.hadax.com/ws';
+                this.ws= new WebSocket(haurl);
+                this.ws.onopen= this.s_open;
+                this.ws.onmessage= this.s_message;
+                this.ws.onclose= this.s_close;
+            }
+            ,s_open:function () {
+                console.log("connection establish");
+                var requestK = { // 请求对应信息的数据
+                    req: "market.btcusdt.kline.1min",
+                    id: "btcusdt",
+                    from: Math.round(new Date().getTime()/1000) - 600,
+                    to: Math.round(new Date().getTime()/1000)
+                };
+
+                var subK = { // 订阅数据
+                    sub: "market.btcusdt.kline.1min",
+                    id: "btcusdt"
+                };
+                this.ws.send(JSON.stringify(subK));
+                this.ws.send(JSON.stringify(requestK));
+            }
+            ,s_message:function (event) {
+                var that = this;
+                var blob = event.data;
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    let ploydata = new Uint8Array(e.target.result);
+                    let msg = pako.inflate(ploydata, {to: 'string'});
+                    that.handleData(msg);
+                };
+                reader.readAsArrayBuffer(blob, "utf-8");
+
+                console.log("get message");
+            }
+            ,s_close:function () {
+                console.log('connection closed');
+                this.ws= null;
+            }
+            ,handleData:function (msg) {
+                var data = JSON.parse(msg);
+                //console.log('msg>>', msg );
+                if (data.ping) {
+                    // 如果是 ping 消息
+                    //sendHeartMessage(data.ping);
+                    this.ws.send(JSON.stringify({"pong": data.ping }));
+                    console.log('send pong >>',data.ping  );
+                } else if (data.status === 'ok') {
+                    // 响应数据
+                    console.log('msg>>', data );
+                } else {
+                    // 数据体
+                    console.log(data)
+                }
+            }
+        }
+    });
+</script>
+</html>

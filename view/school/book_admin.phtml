@@ -1,0 +1,57 @@
+<div class="dr-min">
+
+    <?php if($book_users):?>
+
+    <table class="sui-table table-bordered">
+        <thead>
+        <tr>
+            <th width="30px;">UID</th>
+            <th>指导教师</th>
+            <th>指导教师学校</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ( $book_users as $v):  ?>
+        <tr>
+            <td><?=$v['user_id']?></td>
+            <td><?=$user[$v['user_id']]['name']?></td>
+            <td><?=$user[$v['user_id']]['school']?></td>
+            <td>[<a href="<?=R('school/book/admin_del/'.$v['book_id'].'/'. $v['user_id'])?>">删除</a>]</td>
+        </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+        <div style="padding: 5px 0; text-align: right"><a class="sui-btn" href="javascript:;" onclick="javascript: $('#form-book').show();" >新增</a></div>
+    <?php endif;?>
+
+    <form id="form-book" class="sui-form form-horizontal" novalidate="novalidate" action="<?=R($_c.'/book/admin_add/'.$book['book_id'])?>" style=" <?php if($book_users):?>display: none<?php endif;?>">
+
+        <div class="control-group">
+            <label for="inputNick" class="control-label sui-text-xlarge v-top hide-min"></label>
+            <div class="controls">
+                <select multiple="multiple"  name="uids[]" style="min-height: 200px;">
+                    <?php foreach ( $teachers as $v ): ?>
+                        <option value ="<?=$v['user_id']?>"><?=$v['name']?></option>
+                    <?php endforeach;  ?>
+                </select>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label for="inputNick" class="control-label sui-text-xlarge v-top "> </label>
+            <div class="controls">
+                <button type="submit" class="sui-btn btn-primary btn-xlarge">添加指导教师</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+<script>
+    $(function () {
+        DR.ajaxAndValidate( 'form-book',{},{'success':function () {
+            location.reload();
+        }});
+    });
+</script>

@@ -1,0 +1,9 @@
+<b class="book-hover" data-title="<?=Html(  strip_tags($book['book']),['"'=>"'"])?>" data-content="<?=Html( strip_tags( $book['book_info']),['"'=>"'"])?>" ><?=$book['book']?></b>
+<div class="des flexbox">
+    <div class="flex dr-book-rate-w"  title="语言难度">  难度:<div class="dr-book-rate rate-<?=intval($isbn[$book['book_isbn']]['difficult_rank'])?>" ></div> </div>
+    <?php if($isbn[$book['book_isbn']]['book_page']>0 || $book['book_page']>0 ): ?> <div><?=($book['book_page']>0? $book['book_page']:$isbn[$book['book_isbn']]['book_page'] )?>页</div><?php endif;?>
+</div>
+<div class="des flexbox">
+    <div class="flex"><i class="sui-icon icon-tb-friendadd"></i> <?=$book['user_cnt']?></div>
+    <div class="flex"><i class="sui-icon icon-tb-message"></i> <?=$book['discuss_cnt']?></div>
+</div>

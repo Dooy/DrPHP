@@ -1,0 +1,134 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>资料完善</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <?php include "bk_head.phtml";?>
+    <style>
+        .title{
+            margin: 20px 15px 7px;
+            color: #6d6d72;
+            font-size: 15px;
+        }
+        #gogo li{color: #999; }
+        #gogo span{color: #333; }
+    </style>
+</head>
+<body>
+<bobo>
+    <header class="mui-bar mui-bar-nav">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+        <h1 class="mui-title">个人信息</h1>
+    </header>
+    <div class="mui-content"   >
+        <div style="margin-top: 30px;" >
+            <div style="text-align: center;padding-bottom: 10px;">
+                <h3  v-html="'状态：'+server.maType[server.ma.type]"> </h3>
+            </div>
+            <div id='login-form' class="mui-input-group">
+                <div class="mui-input-row"  v-if="server.ma.type>=10">
+                    <label>姓名</label>
+                    <div v-html="f.realname" style="display: inline-block;padding-top: 8px;"></div>
+                </div>
+                <div class="mui-input-row" v-else>
+                    <label>姓名</label>
+                    <input   type="text" class="mui-input-clear mui-input" placeholder="提现至该名下，不可修改" v-model="f.realname">
+                </div>
+                <div class="mui-input-row">
+                    <label>电话</label>
+                    <input   type="text" class="mui-input-clear mui-input"   v-model="f.tel" placeholder="工作电话" >
+                </div>
+                <div class="mui-input-row">
+                    <label>QQ</label>
+                    <input   type="text" class="mui-input-clear mui-input"   v-model="f.qq" placeholder="工作qq" >
+                </div>
+                <div class="mui-input-row">
+                    <label>银行卡号</label>
+                    <input   type="text" class="mui-input-clear mui-input"    v-model="f.card_id" placeholder="收款人得真实姓名一样" >
+                </div>
+                <div class="mui-input-row">
+                    <label>银行名称</label>
+                    <input   type="text" class="mui-input-clear mui-input"    v-model="f.card_bank" placeholder="招商银行">
+                </div>
+                <div class="mui-input-row">
+                    <label>开户行</label>
+                    <input   type="text" class="mui-input-clear mui-input"     v-model="f.card_address" placeholder="招商银行大理xx支行">
+                </div>
+
+            </div>
+
+            <div class="mui-content-padded " v-if="server.ma.type!=10">
+                <button  class="mui-btn mui-btn-block mui-btn-primary"   @click="wansan()" style="padding: 10px;">提交完善</button>
+            </div>
+        </div>
+    </div>
+    <!--
+    <div v-else  style="margin-top: 30px;">
+        <div style="text-align: center;padding-bottom: 10px;">
+            <h3  v-html="'状态：'+server.maType[server.ma.type]"> </h3>
+        </div>
+        </ul>
+        <ul class="mui-table-view " id="gogo">
+            <li class="mui-table-view-cell">
+                <a href="#about"  >姓名 <span class="mui-pull-right update" v-html="f.realname"></span></a>
+            </li>
+            <li class="mui-table-view-cell">
+                <a href="#about"  >电话 <span class="mui-pull-right update" v-html="f.tel"></span></a>
+            </li>
+            <li class="mui-table-view-cell">
+                <a href="#about"  >QQ <span class="mui-pull-right update" v-html="f.qq"></span></a>
+            </li>
+            <li class="mui-table-view-cell">
+                <a href="#about"  >银行卡号 <span class="mui-pull-right update" v-html="f.card_id"></span></a>
+            </li>
+            <li class="mui-table-view-cell">
+                <a href="#about"  >银行名称 <span class="mui-pull-right update" v-html="f.card_bank"></span></a>
+            </li>
+            <li class="mui-table-view-cell">
+                <a href="#about"  >开户行 <span class="mui-pull-right update" v-html="f.card_address"></span></a>
+            </li>
+        </ul>
+        <div class="mui-content-padded ">
+            <button  class="mui-btn mui-btn-block mui-btn-primary"   @click="st.tab='modify'" style="padding: 10px;">去完善</button>
+        </div>
+    </div>
+    -->
+</bobo>
+</body>
+<script>
+    new Vue({
+        el: 'bobo',
+        data: {
+            st:{tab:''}
+            ,f:{"realname":"","card_id":"","card_bank":"","card_address":"","tel":"","qq":"","sfz":""}
+            ,server:{"ma":{"user_id":"12","m_user_id":"4","c_user_id":"4","fee":"120","realname":"","card_id":"","card_bank":"","card_address":"","type":"0","tel":"","qq":"","sfz":"","amount":"0","amount_lock":"0","amount_success":"0","live_time":"0"},"maType":{"0":"\u8d44\u6599\u5f85\u5b8c\u5584","1":"\u5f85\u5ba1\u6838","10":"\u901a\u8fc7","-10":"\u672a\u901a\u8fc7","-11":"\u7981\u7528","-20":"\u8d26\u76ee\u5f02\u5e38"}}
+
+        }
+        ,
+        created: function () {
+            this.load();
+        },
+        mounted: function () {
+        },
+        methods: {
+            load:function () {
+                var that = this;
+                HC.ajax('/member/vip',{success:function (rep) {
+                    console.log('rep',rep );
+                    that.f= rep.f;
+                    that.server= rep.server ;
+                    }})
+            }
+            ,wansan:function () {
+                var that = this;
+                HC.ajax('/member/vip/wansan',{data: this.f,success:function (rep) {
+                    that.load();
+                        that.st.tab='ok';
+                    } });
+            }
+
+        }
+    });
+</script>
+</html>

@@ -1,0 +1,31 @@
+<div><h3>登录日志</h3></div>
+<table class="sui-table table-bordered-simple"  >
+    <tr>
+        <th>#</th>
+        <?php if($p[0]=='sys'):?><th>UID</th> <?php endif; ?>
+        <th>时间</th>
+        <th>IP</th>
+        <th>地址</th>
+        <th>状态</th>
+        <th>信息</th>
+    </tr>
+    <?php foreach ($log['list'] as $k=> $v):?>
+    <tr>
+        <td><?=$k+1?></td>
+        <?php if($p[0]=='sys'):?><td><?=$v['user_id']?></td> <?php endif; ?>
+        <td><?=date('Y-m-d H:i:s',$v['ctime'])?></td>
+        <td><a href="http://www.ip138.com/ips138.asp?ip=<?= $v['ip'] ?>&action=2" target="_blank" title="查看ip归属地"> <?=$v['ip'] ?></a></td>
+        <td><?= $v['lo'] ?></td>
+        <td>
+            <?php if($v['type']==1):?>
+            成功
+            <?php else:?>
+                <span style="color: red">失败</span>
+            <?php endif;?>
+        </td>
+        <td><?= $v['error_des'] ?></td>
+    </tr>
+    <?php endforeach; ?>
+</table>
+
+<div><?=$log['page']?></div>

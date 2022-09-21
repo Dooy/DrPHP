@@ -1,0 +1,45 @@
+<div class="dr-min">
+
+    <form id="form-book" class="sui-form form-horizontal" novalidate="novalidate" action="<?=R($_c.'/book/admin_add/'.$book['book_id'])?>">
+
+        <div class="control-group">
+            <label for="inputNick" class="control-label sui-text-xlarge v-top hide-min"></label>
+            <div class="controls">
+                <textarea id="uids" name="uids" style=" height: 100px;"  data-empty-msg="请填写用户UID" placeholder="每行一个UID"   data-rules="required"></textarea>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label for="inputNick" class="control-label sui-text-xlarge v-top "> </label>
+            <div class="controls">
+                <button type="submit" class="sui-btn btn-primary btn-xlarge">编辑指导老师</button>
+            </div>
+        </div>
+    </form>
+    <table class="sui-table table-bordered">
+        <thead>
+        <tr>
+            <th width="30px;">UID</th>
+            <th>指导老师</th>
+            <th>指导老师学校</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ( $book_users as $v):  ?>
+        <tr>
+            <td><?=$v['user_id']?></td>
+            <td><?=$user[$v['user_id']]['name']?></td>
+            <td><?=$user[$v['user_id']]['school']?></td>
+            <td>[<a href="<?=R('hcadmin/book/admin_del/'.$v['book_id'].'/'. $v['user_id'])?>">删除</a>]</td>
+        </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    $(function () {
+        DR.ajaxAndValidate( 'form-book');
+    });
+</script>

@@ -1,0 +1,101 @@
+<div class="control-group-cart"  >
+    <div class="flexbox control-group-cart-title">
+        <div class="flex"><b >书刊描述</b></div>
+        <div class="group-cart-op">
+            <!-- <i class="sui-icon icon-tb-right"></i> -->
+            <i class="sui-icon icon-tb-unfold"></i>
+        </div>
+    </div>
+    <div class="control-group-cart-content" style="display: block">
+
+        <div class="control-group">
+            <label class="control-label"  >字数：</label>
+            <div class="controls">
+                <input type="text"  style="width: 50px;"   name="book_word_cnt" data-error-msg="大于0的数" placeholder="数字" data-empty-msg="字数别忘" value="<?=$book['book_word_cnt']?>">
+                <div class="sui-msg msg-tips msg-naked  ">
+                    <div class="msg-con">选书参考</div>
+                    <s class="msg-icon"></s>
+                </div>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label"  >页数：</label>
+            <div class="controls">
+                <input type="text"  style="width: 50px;"  name="book_page" data-error-msg="大于0的数" placeholder="数字" data-empty-msg="页数别忘" value="<?=$book['book_page']?>">
+                <div class="sui-msg msg-tips msg-naked  ">
+                    <div class="msg-con">选书参考</div>
+                    <s class="msg-icon"></s>
+                </div>
+            </div>
+        </div>
+        <?php  if( $_is_admin) : ?>
+        <div class="control-group">
+            <label  class="control-label sui-text-xlarge v-top "> </label>
+            <div class="controls">
+                <div class="sui-msg msg-tips msg-naked  ">
+                    <div class="msg-con">以下的值是ISBN为主导的，相同的ISBN号会自动关联（仅普通管理员以上才有权限）</div>
+                    <s class="msg-icon"></s>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label"  >译者：</label>
+            <div class="controls">
+                <input type="text"    name="translator" placeholder="翻译人可空" data-empty-msg="翻译人可空" value="<?=$book['isbn']['translator']?>">
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label"  >出版社：</label>
+            <div class="controls">
+                <input type="text"    name="press" placeholder="人民教育出版社" data-empty-msg="人民教育出版社" value="<?=$book['isbn']['press']?>">
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label"  >语种：</label>
+            <div class="controls">
+                <input type="text"    name="language" placeholder="英语、中文、日文" data-empty-msg="英语、中文、日文" value="<?=$book['isbn']['language']?>">
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label"  >出版日期：</label>
+            <div class="controls">
+                <input type="text"    name="publishing_time" placeholder="2017-08-08" data-empty-msg="出版日期" value="<?=$book['isbn']['publishing_time']?>">
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label"  >类别：</label>
+            <div class="controls">
+                <input type="text"    name="cat" placeholder="经济、科技、科幻" data-empty-msg="" value="<?=$book['isbn']['cat']?>">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label"  >难易等级：</label>
+            <div class="controls">
+                <select name="difficult_rank">
+                    <?php
+                    $difficult_rank= $book['isbn']['difficult_rank']>0?$book['isbn']['difficult_rank']:5;
+                    for( $ik=1;$ik<=10;$ik++):
+                        ?><option value="<?=$ik?>" <?php if($ik==$difficult_rank):?>selected<?php endif;?>><?=$ik?></option><?php endfor;?>
+                </select>
+                <div class="sui-msg msg-tips msg-naked  ">
+                    <div class="msg-con">数值也高越难</div>
+                    <s class="msg-icon"></s>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label for="inputNick" class="control-label v-top hide-min">目录：</label>
+            <div class="controls">
+                <textarea  name="contents" style="width:450px;height:200px;"  data-empty-msg="请填写书目录" placeholder="请填写书目录" ><?=$book['isbn']['contents']?></textarea>
+            </div>
+        </div>
+        <?php endif; ?>
+    </div>
+</div>

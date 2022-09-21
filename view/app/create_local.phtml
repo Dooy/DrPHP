@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>本地生成器</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <?php include "bk_head.phtml";?>
+    <style>
+        #bohe ul, #bohe li{ padding: 0 ;margin: 0; list-style: none}
+        #bohe li{width: 187px; float: left; height: 187px; position: relative }
+        @media screen  and (max-width: 374px) {
+            #bohe li{width: 50%;}
+        }
+        #bohe .title{ position: absolute;height: 20px; width: 100%; text-align: center;left: 0;bottom: 0px; background-color: rgba(0,0,0,0.2) ;color: #fff }
+    </style>
+</head>
+<body>
+<bobo>
+    <div class="mui-content">
+        <ul class="mui-table-view">
+            <li class="mui-table-view-cell" v-for="v in list">
+                <a class="mui-navigate-right" >
+                    <span v-html="v.url"></span>
+                    <div style="float: right" v-if="v.ok">ok</div>
+                </a>
+            </li>
+        </ul>
+    </div>
+</bobo>
+
+</body>
+<script>
+    mui.init();
+    new Vue({
+        el: 'bobo',
+        data: {
+            list:[
+                {url:'main',ok:false }
+                ,{url:'wtfpass',ok:false}
+                ,{url:'wtfpass_list',ok:false}
+                ,{url:'bohe',ok:false}
+                ,{url:'youqi',ok:false}
+                ,{url:'hongxin',ok:false}
+            ]
+        },
+        created:function(){
+    	},
+    	mounted:function(){
+            this.doList();
+    	},
+        methods:{
+            doList:function () {
+                //alert('gggd');
+                for(var i=0; i< this.list.length;i++) this.doItem(i);
+            }
+            ,doItem:function ( i ) {
+                var v= this.list[i];
+                var that= this;
+                HC.ajaxGet('/app/page/'+v.url+'?local=write',function () {
+                    that.list[i].ok = true;
+                })
+            }
+    	}
+    });
+</script>
+</html>

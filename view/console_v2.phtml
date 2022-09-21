@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <htitle>
+        <title v-html="st.fee+':'+ u.n" v-if="st.fee"><?=($site_title?$site_title.'-':'')?></title>
+        <title v-html="u.n"><?=($site_title?$site_title.'-':'')?></title>
+    </htitle>
+    <link href="<?=$WWW_RES?>/sui/css/sui.min.css" rel="stylesheet">
+    <link href="<?=$WWW_RES?>/css/dr.css?d=0929" rel="stylesheet">
+    <!--
+    <script type="text/javascript" src="//g.alicdn.com/sj/lib/jquery/dist/jquery.min.js"></script>
+    -->
+    <script type="text/javascript" src="/res/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/res/js/vue.min.js"></script>
+
+    <style>
+        body{margin: 0 auto;padding: 0; }
+        .slide-fade-enter-active {
+            transition: all .3s ease;
+        }
+        .slide-fade-leave-active {
+            transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+        }
+        .slide-fade-enter, .slide-fade-leave-to{
+            transform: translateX(300px);
+            opacity: 0;
+        }
+        @media screen and (max-width: 540px) {
+            .ad-head-open .leafmenu.hide2 {
+                display: none
+            }
+        }
+
+    </style>
+</head>
+<body style="background-color: #e8ecf0">
+<bobo>
+    <div class="ad-head2" style="height: 40px; ">
+        <div class="flexbox">
+            <div class="flex"><a class="logo-txt"  style="padding-top: 15px;"><?=$site_title?> </a></div>
+            <div class="ad-head-link">
+                <span  >欢迎<?=$_cu['name']?></span> <i>|</i>
+                <a   href="/console?no=1">切换单开</a><i>|</i>
+                <a href="<?=R('logout')?>">登出</a>
+            </div>
+        </div>
+    </div>
+
+    <ul class="ad-head-menu" style="top: 41px; ">
+
+        <li> <a  href="javascript:;" data-url="<?=R('console/mainv2')?>" class="select" ><i class="sui-icon icon-tb-refund"></i> <span>多开收银台</span></a></li>
+
+        <!--
+        <li> <a  href="javascript:;" data-url="<?=R('console/cashList/tj/today' )?>"  ><i class="sui-icon icon-tb-form"></i> <span>收银统计</span></a></li>
+
+        <?php if(in_array('p2', $_cu['attr'] )):?>
+            <li> <a  href="javascript:;" data-url="<?=R('finance/transfer/tab/today')?>"  ><i class="sui-icon icon-tb-deliver"></i> <span>提现</span></a></li>
+        <?php endif; ?>
+
+
+        <li> <a  href="javascript:;" data-url="<?=R('console/bu/search')?>"  ><i class="sui-icon icon-tb-scan"></i> <span>补单处理</span></a></li>
+        -->
+
+        <li> <a  class="menu-one" href="javascript:;" ><i class="sui-icon icon-tb-form"></i> <span>收银统计</span></a>
+            <ul class="leafmenu">
+                <?php foreach ($fuser as $k=>$v ): ?>
+                    <li> <a  href="javascript:;" data-url="<?=R( $re['url'][$k].'/console/cashList/tj/today')?>"><?=$userList[$v]['name']?></a></li>
+                <?php endforeach; ?>
+            </ul>
+        </li>
+
+
+
+        <li> <a  class="menu-one" href="javascript:;" ><i class="sui-icon icon-tb-deliver"></i> <span>提现</span></a>
+            <ul class="leafmenu">
+
+                <?php foreach ($fuser as $k=>$v ): ?>
+                    <li> <a  href="javascript:;" data-url="<?=R( $re['url'][$k].'/finance/transfer/tab/today')?>"><?=$userList[$v]['name']?></a></li>
+                <?php endforeach; ?>
+            </ul>
+        </li>
+
+        <li> <a  class="menu-one" href="javascript:;" ><i class="sui-icon icon-tb-scan"></i> <span>补单处理</span></a>
+            <ul class="leafmenu">
+
+                <?php foreach ($fuser as $k=>$v ): ?>
+                    <li> <a  href="javascript:;" data-url="<?=R( $re['url'][$k].'/console/bu/search')?>"><?=$userList[$v]['name']?></a></li>
+                <?php endforeach; ?>
+            </ul>
+        </li>
+
+        <li >
+            <a class="menu-one" href="javascript:;"><i class="sui-icon icon-tb-settings"></i> <span>账号设置</span></a>
+            <ul class="leafmenu">
+                <!--<li> <a  href="javascript:;" data-url="<?=R('console/bank')?>">银行卡</a></li>-->
+                <?php foreach ($fuser as $k=>$v ): ?>
+                <li> <a  href="javascript:;" data-url="<?=R( $re['url'][$k].'/console/zhifu')?>"><?=$userList[$v]['name']?></a></li>
+                <?php endforeach; ?>
+            </ul>
+        </li>
+
+        <!--
+        <li> <a  href="javascript:;" data-url="<?=R('console/cash')?>"  ><i class="sui-icon icon-tb-redpacket"></i> <span>收款明细</span></a></li>
+        -->
+
+        <li >
+            <a class="menu-one" href="javascript:;"><i class="sui-icon icon-tb-redpacket"></i> <span>收款明细</span></a>
+            <ul class="leafmenu">
+                <?php foreach ($fuser as $k=>$v ): ?>
+                    <li> <a  href="javascript:;" data-url="<?=R( $re['url'][$k].'/console/cash')?>"><?=$userList[$v]['name']?></a></li>
+                <?php endforeach; ?>
+            </ul>
+        </li>
+
+
+        <li >
+            <a class="menu-one" href="javascript:;"><i class="sui-icon icon-tb-attention"></i> <span >其他</span></a>
+            <ul class="leafmenu">
+                <!-- <li> <a  data-url="/m007" href="javascript:;"   >商户测试</a></li>-->
+
+                <li> <a  href="javascript:;" data-url="<?=R('member/changPsw')?>"  >修改密码</a></li>
+            </ul>
+        </li>
+
+
+
+
+
+    </ul>
+    <div class="ad-head-top">
+        <span>菜单名称</span>
+    </div>
+    <div class="ad-head-iframe" style="overflow: hidden; top:41px">
+        <iframe src="<?=R('console/mainV2')?>" style="width: 100%; height: 100%;border: 0px; overflow:auto " id="ad-iframe"></iframe>
+    </div>
+
+
+
+    <transition name="slide-fade">
+        <div v-if="st.if_url!=''" style="overflow: hidden;bottom: 0;right: 0;width: 450px;top:61px;position: absolute;z-index: 20;border-left:1px solid #e6e6e6; ">
+            <iframe :src="st.if_url" style="width: 100%; height: 100%;border: 0px; overflow:auto "  ></iframe>
+            <div style="z-index: 21; border-radius:0 0  0  50%; top: -50px; position: absolute;
+        width: 100px; height: 100px; background-color:rgba(0,0,0,0.3);right: -50px;" @click="st.if_url=''"></div>
+            <div style="z-index: 22; cursor: pointer;position: absolute; right: 5px; top:5px; "  @click="st.if_url=''"> <i class="sui-icon icon-tb-close" style="font-size: 30px;color: #fff"></i></div>
+        </div>
+    </transition>
+
+</bobo>
+</body>
+
+<script>
+    $(function () {
+        var ui={
+            iframe:$('#ad-iframe')
+            ,a: $('.ad-head-menu a')
+            ,menu: $('.menu-one')
+        };
+        ui.a.click(function () {
+            var that = $(this);
+            var url = that.data('url');
+            if( 'undefined'== typeof  url ) return false ;
+            ui.iframe.attr('src', url );
+            ui.a.removeClass('select' );
+            that.addClass('select');
+            return false ;
+            //alert( url );
+        });
+        ui.menu.click(function () {
+            var that = $(this);
+            var pli = that.parents( 'li');
+            var clname = pli.attr('class');
+
+            if('undefined' != typeof  clname && clname.indexOf( 'ad-head-open')>=0) pli.removeClass( 'ad-head-open');
+            else pli.addClass( 'ad-head-open');
+        });
+    });
+    window.goo=function (str) {
+        //alert( str );
+        hvm.st.fee= str;
+    }
+
+    var hvm= new Vue({
+        el: 'htitle',
+        data: {
+            u:{n:'<?=$_cu['name']?>'},
+            st:{fee:''}
+        }
+        ,
+        created: function () {
+        },
+        mounted: function () {
+        },
+        methods: {}
+    });
+
+    var vm = new Vue({
+        el: 'bobo',
+        data: {
+            st:{if_url:'',is_min_tab:false, is_click:false}
+        }
+        ,
+        created: function () {
+        },
+        mounted: function () {
+        },
+        methods: {}
+    });
+
+    window.goo2=function (obj) {
+        vm.st.if_url=  obj.url ;
+        //hvm.st.fee= str;
+    }
+</script>
+
+</html>
+
+
+

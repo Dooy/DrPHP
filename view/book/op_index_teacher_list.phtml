@@ -1,0 +1,35 @@
+<div class="dr-box-padding">
+    <div class="dr-box-title">
+        <div class="flexbox">
+            <div class="flex">全校老师 <span class="sui-text-disabled" style="font-size: 12px;">仅显示有创建书刊的老师</span></div>
+            <!--
+            <div>
+                <form class="sui-form form-dark" style="margin: 0;padding: 0;" action="<?=R($DR_SELF)?>" method="get">
+                    <div class="input-control control-right">
+                        <input type="text"  placeholder="搜索书关键字" name="q" value="<?=$get['q']?>" ><i class="sui-icon icon-touch-magnifier"></i>
+                    </div>
+                </form>
+            </div>
+            -->
+        </div>
+    </div>
+
+
+    <div class="dr-box-content book-item-w clearfix">
+        <?php foreach( $teacherList as $uid=>$v ):?>
+        <a class="book-teacher-item"  href="<?=R('book/index/teacher/'.$v['user_id'])?>">
+            <div class="teacher-img"  ><img src="<?=H($user[$uid]['head'])?>"> </div>
+            <div class="teacher-name">
+                <div  class="teacher-name-text" ><?=$user[$uid]['name']?><br>
+                    书刊：<?=$v['cnt']?>本
+                </div>
+            </div>
+        </a>
+        <?php endforeach;?>
+
+    </div>
+
+
+
+
+</div>

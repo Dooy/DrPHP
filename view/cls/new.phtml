@@ -1,0 +1,60 @@
+<div class="dr-min "  >
+    <form id="form-cls" class="sui-form form-horizontal" novalidate="novalidate" action="ajax_teacher/cls/new">
+        <div class="control-group">
+            <label   class="control-label"></label>
+            <div class="controls"><h1>添加班级</h1></div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label sui-text-xlarge"  >班级：</label>
+            <div class="controls ">
+                <input type="text"  id="class"  class="input-xfat" name="class" placeholder="给班级取个响亮的名称" data-rules="required" data-empty-msg="亲，别忘记班级名称">
+            </div>
+        </div>
+
+
+        <div class="control-group">
+            <label class="control-label sui-text-xlarge"  >年级：</label>
+            <div class="controls ">
+                <span class="sui-dropdown dropdown-bordered select dropdown-xlarge">
+                    <span class="dropdown-inner">
+                        <a id="select" role="button" href="javascript:void(0);" data-toggle="dropdown" class="dropdown-toggle">
+                            <input value="" name="grade" type="hidden" data-rules="required" data-empty-msg="亲，选个年级"><i class="caret"></i><span>选择一个年级</span></a>
+                        <ul  aria-labelledby="drop1" class="sui-dropdown-menu">
+                            <?php foreach( $grade as $k=>$v ) :  if(is_array($v)) : ?>
+                                <?php if($k=='') : ?> <li role="presentation" class="divider"></li><?php else :?><li role="presentation" class="group-title"><?=$k?></li><?php endif?>
+                                        <?php foreach( $v as $k2=>$v2 ): ?>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="<?=$k2?>"><?=$v2?></a></li>
+                                        <?php endforeach;?>
+
+                                <?php else: ?>
+                                <li role="presentation"><a  tabindex="-1" href="javascript:void(0);" value="<?=$k?>"><?=$v?></a></li>
+                            <?php endif; ?> <?php   endforeach; ?>
+
+                        </ul>
+                    </span>
+                </span>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label for="sanwei" class="control-label"></label>
+            <div class="controls">
+                <button type="submit" class="sui-btn btn-primary btn-xlarge">新建</button>
+            </div>
+        </div>
+
+    </form>
+
+</div>
+
+<script>
+    $(function () {
+        var opt = {
+            messages: {
+                grade:"请选择年级？"
+                ,'class':"请填写班级12"
+            }};
+        DR.ajaxAndValidate('form-cls', opt );
+    })
+</script>

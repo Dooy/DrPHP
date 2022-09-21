@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>详情</title>
+
+    <!--标准mui.css-->
+    <link href="<?=$_cdn?>/res/js/art/dialog.css" rel="stylesheet">
+    <link rel="stylesheet" href="<?=$_cdn?>/res/mui/css/mui.min.css">
+    <script src="<?=$_cdn?>/res/js/mui.min.js"></script>
+    <script src="<?=$_cdn?>/res/js/vue.min.js"></script>
+    <script src="<?=$_cdn?>/res/js/hc_v2.js?d=20180722"></script>
+
+    <style>
+        .pay-btn-group-sb{   background-color:#4cb9fc ; border: 1px solid #4cb9fc; color: #fff;text-decoration:none;
+            display: inline-block; box-sizing: border-box; margin-bottom: 0;    font-size: 12px;            line-height: 12px;
+            text-align: center;    vertical-align: middle;    cursor: pointer;  float: right ;
+            user-select: none; margin: 0; }
+
+        .toast-container {     line-height: 17px;  position: fixed; z-index: 9999; bottom: 0px;
+            left: 50%;   -webkit-transition:  .3s;   transition: .3s;  -webkit-transform: translate(-50%,0);   transform: translate(-50%,0);
+            max-width: 300px; opacity:0;
+        }
+        .toast-message{  font-size: 14px;padding: 10px 25px;  text-align: center; color: #fff; border-radius: 6px; background-color: #323232;}
+        .toast-active{ opacity:0.9; bottom: 50px; }
+
+    </style>
+</head>
+
+<body>
+<bobo>
+    <div class="toast-container" id="toast" :class="{'toast-active': st.msgShow}" ><div class="toast-message" id="toast-txt" v-html="st.msg"></div></div>
+    <?php if($_GET['head']): ?>
+        <header class="mui-bar mui-bar-nav">
+            <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+            <h1 class="mui-title" v-if="sv.isadmin==2">汇款</h1>
+            <h1 class="mui-title" v-else>下发</h1>
+        </header>
+    <?php endif;?>
+    <div class="mui-content">
+        <div>
+            <ul class="mui-table-view ">
+                <li class="mui-table-view-cell mui-media">
+                    <div style="text-align: center"><h3 v-html="sv.mc.merchant"></h3></div>
+                </li>
+
+
+                <li class="mui-table-view-cell">
+                    商户号：<b v-html="sv.bill.merchant_id"></b>
+                </li>
+                <li class="mui-table-view-cell">
+                    类型：<b v-html="sv.typeName[sv.bill.type]"    ></b>
+                </li>
+
+                <li class="mui-table-view-cell">
+                    单号：<span v-html="sv.bill.order_no"></span>
+                </li>
+
+
+                <li class="mui-table-view-cell">
+                    金额：<span v-html="sv.bill.money/100"></span>元
+                    <button class="pay-btn-group-sb"   :data-clipboard-text="sv.bill.money/100" data-toast="复制金额成功" >复制</button>
+                </li>
+
+                <li class="mui-table-view-cell" v-if="sv.isadmin!=2">
+                    变动金额：<span v-if="sv.bill.real_money>0" style="color: #ff6700">+</span><span v-html="sv.bill.real_money/100" style="color: #ff6700"></span>元
+                </li>
+
+
+
+                <li class="mui-table-view-cell">
+                    创建时间：<span v-html="HC.dateUtils.date_format(sv.bill.ctime,'MM/dd HH:mm:ss')"></span>
+                </li>
+
+                <li class="mui-table-view-cell" v-if="sv.isadmin==2 && sv.last.type==66" >
+                    <span style="font-size: 12px;">注意：请在 <b style="color: red" v-html="HC.dateUtils.date_format(sv.last.t+300,'MM/dd HH:mm:ss')"></b> (<b v-html="showCaoshi(sv.last)"></b>)前汇款并请求审核，超时将被取消</span>
+                </li>
+
+
+
+            </ul>
+        </div>
+
+
+        <div class="mui-content-padded" v-if="sv.isadmin==2" >
+            <template v-if="sv.billType[sv.bill.type].can && sv.billType[sv.bill.type].can.length>0">
+                <button @click="doJobV2(sv.bill,'do')" type="button"   class="mui-btn  mui-btn-block mui-btn-primary" style="padding: 10px 0"  >我已汇款成功，请求审核</button>
+                <button @click="doJobV2(sv.bill,'cancel')" type="button"   class="mui-btn  mui-btn-block" style="padding: 10px 0" >取消</button>
+
+            </template>
+        </div>
+        <div class="mui-content-padded" v-else-if="sv.isadmin" >
+            <template v-if="sv.bill.ma_user_id<=0">
+            <button  v-for="(v,k) in sv.billType[sv.bill.type].can" @click="doJob(sv.bill,v)" type="button" :class="{'mui-btn-primary':k==0 }" class="mui-btn  mui-btn-block" style="padding: 10px 0" v-html="sv.billType[v].n">通过</button>
+            </template>
+            <template v-else-if="sv.bill.type==21 && sv.bill.ma_user_id>0">
+                <a   :href="'/console/ma2/search?uname='+sv.bill.ma_user_id" target="_blank"     class="mui-btn  mui-btn-block mui-btn-primary" style="padding: 10px 0" >查服务商</a>
+            </template>
+            <template v-else>
+                <a   :href="'/console/ma2/search?uname='+sv.bill.ma_user_id" target="_blank"     class="mui-btn  mui-btn-block mui-btn-primary" style="padding: 10px 0" >已接单，查服务商</a>
+                <button   @click="doJob(sv.bill,1)" type="button"   class="mui-btn  mui-btn-block" style="padding: 10px 0" >取消,先与服务商协商</button>
+
+            </template>
+        </div>
+
+
+
+
+
+        <div>
+            <div style="padding: 20px 20px 10px 15px;color: #666666;font-size:15px">汇款信息</div>
+            <ul class="mui-table-view " >
+                <li class="mui-table-view-cell" >
+                    银行：<span v-html="sv.bill.card_bank" id="cp_yh"></span>
+                    <button class="pay-btn-group-sb"   :data-clipboard-text="sv.bill.card_bank" data-toast="复制银行成功" >复制</button>
+                </li>
+                <li class="mui-table-view-cell" >
+                    卡号：<span v-html="sv.bill.card_id" id="cp_card"></span>
+                    <button class="pay-btn-group-sb"   :data-clipboard-text="sv.bill.card_id" data-toast="复制卡号成功" >复制</button>
+                </li>
+                <li class="mui-table-view-cell" >
+                    收款人：<span v-html="sv.bill.card_name" id="cp_realname"></span>
+                    <button class="pay-btn-group-sb"   :data-clipboard-text="sv.bill.card_name" data-toast="复制收款人成功" >复制</button>
+                </li>
+                <li class="mui-table-view-cell" >
+                    开户行：<span v-html="sv.bill.card_address" id="card_address"></span>
+                    <button class="pay-btn-group-sb"   :data-clipboard-text="sv.bill.card_address" data-toast="复制开户行成功" >复制</button>
+                </li>
+                <li v-if="sv.bill.opt_value && sv.bill.opt_value.img" class="mui-table-view-cell">
+                    <div style="padding: 20px 20px 10px 15px;color: #666666;font-size:15px">凭证</div>
+                    <a :href="HC.alioss+sv.bill.opt_value.img" target="_blank"> <img :src="HC.alioss+sv.bill.opt_value.img" style="max-width: 90%;"></a>
+                </li>
+                <li  class="mui-table-view-cell"  v-else-if="sv.isadmin"  > <!-- -->
+                    <div >
+                    <button  type="button"  class="mui-btn  mui-btn-block mui-btn-primary" style="padding: 10px 0" id="upload">上传凭证</button>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div v-if="sv.bill.opt_value && sv.bill.opt_value.log && sv.bill.opt_value.log.length">
+            <div style="padding: 20px 0px 10px 15px;color: #666666;font-size:15px">日志</div>
+            <div class="mui-content-padded">
+                <ul>
+                <li v-for="v in sv.bill.opt_value.log" style="color: #999999;font-size: 12px;">
+                    [<span v-html="HC.dateUtils.date_format(v.t,'MM/dd HH:mm')"></span>]  <span v-html="v.name"></span>
+                    <span v-html="sv.billName[v.type]" v-if="sv.billName[v.type]"></span>
+                    <span v-html="v.type" v-else></span>
+                </li>
+                </ul>
+            </div>
+        </div>
+
+
+
+
+
+
+
+    </div>
+</bobo>
+</body>
+<script src="<?=$_cdn?>/res/js/clipboard.min.js"></script>
+<script type="text/javascript" src="<?=$_cdn?>/res/js/jquery.min.js"></script>
+<script type="text/javascript" src="<?=$_cdn?>/res/js/dr.js?d=20191110"></script>
+<script type="text/javascript" src="<?=$_cdn?>/res/js/art/dialog.js"></script>
+
+<script type="text/javascript" src="<?=$_cdn?>/res/js/plupload/plupload.full.min.js?d101"></script>
+
+<script>
+    new Vue({
+        el: 'bobo',
+        data: {
+            sv:<?=json_encode($server )?>
+            ,cu:<?=json_encode($_cu )?>
+            ,st:{msg:'', msgShow:false }
+        }
+        ,
+        created: function () {
+        },
+        mounted: function () {
+            var that = this;
+            that.initCopy();
+            setTimeout(function () {
+
+
+
+                DR.uploadone( 'upload',{url:'/console/transfer2/upload/'+ that.sv.bill.export_id ,cb:function (rep) {
+                        //alert(rep.file );
+
+                        if(that.sv.isadmin==2 ){
+                            var url='/fw/xia/imgUpload/'+ that.sv.bill.export_id;
+                        }
+                        else{
+                            var url='/console/transfer2/upload2/'+ that.sv.bill.export_id;
+                        }
+
+                        HC.ajax( url,{  data:{fname:rep.file } } );
+
+                        if( typeof that.sv.bill.opt_value=='undefined'  ||typeof that.sv.bill.opt_value.img =='undefined'  ){
+                            location.reload();
+                        }
+                        else that.sv.bill.opt_value.img ='/'+ rep.file;
+
+
+                        //alert( that.sv.bill.opt_value.img );
+                    },query:'abc=123'} );
+
+            },2000 );
+
+        },
+        methods: {
+            doJob:function (obj,type) {
+                console.log(obj,type );
+                var url='/console/transfer2/do/'+ obj.export_id+'/'+ type;
+                if(this.sv.isadmin==2 ) url= '/fw/xia/do/'+ obj.export_id+'/'+ type;
+                HC.ajax(url);
+
+            }
+            ,showCaoshi:function (v) {
+                //return  '';
+                var n= Math.round(new Date() / 1000);
+                var dt= (v.t+300)-n;
+                if(dt<=0) return '已超时';
+                return  '余'+HC.dateUtils.date_format(1592668800+dt ,'mm:ss') ;//1592668800
+            }
+            ,doJobV2:function ( obj,type) {
+                var url= '/fw/xia/'+type+'/'+ obj.export_id;
+                HC.ajax(url,{success:function () {
+                        if( type=='cancel') window.history.go(-1);
+                        else location.reload();
+                    }});
+
+            }
+            ,initCopy:function ( ) {
+                var clipboard = new ClipboardJS('.pay-btn-group-sb');
+                //clipboard = new ClipboardJS('#pay_sb');
+                var that = this;
+                clipboard.on('success', function(e) {
+                    console.info('Action:', e.action ,e);
+                    console.info('Text:', e.text);
+                    console.info('Trigger:', e.trigger);
+                    e.clearSelection();
+                    that.toast(  e.trigger.getAttribute('data-toast') );
+                });
+                
+            }
+            ,toast: function ( str ) {
+                this.st.msg= str ;
+                this.st.msgShow=true;
+                var that = this;
+                setTimeout(function () {
+                    that.st.msgShow= false;
+                },3000)
+                /*
+                st.toastTxt.innerHTML= str;
+                st.toast.classList.add('toast-active');
+                setTimeout(function () {
+                    st.toast.classList.remove('toast-active');
+                },3000);
+                */
+            }
+        }
+    });
+</script>
+</html>

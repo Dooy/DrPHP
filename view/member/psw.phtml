@@ -1,0 +1,41 @@
+
+<form class="sui-form form-horizontal sui-validate" method="post" action="/member/changPsw/change">
+
+
+    <div class="control-group">
+        <label for="inputEmail" class="control-label"> </label>
+        <div class="controls">
+            <h3>修改密码</h3>
+            <?php if($is_console): ?><div class="sui-msg msg-warning">
+                <div class="msg-con">主要：操作修改密码了，手机客户端登录密码也得修改！</div>
+                <s class="msg-icon"></s>
+            </div><?php endif;  ?>
+        </div>
+    </div>
+    <div class="control-group">
+        <label for="inputEmail" class="control-label">旧密码：</label>
+        <div class="controls">
+            <input type="password"   name="password" placeholder="旧密码" data-rules="required">
+        </div>
+    </div>
+    <div class="control-group">
+        <label for="inputPassword" class="control-label">密码：</label>
+        <div class="controls">
+            <input type="password"  name="psw" placeholder="密码" data-rules="required" title="密码">
+        </div>
+    </div>
+    <div class="control-group">
+        <label for="inputRepassword" class="control-label">重复密码：</label>
+        <div class="controls">
+            <input type="password"   name="repassword" placeholder="重复密码" data-rules="required|match=psw"  >
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label"></label>
+        <div class="controls">
+            <button type="submit" class="sui-btn btn-primary">修改</button>
+        </div>
+    </div>
+
+</form>

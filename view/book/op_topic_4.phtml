@@ -1,0 +1,93 @@
+<?php
+$_is_show = ( $_cu['uid']>0  and $_cu['uid']!=$topic_list['list'][0]['user_id'] );
+?>
+<div class=" flexbox">
+    <div class="book-topic-tip flex">
+        <?php if($book_opt['tag_'.$tag_id]):?><?=nl2br($book_opt['tag_'.$tag_id])?>
+        <?php elseif( 4==$tag_id):  $bname=''; $cName='期中读书测验'; ?>任务：请在读这本的过程中撰写一篇期中总结，按照主题或章节归纳已读完部分的核心内容，培养你归纳、分析与整合信息的能力。
+        <?php elseif( 5== $tag_id ): $bname='';  $cName='期末读书报告';  ?> 任务：请在期末时撰写一篇读书报告，在总结本书主要内容的基础上发表自己反思性的感想或见解，培养自己的思辨能力。
+        <?php elseif( 6== $tag_id ): $bname='新贴';  $cName='美文美句';  ?>任务：请摘抄出书中让你印象深刻的句子或段落，并附上自己的见解与感受。
+        <?php else:  $bname='发布主题'; $cName='讨论';  ?>
+            任务：发布<?= $book['user_topic'] ?>个主题，回复<?= $book['user_comment'] ?>个帖子
+        <?php endif;?>
+    </div>
+    <?php if(!$_is_show && $bname): ?>
+    <div class="book-topic-tip"><a href="<?= R('book/topicForm/new/' . $book['book_id'] . '/' . $tag_id) ?>"   class="sui-btn   btn-success book-new-add"><?=$bname?></a></div>
+    <?php endif ; ?>
+</div>
+
+<?php if($_is_show ):?>
+    <?php include "op_new.phtml"; ?>
+<?php endif;?>
+
+
+<?php if ($topic_list['list']) : ?>
+    <div class="flexbox">
+        <div class="sui-btn-group flex">
+
+        </div>
+        <div>
+                <span class="sui-dropdown">
+                    <span class="dropdown-inner"><a role="button" data-toggle="dropdown"
+                                                    href="javascript:void(0);"
+                                                    class="dropdown-toggle"><?= $order[$p[1]] ?> <i
+                                    class="caret"></i></a>
+                        <ul role="menu" aria-labelledby="drop1" class="sui-dropdown-menu">
+                             <?php foreach ($order as $k => $v): ?>
+                                 <li role="presentation"><a role="menuitem" tabindex="-1"
+                                                            href="<?= R('book/detail/' . $book['book_id'] . '/' . $k . '/' . $p[2] . '/' . $p[3]) ?>"><?= $v ?></a></li>
+                             <?php endforeach; ?>
+                        </ul>
+                    </span>
+                </span>
+        </div>
+    </div>
+    <div class="book-list">
+        <?php foreach ($topic_list['list'] as $topic): ?>
+            <div class="book-list-item flexbox">
+
+                <div class="book-list-num"><?= $topic['comment_cnt'] ?></div>
+
+
+                <div class="flex sui-text-large book-list-item-content">
+                    <a class="title" href="<?= R('book/topic/' . $topic['topic_id']) ?>">
+                        <?php if (isset($topic['attr'][31])): ?><span class="sui-label label-success">置顶</span> <?php endif; ?>
+                        <?php if (isset($topic['attr'][32])): ?><span class="sui-label label-warning">精华</span> <?php endif; ?>
+                        <?php if(  in_array( $tag_id, $tag_p ) and $_cu['uid']== $topic['user_id'] ): ?><span class="sui-label ">本人</span> <?php endif; ?>
+                        <?php if( $tag_id!=6 ): ?><?= $topic['topic'] ?><?php endif; ?>
+                    </a>
+                    <a class="des" href="<?= R('book/topic/' . $topic['topic_id']) ?>"><?= $topic['topic_info'] ?> </a>
+                    <a class="des_href"  href="<?= R('book/topic/' . $topic['topic_id']) ?>" >查看详情</a>
+                </div>
+
+                <div class="book-list-dt">
+                    <?php if($checkUser['bookAdmin']|| $checkUser['create'] || $checkUser['schoolAdmin']): ?>
+                        <div class="sui-form book-list-dt-item" style="margin: 0" ><!--打分:-->
+                            <?php foreach ($topic_attr[41]['keys'] as $k5=>$v5  ) :?>
+                                <label class="checkbox-pretty inline <?=($topic['attr'][41][$_cu['uid']][0]['attr']== $k5)?'checked':''?>">
+                                    <input  type="radio" <?=($topic['attr'][41][$_cu['uid']][0]['attr']== $k5 )?'checked="checked"':''?> name="r41" class=" ajax-url"  data-url="<?=R('book/attr/41/'.$topic['topic_id'].'/'.$k5 )?>"><span><?=$v5?></span>
+                                </label>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif;?>
+                    <div class="book-list-dt-item "><b><i
+                                    class="sui-icon icon-tb-my"></i> <?= $user[$topic['user_id']]['name'] ?></b></div>
+                    <?php if ($topic['comment_cnt'] > 0 && $topic['comment_user_id'] > 0): ?>
+                        <div class="book-list-dt-item"><b><i
+                                        class="sui-icon icon-tb-message"></i> <?= $user[$topic['comment_user_id']]['name'] ?>
+                            </b> <span><?= date("m-d", $topic['comment_time']) ?></span></div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endforeach; ?>
+        <div class="flexbox">
+            <div class="dr-page flex"><?= $topic_list['page'] ?></div>
+            <?php if( $_is_teacher==3 ):?><div  class="sui-btn-group">
+
+                <a href="<?=R($DR_SELF,  ['export'=>1] )?>" class="sui-btn  btn-info">导出Excel</a>
+                <a href="<?=R($DR_SELF,  ['export'=>1,'ex_type'=>'doc'] )?>" class="sui-btn  btn-info">Word</a>
+
+                </div><?php endif;?>
+        </div>
+    </div>
+<?php endif; ?>

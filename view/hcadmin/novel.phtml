@@ -1,0 +1,189 @@
+<?php if($book_isbn):?>
+<div class="flexbox" >
+    <div style="width: 160px; margin-right: 10px"><img src="http://cdn.haoce.com/<?=$book_isbn['book_img']?>"></div>
+    <div class="flex">
+        <h1>绑定：<?=$book_isbn['book']?> </h1>
+        <p>ISBN:<?=$book_isbn['book_isbn']?><?php if($novel_isbn):?> ，<span style="color: red">已经绑定 《<?=$novel_isbn['novel']?>》</span><?php endif; ?></p>
+        <div><?=$book_isbn['book_info']?></div>
+    </div>
+</div>
+<?php endif; ?>
+<div class="flexbox" style="padding: 8px 0px 0 0px; ">
+    <div class="flex">
+        <form id="user-search" action="/hcadmin/novel/"  class="sui-form">
+            <input type="text" placeholder="搜索名称." class="input-medium" name="q" value="<?=$get['q']?>">
+            <button type="submit" class="sui-btn ">查找</button>
+            <input type="hidden" name="isbn" value="<?=$book_isbn['book_isbn']?>"/>
+        </form>
+    </div>
+    <div>
+        <span class="sui-dropdown dropdown-bordered"><span class="dropdown-inner"><a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle"><span class="dropdown-value"><?=isset($_GET['is_shuan'])?$ct_arr[$_GET['is_shuan']]:'请选择形式'?></span> <i class="caret"></i></a>
+            <ul id="menu1" role="menu" aria-labelledby="drop1" class="sui-dropdown-menu">
+                <?php if(isset($_GET['is_shuan'] ) ):  ?><li role="presentation"  ><a role="menuitem" tabindex="-1" href="<?=R($_c.'/novel')?>">全部</a></li><?php endif;  ?>
+                <?php foreach ($ct_arr as $k2=>$v2): ?>
+                    <li role="presentation"  ><a role="menuitem" tabindex="-1" href="<?=R($_c.'/novel?is_shuan='.$k2)?>"><?=$v2?></a></li>
+                <?php  endforeach; ?>
+            </ul></span>
+        </span>
+
+        <div class="sui-btn-group">
+            <?php foreach ( $show as $k=>$v ) :?>
+             <a class="sui-btn <?= ( isset($_GET['is_show']) && $_GET['is_show']==$k   )?'btn-primary':'btn-bordered'?> " href="/hcadmin/<?=$_a?>?is_show=<?=$k?>"><?=$v?></a>
+            <?php endforeach; ?>
+        </div>
+
+        <div class="sui-btn-group">
+            <a class="sui-btn <?=$_GET['is_yin']==1?'btn-primary':'btn-bordered'?> " href="/hcadmin/<?=$_a?>?is_yin=1">含音频</a>
+            <!--
+            <a class="sui-btn <?=$_GET['is_shuan']==2?'btn-primary':'btn-bordered'?> " href="/hcadmin/<?=$_a?>?is_shuan=2">双语</a>
+            <a class="sui-btn <?= isset($_GET['is_shuan']) &&$_GET['is_shuan']==0?'btn-primary':'btn-bordered'?> " href="/hcadmin/<?=$_a?>?is_shuan=0">无内容</a>
+            -->
+        </div>
+        <a class="sui-btn  btn-bordered" href="/hcadmin/<?=$_a?>?export=1">导出</a>
+    </div>
+</div>
+<table class="sui-table table-bordered">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>名称</th>
+        <th>来源</th>
+        <th>形式</th>
+        <th>创建时间</th>
+        <th>创建人</th>
+        <th>章节/字数/选读</th>
+        <th>状态/编辑</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php foreach ( $list['list'] as $v ) : ?>
+        <tr>
+            <td><?=$v['novel_id']?> </td>
+            <td>
+                <a href="/hcadmin/novel/chapter/<?=$v['novel_id']?>" target="_blank"><?=$v['novel']?></a>
+                <?php if($v['is_yin']==1): ?><span class="sui-label label-warning">含音频</span> <?php endif; ?>
+                <?php if($v['is_shuan']==0): ?><span class="sui-label label-danger">无内容</span> <?php endif; ?>
+                <?php if($v['img']==''): ?><span class="sui-label label-danger">无封面</span> <?php endif; ?>
+            </td>
+            <td><?=$v['site']?> </td>
+            <td><?=$ct_arr[$v['is_shuan']]?> </td>
+            <td>
+                <?=date("Y-m-d H:i:s",$v['ctime'])?></td><td>
+                <?=($user[$v['user_id']]['name']? $user[$v['user_id']]['name']:'-')?>
+            </td>
+            <td><?=$v['cp']?>/<?=$v['word']?>/<?=$v['read']?></td>
+            <td>
+                [<span class="sui-dropdown"><span class="dropdown-inner"><a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle"><span class="dropdown-value"><?=$show[$v['is_show']]?></span> <i class="caret"></i></a>
+                    <ul id="menu1" role="menu" aria-labelledby="drop1" class="sui-dropdown-menu">
+                        <?php foreach ($show as $k2=>$v2): ?>
+                            <li role="presentation" class="booktype" data-url="<?=R($_c.'/novel/editShow/'.$v['novel_id'].'/'.$k2)?>"><a role="menuitem" tabindex="-1" href="javascript:;"><?=$v2?></a></li>
+                        <?php  endforeach; ?>
+                    </ul></span>
+                </span>]
+                [<a href="/hcadmin/novel/chapter/<?=$v['novel_id']?>" target="_blank">编辑</a> ]
+                <!-- [<a href="/hcadmin/novel/edit/<?=$v['novel_id']?>" target="_blank">编辑</a> ] -->
+                <?php if($book_isbn): ?>
+                    [<a href="javascript:;" class="ajax-url" data-url="/hcadmin/novel/bind?novel_id=<?=$v['novel_id']?>&isbn=<?=$book_isbn['book_isbn']?>"><?=$v['novel_id']==$book_isbn['novel_id']?'已绑定':'绑定'?></a> ]
+                <?php endif; ?>
+            </td>
+        </tr>
+    <?php endforeach;?>
+    </tbody>
+</table>
+<haoce>
+    <div class="flexbox" style="padding-bottom: 20px; ">
+        <div class="dr-page flex"><?=$list['page']?></div>
+        <div class="">
+
+            <div class="sui-btn-group">
+                <a class="sui-btn  btn-bordered" href="javascript:;" @click="st.add=!st.add">新增</a>
+                <a class="sui-btn  btn-bordered" href="javascript:;" @click="plGenxin()">更新（剩余<span v-html="st.max_novel_id"></span>）</a>
+            </div>
+
+            <div class="sui-btn-group">
+                <a class="sui-btn btn-bordered" href="javascript:;"  id="tagUpload" >导入Tag</a>
+                <a class="sui-btn btn-bordered" href="/res/book_tag.xlsx" title="下载Tag模板" >模板</a>
+            </div>
+
+    </div>
+    <form class="sui-form form-horizontal sui-validate" v-if="st.add">
+        <div class="control-group">
+            <label  class="control-label">书名：</label>
+            <div class="controls">
+                <input type="text"  name="name" placeholder="书名称" data-rules="required" data-empty-msg="亲，昵称别忘记填了" v-model="f.novel">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label"></label>
+            <div class="controls">
+                <button type="button" class="sui-btn btn-primary" @click="add()">增加</button>
+            </div>
+        </div>
+    </form>
+</haoce>
+
+<script src="<?=$_cdn?><?=$WWW_RES?>/js/plupload/plupload.full.min.js"></script>
+
+<script>
+    $(function () {
+        $('.ajax-url').click( DR.ajaxUrl );
+        $('.booktype').click(function () {
+            var that = $(this);
+            var p= that.parents('.dropdown-inner');
+            DR.ajax( that.data('url') );
+            p.find('.dropdown-value').html( that.text()  );
+        });
+    });
+    
+    var vm = new Vue({
+        el:'haoce',
+        data:{
+            st:{add:false,max_novel_id:<?=intval($list['list'][0]['novel_id'])?> }
+            ,f:{ novel:'' }
+        }
+        ,mounted:function () {
+            //console.error('mount');
+            this.tagUploadReg();
+        }
+        ,methods:{
+            add: function () {
+                DR.ajax('/hcadmin/novel/addNovel',{
+                    data:vm.f
+                });
+            }
+            ,tagUploadReg:function ( ) {
+                $(function () {
+                    DR.uploadone( 'tagUpload'
+                    ,{
+                        cb:function (rep) {
+                            alert("共"+rep.rz.f+"条数据\n成功："+rep.rz.success+"条Tag\n失败："+  rep.rz.fail +'条Tag' );
+                        }
+                        ,query:'abc=123'
+                        ,url:'/hcadmin/novel/imTag'
+                        ,ext:'xls,xlsx'
+                    });
+                });
+            }
+            ,plGenxin:function () {
+                var that = this;
+                if(that.st.max_novel_id<=0 ) return ;
+
+                DR.ajax('/hcadmin/novel/gengxin/'+ this.st.max_novel_id+'?noError=1',{
+                    error:function () {
+                        that.st.max_novel_id--;
+                        that.plGenxin() ;
+                    }
+                },{
+                    success:function ( rep ) {
+                        that.st.max_novel_id--;
+                        that.plGenxin() ;
+                    }
+                    ,error:function () {
+                        that.st.max_novel_id--;
+                        that.plGenxin() ;
+                    }
+                } );
+            }
+        }
+    });
+</script>

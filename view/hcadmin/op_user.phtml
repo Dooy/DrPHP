@@ -1,0 +1,65 @@
+
+<form id="form-user" class="sui-form form-horizontal" novalidate="novalidate" action="<?=R($_c.'/user/edit_info/'. $me['user']['user_id'])?>">
+
+    <div class="head-img-show" id="headImgShow" style="height: 150px;margin-left: 50px; width: 200px; text-align: center">
+        <div  ><img src="<?=H($me['user']['head'])?>" alt="" class="click-block" reveal-model-id="popup-head-upload"></div>
+    </div>
+    <div class="control-group">
+        <label for="inputNick" class="control-label ">姓名：</label>
+        <div class="controls">
+            <input type="text" class=" " id="cat" name="name" value="<?=$me['user']['name']?>" data-rules="required" placeholder="请填写姓名"  data-empty-msg="亲，别忘记填了"/>
+        </div>
+    </div>
+    <div class="control-group">
+        <label for="inputNick" class="control-label ">学号：</label>
+        <div class="controls">
+            <input type="text" class=" "  name="number" value="<?=$me['user']['number']?>"  />
+            <div class="sui-msg msg-tips msg-naked">
+                <div class="msg-con">提示:仅学生！</div>
+                <s class="msg-icon"></s>
+            </div>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label   class="control-label">性别：</label>
+        <div class="controls">
+            <label data-toggle="radio" class="radio-pretty inline <?=($me['user']['sex']==1?'checked':'')?>">
+                <input type="radio" name="sex" value="1" data-rules="required" <?=($me['user']['sex']==1?'checked':'')?>><span>男</span>
+            </label>
+            <label data-toggle="radio" class="radio-pretty inline  <?=($me['user']['sex']==2?'checked':'')?>">
+                <input type="radio" name="sex" value="2" data-rules="required"  <?=($me['user']['sex']==2?'checked':'')?>><span>女</span>
+            </label>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label   class="control-label">身份：</label>
+        <div class="controls">
+            <label data-toggle="radio" class="radio-pretty inline  <?=($me['user']['ts']==2?'checked':'')?>">
+                <input type="radio" name="ts" value="2" data-rules="required"  <?=($me['user']['ts']==2?'checked':'')?>><span>学生</span>
+            </label>
+            <label data-toggle="radio" class="radio-pretty inline <?=($me['user']['ts']==1?'checked':'')?>">
+                <input type="radio" name="ts" value="1" data-rules="required" <?=($me['user']['ts']==1?'checked':'')?>><span>一般教师</span>
+            </label>
+            <label data-toggle="radio" class="radio-pretty inline <?=($me['user']['ts']==3?'checked':'')?>">
+                <input type="radio" name="ts" value="3" data-rules="required" <?=($me['user']['ts']==3?'checked':'')?>><span>认证教师</span>
+            </label>
+        </div>
+    </div>
+    <?php if('hcadmin'==$_c): ?>
+    <div class="control-group">
+        <label  class="control-label">学校：</label>
+        <div class="controls">
+            <input type="text" class=""  value="<?=$me['user']['school']?>"  name="school" placeholder="请填写你的真实学校" data-rules="required|minlength=2|maxlength=12" data-error-msg="学校必须是2-12字" data-empty-msg="亲，学校别忘记填了">
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <div class="control-group">
+        <label for="sanwei" class="control-label"></label>
+        <div class="controls">
+            <button type="submit" class="sui-btn btn-primary">修改信息</button>
+        </div>
+    </div>
+</form>

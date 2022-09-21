@@ -1,0 +1,101 @@
+<link href="<?=$WWW_RES?>/css/msui.css" rel="stylesheet">
+<style>
+  .dr-tool  .card-content{height: 90px; }
+  #tool-main .sui-form .control-group{ margin-bottom: 10px; }
+</style>
+<bobo>
+<div class="dr-tool" id="tool-main">
+
+    <div class="card" >
+        <div class="card-header">IP 黑名单</div>
+        <div class="card-content" style="height: 200px">
+            <div class="card-content-inner">
+                <div class="color-gray form-inline sui-form">
+                    <textarea rows="6" placeholder="1行一个IP" v-model="sv.ip"></textarea>
+                    <div>
+                        <div class="sui-btn-group" style="padding-top: 20px; text-align: center;padding-left: 20px;">
+                            <button class="sui-btn btn-bordered btn-primary" @click="goHei( )">黑名单更改</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+        <a class="card ajax-url"  href="javascript:;" data-url="<?=R('hcadmin/tool2/payLogCF')?>">
+            <div class="card-header">查重</div>
+            <div class="card-content">
+                <div class="card-content-inner">
+                    <div class="color-gray">提交pay_log太快导致重复提交 </div>
+                </div>
+            </div>
+        </a>
+
+
+</div>
+</bobo>
+
+<script>
+    $(function () {
+        $('.ajax-url').click( DR.ajaxUrl );
+        DR.ajaxAndValidate( 'school-sss');
+    });
+    new Vue({
+        el: 'bobo',
+
+        data: {total:0,now:0,isStart:false, isLock:false, thread:0,max_thread:10 ,handle:false
+            ,st:{ip:''}
+            ,sv:<?=json_encode($sv)?>
+        }
+        , created: function () {
+
+        }
+        , methods: {
+            goHei:function(){
+                //alert( this.st.ip );
+                DR.ajax('/hcadmin/tool/hei',{data: {ip:this.sv.ip }});
+            },
+            start:function () {
+                this.isStart= true;
+                var that = this;
+                $.ajax( {
+                    url:'/hcadmin/tool/viewListMaxID?display=json'
+                ,success:function (rep) {
+                    //
+                    console.log('rep',rep );
+                    that.total = rep.data.max_id ;
+                    that.start_do();
+                }
+                } );
+            },
+            start_do:function () {
+                if( this.now>= this.total  ) return ;
+                this.handle =  setInterval(this.doItem ,3);
+            },
+            doItem:function () {
+                console.log('doItem:' , this.isLock ,  this.thread,this.max_thread);
+                if( this.now>= this.total  ) {
+                    clearInterval( this.handle );
+                    return ;
+                }
+                if(  this.isLock ||  this.thread>=this.max_thread ){
+                    return ;
+                }
+                this.isLock= true;
+                this.now++;
+                var that = this;
+                this.thread++;
+                $.ajax( {
+                    url:'/book/novel/upViewListCntByID/'+that.now+'?display=json'
+                    ,success:function (rep) {
+                        that.thread--;
+                        //that.doItem();
+                    }
+                } );
+                this.isLock= false;
+            }
+
+        }
+    });
+</script>

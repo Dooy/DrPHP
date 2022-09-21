@@ -1,0 +1,80 @@
+<div id="container" style="height: 800px;"></div>
+<div class="dr-page" style="text-align: center"><?=$list['page']?></div>
+<div style="text-align: center"> 灰色表示未阅读的章节</div>
+<script src="https://img.hcharts.cn/jquery/jquery-1.8.3.min.js"></script>
+<script src="https://img.hcharts.cn/highcharts/highcharts.js"></script>
+<script src="https://img.hcharts.cn/highcharts/modules/exporting.js"></script>
+<script src="https://img.hcharts.cn/highcharts/modules/oldie.js"></script>
+<script src="https://img.hcharts.cn/highcharts-plugins/highcharts-zh_CN.js"></script>
+<script src="/res/hcapp/js/haoce.js?d=20180418"></script>
+<script>
+    $(function () {
+        $('#container').highcharts({
+            chart: {
+                type: 'bar'
+            },
+            title: {
+                text: '阅读进度可视化'
+            },
+            xAxis: {
+                //categories: ['苹果', '橘子', '梨', '葡萄', '香蕉']
+                categories:[<?php foreach ( $list['list'] as $k=> $v )   : if( $k>0)echo ','; ?>'<?=$user[$v['user_id']]['name']?>'<?php endforeach;?>]
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: '章节进度'
+                }
+
+            },
+            legend: {
+                reversed: true,
+                enabled:false
+            },
+            tooltip:{
+                pointFormatter:function(){
+
+                    console.log('f', this );
+                    /**
+                     * 用 this.x 去获取 list当中的数据 包括 novel_id
+                     * 用 this.series.name 获取章节内容，当然 章节内容必须是数组 不能是obj得php内转换下
+                     */
+                    var k=parseInt( parseInt(this.series.name )/2);
+                    var novel_id = list[ this.x ].novel_id;
+                    var uid =  list[ this.x ].user_id;
+                    var cp_id = chapter[ novel_id][ k].cp_id;
+
+                    var str='《'+ list[ this.x ].novel +'》<br>章节：'+ chapter[ novel_id][ k].chapter ;
+                    str+='<br>总进度：'+ list[ this.x ].progress/100+'%';
+                    str+='<br>总耗时：'+HC.timeShow( list[ this.x ].dtime );
+                    //str+='<br>总进度：'+ list[ this.x ].progress/100+'%';
+                    str+='<br>'+(parseInt(this.series.name )%2?'完成':'未完成' )+'字数：'+ this.y;
+                    if( parseInt(this.series.name )%2   ){
+                        str+='<br><span style="color:red">本章耗时：'+HC.timeShow(cp_view[uid][novel_id][cp_id ][0].dtime )+'</span>';
+                        console.log('cp_view',cp_view[uid][novel_id][cp_id ]  );
+                    }
+                    return str ;
+                    return '字数:'+ this.y+'<br>人名key:'+ this.x + '<br>cp_id_key:'+ this.series.name ;
+                }
+                //,valueSuffix:' '
+            },
+            plotOptions: {
+                series: {
+                    stacking: 'percent'
+                },
+                bar:{
+                    borderWidth:0
+                }
+            },
+            series: [
+                <?php foreach( $bar as $k=>$v ): if( $k>0)echo ",\n";  ?>{name:'<?=$k?>',data:<?=json_encode($v)?><?=($k%2?'':",color:'#ccc'" )?> }<?php endforeach;?>
+            ],
+            credits: {
+                enabled: false
+            }
+        });
+    });
+var chapter= <?=json_encode($chapter)?>;
+var list =  <?=json_encode($list['list'])?>;
+var cp_view =  <?=json_encode($cp_view)?>;
+</script>

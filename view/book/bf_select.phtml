@@ -1,0 +1,51 @@
+
+<div class="control-group-cart"  >
+    <div class="flexbox control-group-cart-title">
+        <div class="flex"><b >选书控制</b></div>
+        <div class="group-cart-op">
+            <i class="sui-icon icon-tb-right"></i>
+            <!-- <i class="sui-icon icon-tb-unfold"></i> -->
+        </div>
+    </div>
+    <div class="control-group-cart-content"  >
+
+        <div class="control-group">
+            <label class="control-label"  >限选人数：</label>
+            <div class="controls">
+                <input type="text"  style="width: 50px;"   name="user_limit" data-error-msg="大于0的数" placeholder="数字" data-empty-msg="字数别忘" value="<?=$book['user_limit']>0?$book['user_limit']:0?>">
+                <div class="sui-msg msg-tips msg-naked  ">
+                    <div class="msg-con">限制选书的人数，0表示不限制</div>
+                    <s class="msg-icon"></s>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">  选书时间：</label>
+            <div class="controls">
+                <input value="<?=$book_opt['s_start_time']?>" type="text" name="opt[s_start_time]" class="  input-date" placeholder="开始时间"   data-rules="datetime" data-toggle="datepicker" data-date-timepicker="true" >
+                -
+                <input value="<?=$book_opt['s_end_time']?>" type="text" name="opt[s_end_time]" class=" input-date" placeholder="截止时间"    data-rules="datetime" data-toggle="datepicker" data-date-timepicker="true" >
+
+                <div class="sui-msg msg-tips msg-naked  ">
+                    <div class="msg-con">选填 留空可随学校设置</div>
+                    <s class="msg-icon"></s>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">  提交截止：</label>
+            <div class="controls">
+                <input value="<?=$book_opt['end']?>" type="text" name="opt[end]" class=" input-date" placeholder="答题截止"    data-rules="datetime" data-toggle="datepicker" data-date-timepicker="true" >
+
+                <div class="sui-msg msg-tips msg-naked  ">
+                    <div class="msg-con">选填 留空可随学校设置</div>
+                    <s class="msg-icon"></s>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>

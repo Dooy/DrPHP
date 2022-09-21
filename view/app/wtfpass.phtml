@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <?php include "bk_head.phtml";?>
+    <style>
+        #bohe ul, #bohe li{ padding: 0 ;margin: 0; list-style: none}
+        #bohe li{width: 187px; float: left; height: 120px; position: relative;overflow: hidden }
+        @media screen  and (max-width: 374px) {
+            #bohe li{width: 50%;}
+        }
+        #bohe .title{ position: absolute;height: 20px; width: 100%; text-align: center;left: 0;bottom: 0px; background-color: rgba(0,0,0,0.2) ;color: #fff }
+        .pos{ position: absolute;right: 2px; top:2px; font-size: 12px;border-radius: 2px; background-color: rgba(0,0,0,0.5); color: #fff;padding: 0 3px;}
+    </style>
+</head>
+<body>
+<bobo>
+    <div class="mui-content">
+        <div id="video" style="height:20px;background-color:#000000;margin:auto;width: 20px;margin-top: -20px;;"></div>
+
+        <div id="bohe" style=" z-index: 11;">
+            <ul>
+                <li v-for="(v,k) in catList.img" @tap="goto(k)">
+                    <img :src="v" style="width: 100%;height: 100%">
+                    <div class="title mui-ellipsis" v-html="catList.n[k]"></div>
+                    <div  class="pos"><i class="mui-icon mui-icon-videocam" style="font-size: 16px;"></i><span v-html="catList.pos[k]"></span></div>
+                </li>
+            </ul>
+        </div>
+
+
+    </div>
+</bobo>
+</body>
+<script src="<?=$hc_app?>/js/ls.wftpass.js<?=$local_version?>"></script>
+</html>

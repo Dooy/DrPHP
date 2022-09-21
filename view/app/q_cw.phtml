@@ -1,0 +1,657 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>财务</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <?php include "bk_head.phtml";?>
+    <script src="<?=$hc_app?>/js/dc.js<?=$local_version?>"></script>
+    <style>
+        .title{
+            margin: 20px 15px 7px;
+            color: #6d6d72;
+            font-size: 15px;
+        }
+        #info .mui-btn-outlined{padding: 3px 6px;}
+
+    </style>
+</head>
+<body>
+<bobo>
+    <header class="mui-bar mui-bar-nav">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+        <h1 class="mui-title" v-if="sv.ma" v-html="'余额：'+sv.ma.amount/100+'元'">财务</h1>
+        <h1 class="mui-title" v-else>财务</h1>
+        <button class="mui-btn mui-btn-blue mui-btn-link mui-pull-right" @tap="openCz()">充值</button>
+    </header>
+
+    <div class="mui-content" v-show="st.tab=='czone'  ">
+        <div class="title"  >充值:{{oitem.realprice/100}} ,付款人:{{oitem.opt_value.beizhu}}, ID:{{oitem.fw_id}}</div>
+        <ul class="mui-table-view">
+            <li class="mui-table-view-cell">
+                金额：<span  v-html="oitem.realprice/100"></span>
+                <button :data-clipboard-text="oitem.realprice/100" type="button" class="mui-btn mui-btn-success mui-btn-outlined copy">复制</button>
+            </li>
+            <li class="mui-table-view-cell">
+                卡号：<span  v-html="oitem.c_id"></span>
+                <button :data-clipboard-text="oitem.c_id" type="button" class="mui-btn mui-btn-success mui-btn-outlined copy">复制</button>
+            </li>
+            <li class="mui-table-view-cell">
+                银行：<span  v-html="oitem.c_bank"></span>
+                <button :data-clipboard-text="oitem.c_bank" type="button" class="mui-btn mui-btn-success mui-btn-outlined copy">复制</button>
+            </li>
+            <li class="mui-table-view-cell">
+                收款人：<span  v-html="oitem.c_name"></span>
+                <button :data-clipboard-text="oitem.c_name" type="button" class="mui-btn mui-btn-success mui-btn-outlined copy">复制</button>
+            </li>
+            <li class="mui-table-view-cell">
+                开户行：<span  v-html="oitem.c_add"></span>
+                <button :data-clipboard-text="oitem.c_add" type="button" class="mui-btn mui-btn-success mui-btn-outlined copy">复制</button>
+            </li>
+            <li class="mui-table-view-cell">
+                服务商：<span  v-html="oitem.ma_user_id_merge.name" v-if="oitem.ma_user_id_merge"></span>(<b v-html="oitem.ma_user_id"></b>)
+
+            </li>
+            <li class="mui-table-view-cell">
+                时间：<span  v-html="HC.dateUtils.date_format(oitem.ctime,'yyyy-MM-dd HH:mm:ss')"></span>
+            </li>
+            <li class="mui-table-view-cell">
+                状态：<span  v-html="sv.opt_type[oitem.opt_type]"></span>
+            </li>
+
+        </ul>
+        <div class="mui-content-padded">
+            <div class="title" v-if="oitem.opt_type==0">请在规定时间内付款完，并上传凭证</div>
+
+            <button  v-if="oitem.opt_type==0 && st.limitTime>0" type="button"  class="mui-btn mui-btn-block mui-btn-primary" @click="czB2(oitem,'go')" style="padding: 10px 0"   v-html="st.limitTimeBtn">我已付款</button>
+            <button  v-else-if="oitem.opt_type==0" type="button"  class="mui-btn mui-btn-block mui-btn-primary" @click="czB2(oitem,'go')" style="padding: 10px 0">我已付款</button>
+            <button v-show="!oitem.opt_value.img"  id="uploads2" type="button"  class="mui-btn mui-btn-block"   style="padding: 10px 0"  >我要上传凭证</button>
+            <button v-if="oitem.opt_type==0 || oitem.opt_type==3"  type="button"  class="mui-btn mui-btn-block " @click="czB2(oitem,'del')" style="padding: 10px 0"  >我要取消</button>
+
+            <button  v-if="czList.length>1" @click="st.tab='cz'" type="button"  class="mui-btn mui-btn-block "   style="padding: 10px 0"  >返回列表</button>
+        </div>
+        <div  v-if="oitem.opt_value.img" style="text-align: center; padding-top: 40px;" >
+            汇款凭证： <br>
+                <a :href="HC.alioss+oitem.opt_value.img" target="_blank"> <img :src="HC.alioss+oitem.opt_value.img" style="max-width: 90%;"></a>
+        </div>
+
+
+    </div>
+
+    <template v-if="sv.isFw==2">
+        <div class="mui-content" v-if="st.tab=='cz'  ">
+            <div class="mui-content-padded" style="text-align: center; padding-top: 30px;">
+                抢单充值已开启 笔笔都带奖金
+                <br><br>
+                <a type="button" class="mui-btn mui-btn-primary" href="/app/page/q_xia">进入抢单充值，拿奖金</a>
+
+                <br><br>
+                <a href="javascript:;" @click="zhiChong()">我要直充</a>
+            </div>
+        </div>
+    </template>
+    <template v-else-if="sv.isFw==1">
+        <div class="mui-content" v-if="st.tab=='cz'  ">
+            <template v-if="czList.length>0">
+                <ul class="mui-table-view mui-table-view-chevron">
+                    <li class="mui-table-view-cell mui-media"  v-for="(v,k) in czList">
+                        <a class="mui-navigate-right" @click="open2one(v)">
+                            <img class="mui-media-object mui-pull-left" :src="'https://cdn.nekoraw.com/res/head/classics/'+(k+1)+'.jpg'">
+                            <div class="mui-media-body">
+                                充值:{{v.realprice/100}} ,付款人:{{v.opt_value.beizhu}}
+                                <p class='mui-ellipsis'>{{v.c_bank}} {{v.c_name}} {{v.c_id}}</p>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </template>
+            <template v-else>
+                <div class="title">充值 </div>
+                <form class="mui-input-group">
+                    <div class="mui-input-row">
+                        <label>金额</label>
+                        <input type="text"   v-model="f.price" placeholder="充值金额">
+                    </div>
+                    <div class="mui-input-row">
+                        <label>付款人</label>
+                        <input type="text"  v-model="f.beizhu" placeholder="付款人姓名">
+                    </div>
+
+                    <div class="mui-button-row">
+                        <button type="button" class="mui-btn mui-btn-primary" @click="czB1()" >去充值</button>
+
+                        <button type="button" class="mui-btn " @click="st.tab=''">取消</button>
+                    </div>
+                </form>
+                <div class="mui-content-padded" style="text-align: center;padding-top: 20px">
+                    <a href="javascript:;" @click="loadCzList()">充值记录</a>
+                </div>
+            </template>
+        </div>
+    </template>
+    <template v-else>
+        <div class="mui-content" v-show="st.tab=='cz' || st.tab=='modify'">
+
+        <div class="title"  >收款信息 </div>
+            <template v-if="sv.bank">
+                <ul class="mui-table-view" id="info"  v-show="isCheckBeforeShow() && sv.anquan==0">
+                    <li class="mui-table-view-cell">
+                        卡号：<span  v-html="sv.bank.c_id"></span>
+                        <button :data-clipboard-text="sv.bank.c_id" type="button" class="mui-btn mui-btn-success mui-btn-outlined copy">复制</button>
+                    </li>
+                    <li class="mui-table-view-cell">
+                        银行：<span  v-html="sv.bank.c_bank"></span>
+                        <button :data-clipboard-text="sv.bank.c_bank" type="button" class="mui-btn mui-btn-success mui-btn-outlined copy">复制</button>
+                    </li>
+                    <li class="mui-table-view-cell">
+                        收款人：<span  v-html="sv.bank.c_name"></span>
+                        <button :data-clipboard-text="sv.bank.c_name" type="button" class="mui-btn mui-btn-success mui-btn-outlined copy">复制</button>
+                    </li>
+                    <li class="mui-table-view-cell">
+                        开户行：<span  v-html="sv.bank.c_add"></span>
+                        <button :data-clipboard-text="sv.bank.c_add" type="button" class="mui-btn mui-btn-success mui-btn-outlined copy">复制</button>
+                    </li>
+                </ul>
+
+                <form class="mui-input-group" v-if="sv.anquan>0">
+                    <div class="mui-input-row">
+                        <label v-if="st.isShowError" style="color: red">X 错误</label>
+                        <label v-else>安全码</label>
+                        <input type="text"  @keyup="anquanCheck()"  v-model="st.anquan" placeholder="4位安全码,显示收款信息" >
+                    </div>
+                </form>
+                <div v-if="sv.anquan<=1" style="margin: 20px 10px;">请管理员设置安全码</div>
+
+            </template>
+            <div v-show="!isCheckBeforeShow()" style="text-align: center; padding: 20px 0px;">
+                 请先填写金额
+                <br>48小时内不能充值相同金额
+            </div>
+        <div class="title"  >充值 </div>
+        <form class="mui-input-group">
+            <div class="mui-input-row">
+                <label>金额</label>
+                <input type="text"   v-model="f.price" placeholder="金额大于0" @blur="doCheckBefore()">
+            </div>
+            <div class="mui-input-row">
+                <label>付款人</label>
+                <input type="text"  v-model="f.beizhu" placeholder="付款人姓名">
+            </div>
+            <div class="mui-table-view-cell">
+                凭证
+                <!--
+                <button type="button" class="mui-btn mui-btn-primary mui-btn-outlined" style="padding: 3px 6px;" @click="upload()">上传</button>
+                -->
+                <button type="button" class="mui-btn mui-btn-primary mui-btn-outlined" style="padding: 3px 6px;" id="uploads">上传</button>
+            </div>
+            <div class="mui-button-row" v-show="sv.anquan==0">
+                <button type="button" class="mui-btn mui-btn-primary" @click="czSubmit()" v-html=" st.tab=='modify'?'修改':'确认'">确认充值</button>
+
+                <button type="button" class="mui-btn " @click="st.tab=''">取消</button>
+            </div>
+        </form>
+
+        <div style="margin: 0 auto; text-align: center" v-if="f.img!=''">
+            <h4>凭证图片</h4>
+            <div style="max-width: 80%; margin: 0 auto;">
+                <img :src="HC.alioss+f.img" style="width: 100%;">
+            </div>
+        </div>
+    </div>
+    </template>
+
+
+    <div class="mui-content" v-if="st.tab=='tx'">
+        <div class="title"  >汇出信息 </div>
+        <ul class="mui-table-view" id="info" v-if="sv.ma">
+            <li class="mui-table-view-cell">
+                卡号：<span  v-html="sv.ma.card_id"></span>
+            </li>
+            <li class="mui-table-view-cell">
+                银行：<span  v-html="sv.ma.card_bank"></span>
+            </li>
+            <li class="mui-table-view-cell">
+                收款人：<span  v-html="sv.ma.realname"></span>
+            </li>
+            <li class="mui-table-view-cell">
+                开户行：<span  v-html="sv.ma.card_address"></span>
+            </li>
+        </ul>
+        <div class="title"  >提现 </div>
+        <form class="mui-input-group">
+            <div class="mui-input-row">
+                <label>金额</label>
+                <input type="text"   v-model="tx.price" placeholder="提现金额">
+            </div>
+            <div class="mui-table-view-cell" v-if="sv.txFee>0">
+                 <span >实际到账</span>
+                <span v-html="sdao()" style="color: #666666"></span>
+            </div>
+            <div class="mui-button-row">
+                <button type="button" class="mui-btn mui-btn-primary" @click="txSubmit()"  >提现申请</button>
+
+                <button type="button" class="mui-btn " @click="st.tab=''">取消</button>
+            </div>
+        </form>
+
+    </div>
+
+    <div class="mui-content" v-if="st.tab=='czList'">
+        <div class="title">我的充值记录</div>
+        <ul class="mui-table-view mui-table-view-chevron" v-if="czLog.length>0">
+            <li class="mui-table-view-cell mui-media"  v-for="(v,k) in czLog">
+                <a class="mui-navigate-right" @click="open2one(v)">
+                    <img class="mui-media-object mui-pull-left" :src="'https://cdn.nekoraw.com/res/head/classics/'+(k+1)+'.jpg'">
+                    <div class="mui-media-body">
+                        充值:{{v.realprice/100}} ,付款人:{{v.opt_value.beizhu}}
+                        <p class='mui-ellipsis'>{{v.c_bank}} {{v.c_name}} {{v.c_id}}</p>
+
+                    </div>
+                </a>
+                <span class="mui-badge mui-badge-purple" style="top: 14px;right: 10px;"  v-html="sv.opt_type[v.opt_type]">good</span>
+            </li>
+        </ul>
+        <div class="mui-content-padded" style="text-align: center; padding-top: 10px;">
+            无充值记录
+        </div>
+
+    </div>
+
+
+    <div class="mui-content" v-if="st.tab==''">
+
+        <div class="title" >
+            <span @click="changTab()">总概括:{{sv.tab[st.nKey]}}</span> <span class="mui-badge mui-badge-purple" @click="changTab()">切换</span>
+
+        </div>
+        <ul class="mui-table-view">
+
+            <li  class="mui-table-view-cell" v-if="sv.ma">
+                余额：{{sv.ma.amount/100}}元
+            </li>
+            <li  class="mui-table-view-cell" >
+                费率：{{sv.ma.fee/100}}%
+            </li>
+
+            <template v-for="(v,k) in sv.tjType">
+            <li  class="mui-table-view-cell" v-if="sv.tj[k][sv.uid] || v.must==1">
+                {{v.n}}: <span v-if="sv.tj[k][sv.uid]" v-html="sv.tj[k][sv.uid].realprice/100+'元/'+sv.tj[k][sv.uid].cnt+'笔'"></span>
+                <span v-else>-</span>
+
+                <span v-if="k=='txok'" style="float: right; " class="mui-badge mui-badge-purple" @click="openTx()">去申请</span>
+            </li>
+            </template>
+        </ul>
+
+        <div class="title"  >财务记录</div>
+        <ul class="mui-table-view">
+            <li class="mui-table-view-cell" v-for="(v,k) in bill.list">
+                <a   :href="'/member/bill/info/'+ v.mb_id+'?head=1'">
+                    <h4 class="mui-ellipsis" v-html="sv.billType[v.type].n"></h4>
+                    <p class="mui-h6 mui-ellipsis">
+                        <span  v-html="v.price/100+'元'"></span>
+                        变动：<span v-if="v.realprice>0">+</span><span  v-html="v.realprice/100+'元'"></span>
+                        <span v-html="v.beizhu"></span>
+                    </p>
+
+                     <span class="mui-h5" v-html="HC.dateUtils.format_time(v.ctime)" style="position: absolute;right: 8px;  top:10px;">12:25</span>
+
+                </a>
+            </li>
+        </ul>
+    </div>
+
+
+
+</bobo>
+</body>
+<script src="/res/js/clipboard.min.js"></script>
+
+<script type="text/javascript" src="/res/js/plupload/plupload.full.min.js?d=123"></script>
+<script>
+    new Vue({
+        el: 'bobo',
+        data: {
+            st:{tab:'<?=$_GET['tab']?>',nKey:'today',anquan:'', isShowError:false ,limitTime:0,limitTimeBtn:'我要付款',isCheckBefore:false,isInit:false}
+            ,f:{price:"", img:'',beizhu:''}
+            ,sv:{} //观看load
+            ,tx:{price:'' }
+            ,bill:{list:[],page:''}
+            ,czList:[]
+            ,czLog:[]
+            ,oitem:{"fw_id":"1","ctime":"8","user_id":"12","c_user_id":"4","ma_user_id":"21","ma_bill_id":"54","opt_id":"55","type":"1","opt_type":"3","utime":"","realprice":"100000","c_id":"","c_name":"","c_bank":"","c_add":"","opt_value":{"beizhu":"",img:''}}
+
+        }
+        ,
+        created: function () {
+            this.load();
+        },
+        mounted: function () {
+            this.initCopy();
+            this.initUploadV2();
+            if( this.st.tab=='cz') this.openCz();
+            setInterval( this.countTime,1000);
+        },
+        methods: {
+            countTime:function(){
+                var now = Math.round(new Date() / 1000);
+                this.st.limitTime= parseInt( this.oitem.ctime )+10*60-now;
+
+                console.log('limitTime', this.st.limitTime );
+
+                this.st.limitTimeBtn='我已付款('+ this.BtnShow()+')';
+            }
+            ,anquanCheck(){
+                this.st.isShowError=false;
+                console.log('anquanCheck>>', this.st.anquan,this.sv.anquan,this.st.anquan.length );
+                if( this.st.anquan==this.sv.anquan) this.sv.anquan=0;
+                else if(this.st.anquan.length>=4 ){
+                    console.log('isShowError')
+                    this.st.isShowError=true;
+                }
+            }
+            ,zhiChong:function () {
+                this.sv.isFw = 0 ;
+
+                setTimeout( this.initUploadV2Item, 800 );
+
+            }
+            ,doCheckBefore:function () {
+                var that =this;
+                that.st.isCheckBefore= false;
+                if( !this.sv.checkBefore ){
+                    this.st.isCheckBefore=true;
+                    return;
+                }
+                if( this.f.price=='' || this.f.price<=0){
+                    HC.msg('请填写大于0的金额')
+                    return;
+                }
+                HC.ajax('/vip/cz/checkBefore/'+this.f.price ,{ success:function (rep) {
+                        that.st.isCheckBefore=true;
+                        }});
+
+            }
+            ,isCheckBeforeShow:function () {
+
+                //return  true;
+                if( this.st.isCheckBefore ) return true;
+
+                return  !this.sv.checkBefore ;
+            },
+            BtnShow:function(){
+                if( this.st.limitTime<=0) return '';
+                var s= this.st.limitTime%60;
+                var m= parseInt(this.st.limitTime/60);
+
+                if(s==0) s='00';
+                else if(s<10) s='0'+s;
+
+                if(m==0) m='00';
+                else if(m<10) m='0'+m;
+                return  m+':'+s ;
+            },
+            openCz:function () {
+                this.st.tab='cz';
+                var that = this;
+                //if( this.sv.)
+                HC.ajax('/vip/cz/load',{ success:function (rep) {
+                        that.czList= rep.czList;
+                        if( that.czList.length==1){
+                            that.open2one( that.czList[0]);
+                        }
+                    } });
+
+            }
+            ,open2one:function (v) {
+                this.oitem =v ;
+                this.st.tab='czone';
+            }
+            ,loadCzList:function () {
+                this.st.tab='czList';
+                var that = this;
+                HC.ajax('/vip/cz/log',{ success:function (rep) {
+                        that.czLog= rep.log;
+
+                    } });
+            }
+            ,czB1:function () {
+
+                var f= this.f ;
+                if(f.price==''){
+                    HC.msg("请输入金额");
+                    return ;
+                }
+                if( f.beizhu==''){
+                    HC.msg("请输入付款人");
+                    return ;
+                }
+                var d={price:f.price,beizhu: f.beizhu};
+
+                 var that = this;
+
+                HC.ajax('/vip/cz/b1',{data:d ,success:function (rep) {
+                        //that.openCz();
+                        location.href='/app/page/q_cw?tab=cz';
+                    } });
+
+            }
+            ,czB2:function (v,doSm) {
+                var that = this;
+                HC.ajax('/vip/cz/b2/'+doSm,{data:v ,success:function (rep) {
+                        //that.openCz();
+                        location.href='/app/page/q_cw?tab=cz';
+                    } });
+            }
+            ,initUploadV2Item:function () {
+                var that = this;
+                //if( that.st.isInit ) return ;
+
+                HC.pluploadToOSS('uploads', {
+                    cb:function (rep) {
+                        that.f.img= '/'+rep.file;
+                    }
+                });
+            }
+            ,initUploadV2:function () {
+                var that = this;
+                //setTimeout( this.initUploadV2Item, 2000 );
+
+                setTimeout(function () {
+                    HC.pluploadToOSS('uploads', {
+                        cb:function (rep) {
+                            that.f.img= '/'+rep.file;
+                        }
+                    });
+                },2000);
+
+
+
+
+                setTimeout(function () {
+                    HC.pluploadToOSS('uploads2', {
+                        cb:function (rep) {
+                            //that.f.img= '/'+rep.file;
+                            var d={img: '/'+rep.file};
+
+                            that.oitem.opt_value.img= d.img ;
+                            HC.ajax('/vip/cz/updateImg/'+that.oitem.fw_id ,{data:d ,success:function (rep) {
+                                    //that.openCz();
+                                    location.href='/app/page/q_cw?tab=cz';
+                                } });
+                        }
+                    });
+                },2000);
+
+
+
+
+            }
+            ,openTx:function () {
+                if( this.sv.ma.realname=='' ||  this.sv.ma.card_id=='' || this.sv.ma.card_bank==''  || this.sv.ma.card_address=='') {
+                    HC.msg('请先完善资料 无姓名或者银行卡资料不全无法提现');
+                    location.href='/app/page/q_member';
+                    return ;
+                }
+                this.st.tab ='tx';
+            }
+            ,sdao:function () {
+                if( this.tx.price=='' ||  this.tx.price<=0 ) return '请填写提现金额';
+                var f = parseInt( parseInt( this.tx.price*100) * this.sv.txFee/10000 )/100;
+                return ( this.tx.price-f)+'币 手续费'+f+'币';
+            }
+            ,txSubmit:function () {
+                var d= this.tx;
+                if(d.price<=0 || d.price==''){
+                    HC.msg('请输入提现金额！');
+                    return;
+                }
+
+                if( this.sv.txFee>0){
+                    var f = confirm('实际到账：'+ this.sdao()  );
+                    if( !f ) return;
+                }
+
+                d.ma= this.sv.ma ;
+                var that = this;
+                HC.ajax('/vip/cw/tx',{data:d ,success:function (rep) {
+                        that.load() ;
+                        that.st.tab='';
+                        that.tx.price='';
+                        HC.msg('提现申请，审核种！');
+                    } });
+
+            }
+            ,czSubmit:function () {
+                var d= this.f;
+                d.bank= this.sv.bank;
+                var that = this ;
+                HC.ajax('/vip/cw/cz',{data:d ,success:function (rep) {
+                        that.load() ;
+                        that.f.img='';
+                        that.st.tab='';
+                        HC.msg('充值成功 待审核！');
+                    } })
+            }
+            ,changTab:function () {
+                var bnt=[];
+                var key=[];
+                for(p in this.sv.tab ){
+                    bnt.push(this.sv.tab[p] );
+                    key.push(p );
+                }
+                console.log(bnt,key );
+                var that = this;
+                api.actionSheet({
+                    title: '上传凭证',
+                    cancelTitle: '取消',
+                    buttons: bnt
+                }, function(ret, err) {
+                    if (ret) {
+                        //alert( ret.buttonIndex );
+                       // that.getPicture(ret.buttonIndex);
+                        that.st.nKey= key[ ret.buttonIndex-1 ];
+                        that.load();
+                    }
+                });
+            }
+            ,load:function () {
+                var that =this;
+                HC.ajax('/vip/cw/tj/'+ that.st.nKey ,{success:function (rep) {
+                    that.sv= rep.server;
+                    that.bill= rep.bill;
+                    }});
+            }
+            ,initCopy:function () {
+                var clipboard = new ClipboardJS('.copy');
+                //clipboard = new ClipboardJS('#pay_sb');
+                clipboard.on('success', function(e) {
+                    console.info('Action:', e.action);
+                    console.info('Text:', e.text);
+                    console.info('Trigger:', e.trigger);
+                    e.clearSelection();
+                    HC.msg("复制成功");
+                });
+
+            }
+            ,upload:function () {
+                var that = this;
+                api.actionSheet({
+                    title: '上传凭证',
+                    cancelTitle: '取消',
+                    buttons: ['拍照','从手机相册选择']
+                }, function(ret, err) {
+                    if (ret) {
+                        that.getPicture(ret.buttonIndex);
+                    }
+                });
+            }
+            ,uploadFinish:function (rep) {
+                api.hideProgress();
+                this.f.img= '/'+rep.file;
+            }
+            ,uploadFileV2:function (file) {
+                api.showProgress({
+                    title: '上传',
+                    text: '图中正在上传...',
+                    modal: false
+                });
+                var that = this;
+
+                //alert(JSON.stringify(location));
+                DC.ajax( location.origin+ '/member/upload', {
+                    data: {'abc':123}
+                    , files: {file: file}
+                    , success: that.uploadFinish
+                    , error: function (rep) {
+                        api.alert({msg: JSON.stringify(rep)});
+                        api.hideProgress();
+                    }
+                    , error2: function (ret ) {
+                        DC.msg('错误：'+  ret.error_des +'('+ret.error +')');
+                        api.hideProgress();
+                    }
+                });
+            }
+            ,getPicture:function getPicture(sourceType) {
+                var that = this;
+                if(sourceType==1){ // 拍照
+                    //获取一张图片
+                    api.getPicture({
+                        sourceType: 'camera',
+                        encodingType: 'png',
+                        mediaValue: 'pic',
+                        allowEdit: false,
+                        quality: 90,
+                        saveToPhotoAlbum: true
+                    }, function(ret, err) {
+                        // 获取拍照数据并处理
+                        if (ret) {
+                            var imgSrc = ret.data;
+                            that.uploadFileV2( imgSrc );
+                        }
+                    });
+                }
+                else if(sourceType==2){ // 从相机中选择
+                    //UIMediaScanner 是一个多媒体扫描器，可扫描系统的图片、视频等多媒体资源
+                    var obj = api.require('mediaScanner');
+                    obj.open( {
+                        bg:'#ffffff',
+                        state:{color:"red"},
+                        cancel:{title:'取消',color:'#ffffff'},
+                        finish:{title:'确定',color:'#ffffff'}
+                    }, function(ret) {
+                        if (ret) {
+                            //alert( JSON.stringify(ret ));
+                            that.uploadFileV2(  ret.list[0].url  );
+                         }
+
+                    });
+
+
+                }
+            }
+        }
+    });
+</script>
+</html>

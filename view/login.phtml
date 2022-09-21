@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="好策科技是目前中国最大的互联网教育综合服务提供商之一；自成立以来一直秉承“百年大计，教育为先”的理念，始终致力于促进学习者的能力发展与素质发展。目前公司主要产品包括语言教学、语言能力测试、语言能力评价、自适应学习以及相关增值产品。">
+    <title>好策</title>
+    <?php
+    include "header.phtml";
+    ?>
+    <link href="<?=$_cdn?><?=$WWW_RES?>/css/index2017.css?d=2018020901" rel="stylesheet">
+</head>
+<body style="background-color: #fafafa">
+    <h1 class="dr-baidu-txt">好策科技是目前中国最大的互联网教育综合服务提供商之一；自成立以来一直秉承“百年大计，教育为先”的理念，始终致力于促进学习者的能力发展与素质发展。目前公司主要产品包括语言教学、语言能力测试、语言能力评价、自适应学习以及相关增值产品。</h1>
+    <div class="dr-index-head">
+        <div class="dr-index-logo">
+            <div class="pull-left" id="logo-img" style="margin-top: 20px;"><a title="好策科技"><img src="<?=$_cdn?>/res/img/logo-haoce80.png?d="></a> </div>
+            <!--<div class="pull-left" id="logo-txt"><h1 style="padding: 10px 0 0 10px;color: #333">好策科技</h1> </div>-->
+            <div style="clear: both;"></div>
+        </div>
+    </div>
+    <div class="dr-index-main">
+        <div  class="dr-index-banner banner" style="display:block; background: url('<?=$_cdn?>/res/img/banner_01.jpg') 50% 50%; ">
+            <!--div class="dr-hc-slogin dr-index-banner-txt">
+                <div class="slogin-1">读一本好书</div><div class="slogin-2">品一抹墨香</div><div class="slogin-3">守一份宁静</div>
+                <div class="app_code">
+                    <img src="<?=$_cdn?>/res/img/app_code.jpg">
+                    <div>扫描下载好策APP</div>
+                </div>
+            </div-->
+        </div>
+        <div   class="dr-index-banner banner" style=" background-image: url('<?=$_cdn?>/res/img/banner_02.jpg')  ; ">
+        </div>
+        <!--
+        <div   class="dr-index-banner banner" style=" background-image: url('<?=$_cdn?>/res/img/banner_03.jpg')  ; ">
+        </div>
+        -->
+
+        <div class="dr-index-bt">
+            <a href="javascript:;" class="select"></a>&nbsp;
+            <a href="javascript:;"></a>&nbsp;
+        </div>
+    </div>
+
+    <div class="dr-index-from-w">
+        <div class="dr-index-from-op"></div>
+        <div class="dr-index-from">
+            <form id="form-msg" class="sui-form form-horizontal" novalidate="novalidate">
+                <div class="control-group">
+                    <label   class="control-label"></label>
+                    <div class="controls"><h1>登录好策</h1></div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label sui-text-xlarge"  >账号：</label>
+                    <div class="controls ">
+                        <input type="text"   id="openid" class="input-xfat" name="openid" placeholder="手机号码/邮箱" data-rules="required">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label for="inputPassword" class="control-label sui-text-xlarge">密码：</label>
+                    <div class="controls">
+                        <input type="password"class="input-xfat" id="inputPassword" name="psw" placeholder="密码大于6位"  data-rules="required|minlength=6">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="sanwei" class="control-label"></label>
+                    <div class="controls">
+                        <button type="submit" class="sui-btn btn-primary btn-xlarge">登录</button>
+
+                    </div>
+                </div>
+
+
+                <div class="control-group  ">
+                    <label for="sanwei" class="control-label"></label>
+                    <div class="controls">
+                        <div style="width: 190px;"  >
+                            <a href="/forgot"  class="pull-left sui-btn">找回密码</a> <a href="/reg"  class="pull-right sui-btn  btn-danger">马上注册</a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+<a class="app_download flexbox" href="http://a.app.qq.com/o/simple.jsp?pkgname=app.haoce.com" target="_blank">
+
+        <div class="app_img"><img src="<?=$_cdn?><?=$WWW_RES?>img/512.png" ></div>
+        <div class="flex">
+            <h3 style="margin: 0">好策APP</h3>
+            <p class="des2" style="margin: 5px 5px 0 0;font-size: 14px; ">好策读书，好策教学！<br>好策APP随时随地完成作业。</p>
+        </div>
+        <div ><button  class="sui-btn btn-primary  btn-bordered ">下载</button></div>
+
+</a>
+<div style="height: 60px">  </div>
+<div class="g-ft">
+    <div class="p-ft">Copyright 2018 HAOCE.COM 版权所有 京ICP备17031493号 <a href="/help/pad" target="_blank" style="color: #666">正在发生</a></div>
+</div>
+</body>
+<script type="text/javascript" src="<?=$_cdn?><?=$WWW_RES?>/js/index2017.js"></script>
+<script>
+    $(function () {
+        DR.login( $('#form-msg') );
+        banner_index();
+    });
+</script>
+<span id="cnzz_stat_icon_1268518567"><script src="https://s22.cnzz.com/z_stat.php?id=1268518567&web_id=1268518567" language="JavaScript"></script></span>
+</html>

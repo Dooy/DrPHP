@@ -1,0 +1,47 @@
+<?php
+use model\drFun;
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="好策读书为各类学校提供分级分类图书并进行导读，为学校定制个性化读书教学方案，帮助教师对学生读书过程进行引导，并激发学生进行读后讨论、分享、交流及互评，起到以读促写、以读促学之作用。">
+    <title><?=($site_title?$site_title.'-':'')?>好策读书</title>
+    <?php
+    include "header.phtml";
+    ?>
+</head>
+<body style="background-color: #f3f3f3">
+<?php if($_client!=7):?>
+    <div class="sui-navbar  navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="dr-container">
+                <a href="<?=R('book/index') ?>" class="sui-brand">好策读书</a>
+                <ul class="sui-nav pull-right"   id="_haoce_user">    </ul>
+
+            </div>
+        </div>
+    </div>
+    <div style="height: 60px">  </div>
+<?php endif; ?>
+
+
+
+<?php
+include $tpl_file;
+?>
+<div style="height: 60px">  </div>
+<?php
+include "footer.phtml";
+?>
+
+</body>
+<?php
+include "drtip.phtml";
+?>
+<span id="cnzz_stat_icon_1268518567"><script src="https://s22.cnzz.com/z_stat.php?id=1268518567&web_id=1268518567" language="JavaScript"></script></span>
+</html>
+
+
+

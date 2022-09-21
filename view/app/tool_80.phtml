@@ -1,0 +1,198 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>支付宝充值</title>
+
+    <meta name="data-spm" content="a2h1u">
+    <meta name="author" content="">
+    <meta name="copyright" content="">
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="format-detection" content="email=no">
+    <!-- 启用360浏览器的极速模式(webkit) -->
+    <meta name="renderer" content="webkit">
+    <!-- 避免IE使用兼容模式 -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- 针对手持设备优化，主要是针对一些老的不识别viewport的浏览器，比如黑莓 -->
+    <meta name="HandheldFriendly" content="true">
+    <!-- 微软的老式浏览器 -->
+    <meta name="MobileOptimized" content="320">
+    <!-- uc强制竖屏 -->
+    <meta name="screen-orientation" content="portrait">
+    <!-- QQ强制竖屏 -->
+    <meta name="x5-orientation" content="portrait">
+    <!-- UC强制全屏 -->
+    <meta name="full-screen" content="yes">
+    <!-- QQ强制全屏 -->
+    <meta name="x5-fullscreen" content="true">
+    <!-- UC应用模式 -->
+    <meta name="browsermode" content="application">
+    <!-- QQ应用模式 -->
+    <meta name="x5-page-mode" content="app">
+    <!--这meta的作用就是删除默认的苹果工具栏和菜单栏-->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <!--网站开启对web app程序的支持-->
+    <meta name="apple-touch-fullscreen" content="yes">
+    <!--在web app应用下状态条（屏幕顶部条）的颜色-->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <!-- windows phone 点击无高光 -->
+    <meta name="msapplication-tap-highlight" content="no">
+    <!--移动web页面是否自动探测电话号码-->
+    <meta http-equiv="x-rim-auto-match" content="none">
+    <!--移动端版本兼容 start -->
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0" name="viewport">
+    <!--移动端版本兼容 end -->
+    <link rel="stylesheet" type="text/css" href="http://hotel.roomarts.cn:8023/static/app/index/css/wap.css">
+    <link href="http://hotel.roomarts.cn:8023/static/app/wap/css/weui.css" type="text/css" rel="styleSheet" id="layermcss">
+    <style>
+        .root{width: 100%;text-align: center;}
+        .top{
+            background-color: white;
+            padding-top: 0.8rem;
+            padding-bottom: 0.8rem;
+        }
+        .topimg{margin-top: 0.8rem;}
+        .topimg img{width: 3.6rem;}
+        .p1{
+            margin-top: 0.8rem;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .p2{
+            margin-top: 0.8rem;
+            color: #a09898;
+            font-size: 0.8rem;
+            margin-bottom: 0.8rem;
+        }
+        .item{
+            font-size: 1rem;
+            text-align: left;
+            padding-left: 0.8rem;
+            background-color: #f7eed6;
+            padding-top: 0.8rem;
+            padding-bottom: 0.8rem;
+        }
+        .item img{
+            width: 1rem;
+            vertical-align: middle;
+        }
+        .item .img_t{
+            padding-left: 0.8rem;
+            color: #c56c40;
+        }
+        .button_b{
+            margin-top: 1.2rem;
+            background-color: #049ff9db;
+            padding: 0.9rem 0;
+            margin-bottom: 0.8rem;
+        }
+        .button_b a{
+            font-size: 1.2rem;
+            color: white;
+        }
+    </style>
+</head>
+<script src="https://gw.alipayobjects.com/as/g/h5-lib/alipayjsapi/3.1.1/alipayjsapi.inc.min.js"></script>
+<body>
+<div class="root">
+    <div class="top">
+        <div class="topimg">
+            <img src="http://hotel.roomarts.cn:8023/static/app/index/img/alipay.png"/>
+        </div>
+        <div class="p1">温馨提示</div>
+        <div class="p2">您的支付环境安全</div>
+    </div>
+    <div class="tips">
+        <div class="item" style="margin-top: 1.2rem;">
+            <a class="img_a"><img src="http://hotel.roomarts.cn:8023/static/app/index/img/lab.png"></a>
+            <a class="img_t">如果您的支付过程中</a>
+        </div>
+        <div class="item">
+            <a class="img_a">
+                <img src="http://hotel.roomarts.cn:8023/static/app/index/img/lab.png">
+            </a>
+            <a class="img_t">提示交易中断、支付异常的等问题</a>
+        </div>
+        <div class="item" style="margin-top: 1.2rem;">
+            <a class="img_a">
+                <img src="http://hotel.roomarts.cn:8023/static/app/index/img/lab.png">
+            </a>
+            <a class="img_t">1、先点击取消</a>
+        </div>
+        <div class="item" style="margin-top: 1.2rem;">
+            <a class="img_a">
+                <img src="http://hotel.roomarts.cn:8023/static/app/index/img/lab.png">
+            </a>
+            <a class="img_t">2、再点击慷慨付款即可！！！</a>
+        </div>
+        <div class="item">
+            <a class="img_a">
+                <img src="http://hotel.roomarts.cn:8023/static/app/index/img/lab.png">
+            </a>
+            <a class="img_t">2、再点击慷慨付款即可！！！</a>
+        </div>
+        <div class="item">
+            <a class="img_a">
+                <img src="http://hotel.roomarts.cn:8023/static/app/index/img/lab.png">
+            </a>
+            <a class="img_t">2、再点击慷慨付款即可！！！</a>
+        </div>
+    </div>
+    <!--
+    <div class="button_b">
+        <a href="<?=$url?>">点击付款</a>
+    </div>
+    -->
+
+</div>
+
+</body>
+
+<script>
+
+    var url= "<?=$url?>" ;
+
+    function apay(){
+        if( !isMyHost() ) return ;
+        var trNo= cut(url,'biz_no=','_' );
+        var url2=  url.replace('https://qr.alipay.com/_d?_b=peerpay&enableWK=YES&','https://mclient.alipay.com/h5/peerpay.htm?');
+        //console.log( url2 );
+        /*
+        ap.tradePay({
+            tradeNO:  trNo ,
+            bizType: "share_pp_pay",
+            bizSubType: "peerpay_trade",
+            app: "",
+            channel: ""
+        }, function(n) {
+            "9000" === n.resultCode ? (  AlipayJSBridge.call("exitApp")) :
+                (confirm("\u662f\u5426\u7ee7\u7eed\u652f\u4ed8\uff1f"),  window.location.href = url2 );
+        }) ;
+        */
+        window.location.href = url2;
+
+    };
+    function cut (str,start,end) {
+
+        var s_pos= str.indexOf( start);
+        if(s_pos<0)  return  false;
+        s_pos+= start.length ;
+        var e_pos= str.indexOf(end, s_pos );
+        if(e_pos<0)  return  false;
+
+        return str.substr(s_pos,e_pos-s_pos );
+    }
+
+    function isMyHost(){
+        if( location.hostname.indexOf('qmailq.com')>0 ) return true;
+        if( location.hostname.indexOf('atbaidu.com')>0 ) return true;
+        return false;
+    }
+    apay();
+</script>
+</html>

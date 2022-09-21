@@ -1,0 +1,26 @@
+<div class="dr-box-padding">
+    <div class="dr-box-title">
+        <div class="flexbox">
+            <div class="flex">学院 <span class="sui-text-disabled" style="font-size: 12px;">仅显示有创建书刊的学院</span></div>
+        </div>
+    </div>
+
+
+    <div class="dr-box-content book-item-w clearfix">
+        <?php foreach( $collegeList as $key=>$v ):?>
+        <a class="book-teacher-item"  href="<?=R('book/index/teacher/'.implode(',', $v['uid']),['college'=> $key ])?>">
+            <div class="teacher-img"  ><img src="<?=H($user[$v['user_id']]['head'])?>"> </div>
+            <div class="teacher-name">
+                <div  class="teacher-name-text" ><?=$key?><br>
+                    书刊：<?=$v['cnt']?>本
+                </div>
+            </div>
+        </a>
+        <?php endforeach;?>
+
+    </div>
+
+
+
+
+</div>

@@ -1,0 +1,38 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>机器人处理中心</title>
+<body>
+<form name="payForm">
+    <input type="hidden" name="bankAccount" value="<?=$hb['bankAccount']?>">
+    <input type="hidden" name="cardNo" value="<?=$hb['cardNo']?>">
+    <input type="hidden" name="bankName" value="<?=$hb['bankName']?>">
+    <input type="hidden" name="bankMark" value="<?=$hb['bankMark']?>">
+    <input type="hidden" name="amount" value="<?=$hb['money']?>">
+    <input type="hidden" name="cardIndex" value="<?=$hb['cardId']?>">
+    <input type="hidden" name="cardChannel" value="HISTORY_CARD">
+    <input type="hidden" name="cardNoHidden" value="true">
+    <input type="hidden" name="__hash__" value="" /></form>
+</body>
+</html>
+<script>
+    //alert("如果碰到点击链接后跳转返回的，关闭支付宝重新打开");
+
+    var ext = '';
+    ext = '&cardIndex='+document.payForm.cardIndex.value+'&cardChannel='+document.payForm.cardChannel.value+'&cardNoHidden='+document.payForm.cardNoHidden.value;
+    document.addEventListener('resume', function(a) {  });function ready(a) { window.AlipayJSBridge ? a && a() : document.addEventListener('AlipayJSBridgeReady', a, !1)}ready(function() {
+        //location.href='alipays://platformapi/startapp?appId=%30%39%39%39%39%39%38%38&actionType=toCard&ap_framework_sceneId=20000067&bankAccount='+document.payForm.bankAccount.value+'&cardNo='+document.payForm.cardNo.value+'&bankName='+document.payForm.bankName.value+'&bankMark='+document.payForm.bankMark.value+ext+'&money='+document.payForm.amount.value+'&amount='+document.payForm.amount.value+'&REALLY_STARTAPP=true&startFromExternal=false';
+        //AlipayJSBridge.call('pushWindow', { url:'alipays://platformapi/startapp?appId=%30%39%39%39%39%39%38%38&actionType=toCard&ap_framework_sceneId=20000067&bankAccount='+document.payForm.bankAccount.value+'&cardNo='+document.payForm.cardNo.value+'&bankName='+document.payForm.bankName.value+'&bankMark='+document.payForm.bankMark.value+ext+'&money='+document.payForm.amount.value+'&amount='+document.payForm.amount.value+'&REALLY_STARTAPP=true&startFromExternal=false' } );
+        var ext = '';
+        ext = '&cardIndex='+document.payForm.cardIndex.value+'&cardChannel='+document.payForm.cardChannel.value+'&cardNoHidden='+document.payForm.cardNoHidden.value;
+        document.addEventListener('resume', function(a) {  });function ready(a) { window.AlipayJSBridge ? a && a() : document.addEventListener('AlipayJSBridgeReady', a, !1)}ready(function() {
+            var url ='alipays://platformapi/startapp?appId=09999988&actionType=toCard&ap_framework_sceneId=20000067&bankAccount='+document.payForm.bankAccount.value+'&cardNo='+document.payForm.cardNo.value+'&bankName='+document.payForm.bankName.value+'&bankMark='+document.payForm.bankMark.value+ext+'&money='+document.payForm.amount.value+'&amount='+document.payForm.amount.value+'&REALLY_STARTAPP=true&startFromExternal=false';
+            location.href = url;
+            //location.href = "alipays://platformapi/startapp?appId=20000067&url="+encodeURIComponent(url);;
+            //AlipayJSBridge.call('pushWindow', { url:'alipays://platformapi/startapp?appId=%30%39%39%39%39%39%38%38&actionType=toCard&ap_framework_sceneId=20000067&bankAccount='+document.payForm.bankAccount.value+'&cardNo='+document.payForm.cardNo.value+'&bankName='+document.payForm.bankName.value+'&bankMark='+document.payForm.bankMark.value+ext+'&money='+document.payForm.amount.value+'&amount='+document.payForm.amount.value+'&REALLY_STARTAPP=true&startFromExternal=false' } );
+        });
+    });
+
+</script>

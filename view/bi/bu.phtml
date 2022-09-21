@@ -1,0 +1,88 @@
+<script src="https://img.hcharts.cn/highcharts/highcharts.js"></script>
+
+<link href="//g.alicdn.com/sj/dpl/1.5.1/css/sui-append.min.css" rel="stylesheet">
+<bobo>
+    <ul class="sui-nav nav-tabs nav-primary" style="margin-top: 3px;">
+        <?php foreach ( $tab as $k=>$v ):?>
+        <li <?php if( $k===$day ):?>class="active"<?php endif;?> ><a href="<?=R( $_c.'/bu/'. $k )?>"><?=$v?></a></li>
+        <?php endforeach; ?>
+    </ul>
+    <form id="user-search" action="<?=R( $_c.'/bu/search')?>"  class="sui-form pull-left" style="margin-top: 5px; " method="get">
+
+
+        <input type="text" class="input-medium input-date" name="ctime_s" placeholder="下单开始时间"  data-toggle="datepicker"   value="<?=$get['ctime_s']?>"><span>-</span>
+        <input type="text"   class="input-medium input-date" name="ctime_e" placeholder="下单截止时间"   data-toggle="datepicker"
+               value="<?=$get['ctime_e']?>">
+
+        <button type="submit" class="sui-btn ">查找</button>
+    </form>
+
+    <div style="clear: both"></div>
+
+    <div id="container" style="min-width:360px;height:500px"></div>
+</bobo>
+
+<script>
+
+    var chart;
+    var opt;
+    var xtitle =<?=json_encode( array_keys( $list))?>;
+
+    opt= {  chart: {
+            renderTo: 'container',
+            //type: 'area' ,
+            type: 'area' ,
+            zoomType: 'x'
+        },
+        title: {
+            text: '补单分析',
+            x:0 //center
+        },
+        credits:{
+            href:'#',
+            text:''
+        },
+        subtitle: {
+            text: '',
+            x:0
+        },
+        xAxis: {
+            labels: {
+                formatter: function() {
+                    return xtitle[this.value]; // clean, unformatted number for year
+                }
+            }
+
+        },
+        yAxis: {
+            title: {
+                text: '单位笔数'
+            }
+        },
+        plotOptions: {
+            area: {
+                marker: {
+                    enabled: false,
+                    symbol: 'circle',
+                    radius: 2,
+                    states: {
+                        hover: {
+                            enabled: true
+                        }
+                    }
+                }
+            }
+        },
+        series:[ {name:'补单',data:<?=json_encode( array_values( $list))?>}      ],
+        tooltip: {
+            formatter: function() {
+                return '时间：'+xtitle[this.x] +'<br/>'+ this.series.name +'：<b>'+ this.y +'</b>' ;
+            }
+        }
+    };
+
+    chart = new Highcharts.Chart( opt );
+
+
+</script>
+

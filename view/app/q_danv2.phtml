@@ -1,0 +1,645 @@
+<!doctype html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>HI PAY</title>
+        <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+        <?php include "bk_head.phtml";?>
+        <script src="/res/js/qf.icomet.js?d=good news"></script>
+
+        <style>
+            #tabs, #tabs *{ touch-action: none; }
+            .title{
+                margin: 20px 15px 7px;
+                color: #6d6d72;
+                font-size: 15px;
+            }
+            .fade-enter-active, .fade-leave-active {
+                transition: opacity .5s;
+            }
+            .fade-enter, .fade-leave-to  {
+                opacity: 0;
+            }
+            .q_warng{  margin: 10px 15px 7px;  color: #ff7300; font-size: 15px;  }
+
+            .q_time{position: absolute; right: 83px; top: 11px;}
+            .q_btn{ position: absolute; right: 10px;top: 13px; }
+            .mui-popup-input input{ height: 40px; font-size: 20px;  font-weight:bolder; }
+        </style>
+    </head>
+    <body>
+    <bobo>
+        <header class="mui-bar mui-bar-nav">
+            <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+            <h1 class="mui-title">抢单</h1>
+            <a class="mui-btn mui-btn-blue mui-btn-link mui-pull-right"  href="/app/page/q_cw?tab=cz">充值</a>
+        </header>
+
+    <nav class="mui-bar mui-bar-tab" id="tabs">
+        <a class="mui-tab-item " :class="{'mui-active': st.tab!='jxs' }" href="#tabbar" @click="qdanStart()">
+            <span class="mui-icon mui-icon-navigate"></span>
+            <span class="mui-tab-label">接单</span>
+        </a>
+        <a class="mui-tab-item" :class="{'mui-active':  st.tab=='jxs' }" href="#jxs" @click="st.tab='jxs'">
+            <span class="mui-icon mui-icon-refresh"><span class="mui-badge" v-if="qdan.meList.length" v-html="qdan.meList.length"></span></span>
+            <span class="mui-tab-label">进行时</span>
+        </a>
+    </nav>
+
+    <div class="mui-content">
+
+
+        <div  class="mui-control-content mui-active" v-if="st.tab=='account'">
+            <div class="title"  >请选择抢单账号  <a href="/app/page/q_account?tab=add">添加新账号</a></div>
+            <template v-if="account.list.length>0">
+
+
+                <ul class="mui-table-view">
+                    <li class="mui-table-view-cell" v-for="v in account.list">
+                        <a class="mui-navigate-right"  @tap="accountSelect(v)">
+                            [{{v.account}}]  {{v.zhifu_name}} <span style="color: #999;font-size: 12px;" v-html="'限:'+v.price_max/100"></span>
+                        </a>
+                    </li>
+                    <li class="mui-table-view-cell" @click="loadMore()" v-if="(st.now_page+1)<account.page_total" style="text-align: center">加载更多</li>
+                </ul>
+            </template>
+
+        </div>
+
+
+        <div  class="mui-control-content mui-active" v-if="st.tab=='jxs'">
+            <!--
+            <div class="mui-content-padded">
+            <button type="button" class="mui-btn mui-btn-danger mui-btn-block" style="padding: 10px;" @click="qConfirm()">收款确认</button>
+            </div>
+            -->
+            <div class="title">进行中的订单，收款请确认</div>
+            <ul class="mui-table-view">
+                <template v-if="qdan.meList.length">
+                <li class="mui-table-view-cell mui-media" v-for="(v,k) in qdan.meList" >
+                    <a href="javascript:;">
+                        <img class="mui-media-object mui-pull-left" src="/res/img/qdao.png">
+                        <div class="mui-media-body">
+                            {{v.realprice/100}}元
+                            <p class='mui-ellipsis'>账号:<span v-html="v.account_id_merge.zhifu_name" ></span>/<span v-html="showAccount(v.account_id_merge)" style="color: #333333"></span></p>
+                        </div>
+                        <!--
+                        <div class="q_time" style="right: 10px;text-align: right">
+                            <span style="font-size: 14px">余 <b  >30s</b></span>
+                            <span style="font-size: 11px; display: block; text-align: center;margin-top: -2px; color: #666666"  v-html="HC.dateUtils.date_format(v.ctime,'HH:mm:ss')">09:45:04</span>
+                        </div>
+                        -->
+                        <div class="q_btn">
+                            <button class="mui-btn mui-btn-danger" @click="fahuo(v,k )">确认收款</button>
+                        </div>
+                    </a>
+                </li>
+                </template>
+                <div style=" padding: 20px 0; text-align: center;color: #333  " v-else>加油！请到接单中努力抢单</div>
+
+            </ul>
+        </div> <!-- end jxs -->
+        <div  class="mui-control-content mui-active" v-if="st.tab=='' || st.tab=='qiang'">
+            <div class="q_warng">
+                <span class="mui-icon mui-icon-info" style="font-size: 16px"></span> 可用余额：<span v-html="st.ke/100+'元'"></span>，冻结：<span v-html="st.dong/100+'元'"></span>
+            </div>
+
+
+
+            <div v-if="st.tab==''" style="text-align: center; padding-top: 30px">
+                <button class="mui-btn mui-btn-primary" @click="qdanStart()">开始抢单</button>
+                <br><br>
+                <a style="text-align: center;" href="/app/page/q_account?qd=1">启用账号</a>
+            </div>
+            <template v-if="st.tab=='qiang'">
+
+                <!--
+                <div class="title"> </div>
+                <ul class="mui-table-view">
+                    <li class="mui-table-view-cell" >
+                        <a class="mui-navigate-right"  @tap="loadAccountInit()">
+                            <span class="mui-badge mui-badge-purple">切换</span>
+                            正在使用 <b v-html="qdan.account.zhifu_name"></b> 抢单
+                        </a>
+                    </li>
+                </ul>
+                -->
+
+                <ul class="mui-table-view">
+                    <!--
+                    <template  v-if="qdan.iCometList.length">
+                    <li class="mui-table-view-cell mui-media" v-for="(v,k) in qdan.iCometList">
+                        <a href="javascript:;">
+                            <img class="mui-media-object mui-pull-left" src="/res/img/rmb.png">
+                            <div class="mui-media-body">
+                                {{v.realprice/100}}元
+                                <p class='mui-ellipsis'>订单：<span v-html="v.trade_id"></span>  <span v-html="v.lo"></span></p>
+                            </div>
+                            <div class="q_time">
+                                <span style="font-size: 14px">剩 <b style="color: red" v-html="v.timeCnt+'s'">30s</b></span>
+                                <span style="font-size: 11px; display: block; text-align: center;margin-top: -2px; color: #666666"  v-html="HC.dateUtils.date_format(v.ctime,'HH:mm:ss')">09:45:04</span>
+                            </div>
+                            <div class="q_btn">
+                                <button class="mui-btn mui-btn-primary" @click="qaing(v,k )">马上抢</button>
+                            </div>
+                        </a>
+                    </li>
+                    </template>
+                    -->
+                    <template v-if="qdan.meList.length">
+                        <li class="mui-table-view-cell mui-media" v-for="(v,k) in qdan.meList" >
+                            <a href="javascript:;">
+                                <img class="mui-media-object mui-pull-left" src="/res/img/qdao.png">
+                                <div class="mui-media-body">
+                                    {{v.realprice/100}}元
+                                    <p class='mui-ellipsis'>账号:<span v-html="v.account_id_merge.zhifu_name" ></span>/<span v-html="showAccount(v.account_id_merge)" ></span></p>
+                                </div>
+                                <div class="q_btn">
+                                    <button class="mui-btn mui-btn-danger" @click="fahuo(v,k )">确认收款</button>
+                                </div>
+                            </a>
+                        </li>
+                    </template>
+                    <div style=" padding: 20px 0; text-align: center;color: #333  " v-else>正在接单，稍等片刻就会出现订单！</div>
+                </ul>
+
+
+
+                <div class="title">
+                    收款账号  <span  v-html="list.length"></span>台
+                </div>
+                <ul class="mui-table-view" >
+                    <li class="mui-table-view-cell" v-for="v in list">
+
+                        <template v-for="(v2,k2) in tj_arr">
+                            <!--
+                            <span v-if="v.lo" v-html="'['+v.lo+']'" style="color: #666666"></span>
+                            <span v-else style="color: #999999">[随系统]</span>
+                            -->
+
+                            <template v-if="v.trade && v.trade[k2]" >
+                                <span style="color: #49de79">{{v.trade[k2].realprice/100}}</span>元/<span v-html="v.trade[k2].cnt+'笔'" style="font-size: 13px"></span> <span  v-html="v.trade[k2].pc" style="font-size: 13px"></span>
+                            </template>
+                            <template v-else>
+                                <span style="color: #49de79">0</span>元
+                            </template>
+                        </template>
+
+                        <span   style="background-color: red; font-size: 11px; color: #fff;;padding: 2px; border-radius: 2px; "   v-if="v.clienttime<st.now  &&  ( v.online==1 || v.online==11) &&v.type!=50"    >掉线</span>
+
+
+                        <template v-if="!(!v.health || v.health.fail<3)">
+                            <b   style="color: red"   v-if="v.health.fail>5" title="请检查，禁用->测试">检</b>
+                            <b   style="color: #ed6a5a"   title="亚健康"  v-else>亚</b>
+                        </template>
+
+                        <span v-html="'账号:'+v.zhifu_name" style="font-size: 13px;"></span> <span style="color: #666;font-size: 13px;" v-html="showAccount(v)"></span>
+
+                        <div class="mui-switch mui-switch-blue mui-switch-mini " :class="{'mui-active':  v.online==1 || v.online==11  }" @click="doJob(v)">
+                            <div class="mui-switch-handle"></div>
+                        </div>
+                    </li>
+                    <li class="mui-table-view-cell">
+                        <a style="text-align: center;" href="/app/page/q_account?qd=1">启用更多账号</a>
+                    </li>
+                </ul>
+
+
+            </template>
+
+
+        </div>
+    </div>
+</bobo>
+</body>
+<script>
+    new Vue({
+        el: 'bobo',
+        data: {
+            st:{tab:'',ke:0,dong:0,now_page:0 ,now:0, isStartIComet:'',order_cnt:0 }
+            ,qdan:{  account: {"account_id":"",zhifu_name:''} ,iCometList:[], meList:[],tradeIDYes:{},doIng:{} }
+            ,account:{list:[],   page_total:0 },bank2type:[]
+            ,list:[],onlineAccount:{}, tj_arr:{"today":""}
+            ,mp3:{f:'<?=$_cdn?>/res/mp3/kgs.mp3', isPlay: true ,obj:null,player:null,order_cnt:0 }
+            ,server:{ma:{},"liveCnt":0,"time":<?=time()?>,"p":["today"],"is_live":1,"tj_arr":{"2":"2小时内","8":"8小时内","24":"24小时内","today":"今日","yesterday":"昨日"},"testQr":[],"trade_cnt":0,"version":201,"bank2type":{"200101":{"c":"CCB","n":"中国建设银行"},"200102":{"c":"ICBC","n":"中国工商银行"},"200103":{"c":"ABC","n":"中国农业银行"},"200104":{"c":"BOC","n":"中国银行"},"200105":{"c":"PSBC","n":"中国邮储银行"},"200106":{"c":"COMM","n":"交通银行"},"200107":{"c":"CMB","n":"招商银行"},"200108":{"c":"CEB","n":"中国光大银行"},"200109":{"c":"CIB","n":"中国兴业银行"},"200110":{"c":"CITIC","n":"中国中信银行"},"200111":{"c":"CMBC","n":"中国民生银行"},"200112":{"c":"SPDB","n":"中国浦发银行"},"200113":{"c":"SPABANK","n":"中国平安银行"},"200114":{"c":"GDB","n":"中国广发银行"},"200115":{"c":"HXBANK","n":"中国华夏银行"},"200116":{"c":"ANTBANK","n":"网商银行"},"200117":{"c":"ZJKCCB","n":"张家口银行"},"200118":{"c":"BOCFCB","n":"中银富登村镇银行"}},"consoleVersion":1,"online":{"0":{"n":"待登录","cls":""},"1":{"n":"备线收款","cls":"sui-btn btn-success btn-bordered"},"2":{"n":"禁用下线","cls":"sui-btn"},"3":{"n":"服务未启用","cls":"sui-btn btn-warning"},"4":{"n":"小额收款","cls":"sui-btn btn-success btn-bordered"},"11":{"n":"主线收款","cls":"sui-btn btn-success"},"12":{"n":"无权收款","cls":"sui-btn btn-bordered btn-danger"},"13":{"n":"刷脸提现","cls":"sui-btn btn-bordered btn-warning"},"14":{"n":"账号冻结","cls":"sui-btn btn-bordered btn-warning"},"15":{"n":"已恢复","cls":"sui-btn  btn-bordered"}},"muser":[],ma:{amount:0}}
+        }
+        ,
+        created: function () {
+            //this.loadAccountInit();
+            this.live();
+        },
+        mounted: function () {
+            //this.testIComet();
+            setInterval( this.tradeListCheck, 999 );
+            setInterval( this.live, 9999 );
+
+            setTimeout( this.qdanStart, 600 );
+            setTimeout( this.qdanStart, 1500 );
+
+            var  that= this;
+            setTimeout(function () {
+                api.setKeepScreenOn({
+                    keepOn: true
+                });
+
+                if( !that.mp3.player ) {
+                    that.mp3.player = api.require('liveAudioPlayer');
+                    that.mp3.player.stop();
+                }
+
+            },3000);
+
+        },
+        methods: {
+            showAccount:function(v){
+                if(v.type==145){
+                    //return '**'+v.zhifu_account.substr(-4)+ this.bank2Type[v.bank_id].n ;
+                    try {
+                        console.log('v145>>', v);
+                        return '**'+v.zhifu_account.substr(-4)+' '+ this.bank2Type[v.bank_id].n ;
+                    }catch (e) {
+
+                    }
+                }
+                return v.zhifu_account;
+            },
+            fahuo:function(v,k){
+                console.log("qD");
+                var btnArray = ['关闭', '确认收款'];
+                var that = this;
+
+                var html='确认 <b style="color: red">'+ v.account_id_merge.zhifu_name +"</b> 收到<b style=\"color: red\"> "+  v.realprice/100 +'元</b>？' ;
+
+                //html += '<br>建单时间：<b  >'+HC.dateUtils.date_format(v.ctime,'HH:mm:ss')+'</b>' ;
+                html += '<br><span style="color: #666666">注：“确认收款”会扣除相应保证金</span>' ;
+
+                var that = this;
+
+                mui.prompt( html , '请输入到账金额 '  , '收款确认', btnArray, function(e) {
+                    if (e.index == 1) {
+                        if( e.value!= ( v.realprice/100) ){
+                            HC.msg("金额输入错误！！");
+                            return false;
+                        }
+                        console.log("god", e.value );
+                        //that.shangFenDO( v, { doword:e.value });
+                        that.shangFenDO( v, { price:e.value });
+                    }
+                });
+            },
+            shangFenDO:function (v,opt ) {
+                ///
+                console.log( v );
+                this.st.sbId= v.trade_id;
+                var that = this;
+                //return ;
+
+                HC.ajax('/vip/bu/ok2/'+v.trade_id , {data:opt ,success:function (rep) {
+                        HC.msg("发货成功！");
+                        //that.load();
+                        //console.log( rep );
+                        setTimeout( that.live, 300);
+
+                    }});
+            }
+            ,liveAudioPlayer:function () {
+                console.log('liveAudioPlayer>>: go' );
+
+                if( !this.mp3.player )  this.mp3.player = api.require('liveAudioPlayer');
+                var that = this;
+
+                that.mp3.player.stop();
+                this.mp3.player.getPlayStatus(function(ret, err) {
+                    if (ret.status == 'playing') {
+                        //alert("正在播放");
+                    } else {
+                        //alert("没有播放");
+                        that.mp3.player.play({
+                            //url : "http://cache.utovr.com/201508270528174780.m3u8"
+                            url : "<?=$_cdn?>/res/mp3/kgs.mp3"
+                        }, function(ret, err) {
+                            if (ret.status) {
+                                setTimeout(function () {
+                                    that.mp3.player.stop();
+                                },2500 );
+                            }
+                        });
+
+                    }
+                });
+
+            }
+            ,checkMp3s:function () {
+                var that = this;
+                console.log('order_cnt:'+ that.st.order_cnt );
+                //if(  that.mp3.isPlay ) return ;
+                if( that.st.order_cnt > that.mp3.order_cnt ){
+                    try {
+                        that.liveAudioPlayer();
+                    }catch (e) {
+                    }
+                }
+                that.mp3.order_cnt=  that.st.order_cnt;
+            }
+            ,
+            doJob:function(v){
+                if( v.online==1 || v.online==11 ){
+                    this.doJin(v,2);
+                }else{
+                    this.testV2( v );
+                }
+            },
+            doJin:function (v,t ) {
+                HC.ajax('/vip/account/online/'+v.account_id+'/'+t  ,{success:function (rep) {
+                        v.online=t;
+                    }
+                });
+            }
+            ,testV2:function ( v  ) {
+                var that = this;
+                HC.ajax('/vip/account/one2/'+v.account_id ,{success:function (rep) {
+                       //
+                        v.online=1;
+                    }});
+            },
+            qConfirm:function () {
+                console.log("qD");
+                var btnArray = ['关闭', '确定收款'];
+                var that = this;
+                mui.prompt('收到金额：', '请输入收款金额', '收款确认', btnArray, function(e) {
+                    if (e.index == 1) {
+                        //info.innerText = '谢谢你的评语：' + e.value;
+                        console.log("god", e.value );
+                        var aid=  that.qdan.account.account_id==''?'no': that.qdan.account.account_id;
+                        HC.ajax('/vip/account/payLog/'+aid+'/'+  e.value ,{success:function (rep) {
+                            setTimeout( that.live, 1500);
+                            }});
+                    }
+                })
+
+            }
+            ,loadAccount:function () {
+                console.log('acc');
+                var that = this;
+                HC.ajax('/vip/account?pageno='+ (this.st.now_page+1)+'&fr=qdanv2',{success:function (rep) {
+                        console.log('rep',rep );
+                        that.account.list= that.account.list.concat(rep.account.list );
+                        that.account.page_total= rep.account.page_total;
+                    }})
+
+
+            }
+            ,loadLiveAccount:function () {
+                //vip/dan/today
+                var that = this;
+                HC.ajax('/vip/dan/today'   ,{ success:function (res) {
+                        //console.log( rep );
+                        var rep={ data: res};
+                        that.list= rep.data.live;
+
+                        //var ac= that.getNewAccount(   );
+                        //console.warn('AC', ac);
+
+                        //that.tj_arr= rep.data.tj_arr;
+                        that.st.now =  rep.data.server.version==30?(rep.data.server.time-3600 ) :(rep.data.server.time-50 );
+                        that.server.trade_cnt = rep.data.server.trade_cnt ;
+                        that.server.ma = rep.data.server.ma ;
+
+                        /*
+                        for(var i =0; i<that.list.length ; i++ ){
+                            that.onlineAccount[ that.list[i].account_id ]=  that.list[i];
+                        }
+                        */
+
+                        that.server.time= rep.data.server.time;
+                        //console.log('stime:'+ that.server.time );
+                        that.bank2Type= rep.data.server.bank2type;
+                        console.log('bank2Type>>', that.bank2Type );
+                        //that.catName();
+                    }});
+
+            }
+            ,loadAccountInit:function () {
+                //this.st.tab='account';
+                this.st.now_page=0;
+                this.account.list=[];
+                this.loadAccount();
+            }
+            ,loadMore:function () {
+
+                this.st.now_page++;
+                this.loadAccount();
+            }
+            ,qdanStart:function () {
+                //if( this.qdan.account.account_id==''){
+                if( this.list.length<=0 ){
+                    HC.msg('正在启用账号 没启用！');
+                    this.loadAccountInit();
+                    return ;
+                }
+                this.st.tab='qiang';
+            }
+            ,qaing:function (v,k ) {
+
+                this.qdan.doIng[ v.trade_id ]=1;
+                this.qdan.iCometList.splice(k,1 );
+                var that = this;
+                /*
+                HC.ajax('/vip/dan/qiang/'+  v.trade_id+'/'+ v.sign+'/'+ this.qdan.account.account_id ,{
+                    success:function (rep) {
+                        console.log('rep',rep );
+                        that.live();
+                        that.st.tab='jxs';
+                    }
+                });
+                */
+                HC.ajax('/vip/dan/qiangV3'  ,{data: v,
+                    success:function (rep) {
+                        console.log('rep',rep );
+                        that.live();
+                        that.st.tab='jxs';
+                    }
+                });
+            }
+            ,accountSelect:function (v) {
+                this.qdan.account= v ;
+                this.st.tab='qiang';
+                HC.ajax('/vip/account/one2/'+  v.account_id ,{success:function (rep) {
+                    HC.msg('切换成功！');
+                    }} );
+            }
+            ,live:function () {
+
+                this.loadLiveAccount();
+
+                var query='';
+                var that = this;
+                if( this.qdan.account.account_id ) query+='account_id='+ this.qdan.account.account_id+'&';
+                HC.ajax('/vip/live/v2?'+query  ,{
+                    success:function (rep) {
+                        console.log('live2',rep );
+
+                        //icomet 停止
+                        //if( ''== that.st.isStartIComet) that.testIComet(  rep._ma.c_user_id )
+
+                        that.qdan.meList= rep.doing;
+                        that.st.ke= rep._ma.amount;
+                        that.st.dong= Math.abs(  rep.sv.lock.realprice ); //data.sv.lock.realprice
+                        that.st.order_cnt = that.qdan.meList.length ;
+                        that.checkMp3s();
+                    }
+                });
+            }
+            ,testIComet:function ( c_user_id) {
+                var that = this;
+                that.st.isStartIComet= c_user_id ;
+                console.warn("cuser_id="+ c_user_id  );
+                var comet = new iComet({
+                    channel: 'ali23qiang'+c_user_id ,
+                    signUrl: '/icomet/sign',
+                    subUrl: '/icomet/sub',
+                    callback: function(content){
+                        console.warn('icommet:'+ content);
+                        try {
+                            var trade = JSON.parse( content );
+                            that.toTradeList( trade );
+                        }catch (e) {
+                            console.error("JSON解析错误：",content );
+                        }
+
+
+                    }
+                });
+
+            }
+            ,toTradeList:function ( trade ) {
+
+
+                console.warn('debug:'+ trade.trade_id +':'+ trade.realprice +">>>"+   this.st.ke  );
+                //余额不足
+                if( parseInt( trade.realprice) > parseInt( this.st.ke) ) return ;
+                console.warn('debug2:'+ trade.trade_id  );
+
+                //已经在抢单列表中
+                if( this.qdan.tradeIDYes[ trade.trade_id ]  ) return ;
+                this.qdan.tradeIDYes[ trade.trade_id ]= 1;
+
+                console.warn('debug3:'+ trade.trade_id  );
+                //已经在进行时当中
+                if( this.checkInDoingList(trade)) return ;
+                trade.timeCnt= 30;
+
+                //通过地区选账号
+                var acc= this.selectZoneAccount( trade ) ;
+                if(! acc) return ;
+
+                trade.account_id = acc.account_id;
+
+                console.warn('debug4:'+ trade.trade_id  );
+                this.qdan.iCometList.unshift( trade );
+
+                console.warn('debug5:'+  this.qdan.iCometList.length   );
+
+            }
+            ,selectZoneAccount:function ( trade ) {
+
+                for(var p in this.list ){
+                    var o= this.list[p];
+
+                    //if( ! ( o.online==1 ||o.online==11 ||o.online==4 ) ) continue ;
+                    if( ! this.checkAccountHeFa(o) ) continue ;
+
+                    if(o.lo== trade.lo) {
+                        console.warn('g', o , trade.lo);
+                        return o;
+                    }
+                }
+
+
+
+                //新账号
+                /*
+                for( var p in this.list ){
+                    var o= this.list[p];
+                    if( ! ( o.online==1 ||o.online==11 ||o.online==4 ) ) continue ;
+                    if(o.lo==''){
+                        try {
+                            this.list[p].lo = trade.lo;
+                        }catch (e) {
+                        }
+                        return o;
+                    }
+                }
+                */
+                var acc= this.getNewAccount() ;
+
+                return acc;
+
+                return false;
+            }
+            ,checkAccountHeFa:function ( o ) {
+                var v = o ;
+                if( ! ( o.online==1 ||o.online==11 ||o.online==4 ) ) return false ;
+
+                if(  v.health && v.health.fail>=3 ) return false ;
+
+                return true;
+
+            }
+            ,getHistryAccount:function ( trade ) {
+                var nAcc= [];
+                for(var p in this.list ){
+                    var o= this.list[p];
+
+                    if( ! this.checkAccountHeFa(o) ) continue ;
+
+                    if(o.lo== trade.lo) {
+                        console.warn('g', o , trade.lo);
+                        return o;
+                    }
+                }
+
+            }
+            ,getNewAccount:function (   ) {
+                var nAcc= [];
+                for( var p in this.list ){
+                    var o= this.list[p];
+                    //if( ! ( o.online==1 ||o.online==11 ||o.online==4 ) ) continue ;
+                    if( ! this.checkAccountHeFa(o) ) continue ;
+
+                    if(o.lo==''){
+                         nAcc.push( p );
+                    }
+                }
+                console.warn('nAcc', nAcc );
+                if(nAcc.length<=0) return false ;
+                try{
+                    var k=  Math.floor(Math.random() * nAcc.length);
+                    console.warn('rank', k, this.list[ nAcc[k] ] ) ;
+                    return this.list[ nAcc[k] ];
+                }catch (e) {
+                    return false;
+                }
+            }
+            ,checkInDoingList:function (trade) {
+                for(var i=0; i<this.qdan.meList.length; i++ ){
+                    if( trade.realprice== this.qdan.meList[i].realprice ) return true;
+                }
+
+                for(var i=0; i<this.qdan.iCometList.length; i++ ){
+                    if( trade.realprice== this.qdan.iCometList[i].realprice ) return true;
+                }
+
+                return false;
+            }
+            ,tradeListCheck:function () {
+                for(var i=0; i<this.qdan.iCometList.length; i++ ){
+                    this.qdan.iCometList[i].timeCnt--;
+                    if(  this.qdan.iCometList[i].timeCnt<=0 ) this.qdan.iCometList.splice(i ,1 );
+                }
+            }
+
+        }
+    });
+</script>
+</html>

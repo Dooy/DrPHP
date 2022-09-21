@@ -1,0 +1,71 @@
+<haoce>
+    <div style=" margin-top: 10px;">
+        <ul class="sui-nav nav-tabs nav-large">
+            <template v-for="(v,k) in u_obj">
+            <li  :class="{'active': v.k==st.k}" @click="tapU(v)"><a v-html="v.n"></a></li>
+            </template>
+        </ul>
+
+        <div class=" pull-left" style="max-width: 800px" v-if="u_rank.length" >
+            <table class="sui-table table-bordered"  >
+                <thead>
+                <tr>
+                    <th>排名</th>
+                    <th>用户名</th>
+                    <th>学号</th>
+                    <th v-html="st.n2"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="(v ,k) in u_rank">
+                    <td v-html="k+1"></td>
+                    <td v-html="v.user_id_merge.name"></td>
+                    <td v-html="v.user_id_merge.number"></td>
+                    <td v-html="HC.timeShow(v.total)" v-if="st.k=='schoolTime'"></td>
+                    <td v-html="HC.intShow(v.total)" v-else-if="st.key=='total'"></td>
+                    <td v-html="HC.intShow(v.cnt)" v-else-if="st.key=='cnt'"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div v-else style="padding-top: 30px; text-align: center ;color: #666 ;max-width: 800px " v-html="st.msg"></div>
+    </div>
+</haoce>
+<script src="/res/hcapp/js/haoce.js?d=2018042801"></script>
+<script>
+    var vm = new Vue({
+        el: 'haoce',
+        data: {
+            st: {f: false,  k:'', n2:'用时',key:'total',msg:'正在初始化'}
+            ,u_obj:[ {k:'schoolTime',n:'阅读用时排名',n2:'用时',key:'total'},{k:'schoolWord',n:'阅读字数排名',n2:'字数',key:'total'}
+                ,{k:'schoolFinish',n:'阅读完成排名',n2:'本数',key:'cnt'},{k:'schoolXuefen',n:'领取排名',n2:'本数',key:'cnt'}]
+            ,u_rank:[]
+            , f: {novel_id: '', block_id:'' }
+        }
+        ,created:function () {
+            for(var i=0;i<this.u_obj.length;i++ ){
+                this.u_obj[i].list=[];
+            }
+        }
+        ,methods: {
+            tapU:function ( v ) {
+                this.st.n2= v.n2;
+                this.st.k = v.k;
+                this.st.key = v.key;
+                this.u_rank=[];
+                var that = this;
+                this.st.msg='正在载入...';
+                if(v.list.length>0 ){
+                    this.u_rank= v.list;
+                }else{
+                    DR.ajax('/wenda/rank/'+  this.st.k,{},{success:function (rep) {
+                        console.log('rep',rep );
+                        v.list= that.u_rank = rep.data.rank;
+                        if( rep.data.rank.length<=0 ) that.st.msg='哎呦，此项无排名';
+                    }} )
+                }
+            }
+        }
+    });
+    vm.tapU( vm.u_obj[0] );
+</script>

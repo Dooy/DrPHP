@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <title><?=($site_title?$site_title.'-':'')?>好策</title>
+    <?php
+    include "header.phtml";
+    ?>
+<style>
+    .dr-box-padding{border: 0px; }
+</style>
+</head>
+<body style="background-color: #fff">
+<div style="padding: 10px;">
+    <h3>由于文件较大只能分excel导出</h3>
+<?php for($i=0;$i<$ex_var['page_number']; $i++):?>
+        <a href="<?=R($DR_SELF,['start'=>$i*$ex_var['max'],'max'=>$ex_var['max'],'save_name'=>'Haoce_'.date("Y-m-d_His").'_'.($i+1)  ])?>" class="sui-btn btn-bordered btn-xlarge btn-primary">导出_<?=$i+1?></a>
+<?php endfor;?>
+</div>
+</body>
+
+</html>
+
+
+
