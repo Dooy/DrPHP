@@ -9,7 +9,7 @@ dk="\/data\/webRoot\/"
 
 news=$(echo $vfile | sed "s/$ydr/$dk/g")
 
-echo "File is : docker exec php5.6fpm php -f ${news}"
+echo "File is : docker exec php5.6fpm php -f ${news}\n"
 
 docker exec php5.6fpm php -f $news
 
