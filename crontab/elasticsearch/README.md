@@ -34,4 +34,5 @@ https://github.com/jprante/elasticsearch-jdbc/releases/tag/2.3.1.0
 
 配置 请看 本目录下面的 pigai_essay.sh pigai_member.sh pigai_request.sh
 
-设计思路 请参考 https://www.zybuluo.com/dooy/note/384100
+## 设计思路 
+请参考 https://www.zybuluo.com/dooy/note/384100
